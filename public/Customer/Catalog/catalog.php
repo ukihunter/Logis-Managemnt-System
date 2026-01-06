@@ -81,7 +81,7 @@ require_once '../../../config/session_Detils.php';
                     <div class="size-8 bg-primary/70 rounded-lg flex items-center justify-center text-primary">
                         <span class="material-symbols-outlined text-white">shopping_bag_speed</span>
                     </div>
-                    <h2 class="text-lg font-bold leading-tight tracking-tight hidden md:F">IslandDistro</h2>
+                    <h2 class="text-lg font-bold leading-tight tracking-tight hidden md:flex">IslandDistro</h2>
                 </div>
                 <!-- Search Bar -->
                 <label class="flex w-full max-w-lg items-center relative group">
@@ -103,7 +103,7 @@ require_once '../../../config/session_Detils.php';
                     <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Invoices</a>
                 </nav>
                 <div class="flex items-center gap-4">
-                    <button class="relative flex items-center justify-center h-10 px-4 bg-primary hover:bg-green-500 transition-colors text-text-main rounded-lg font-bold text-sm gap-2">
+                    <button onclick="location.href='../../Customer/Cart/cart.php'" class="relative flex items-center justify-center h-10 px-4 bg-primary hover:bg-green-500 transition-colors text-text-main rounded-lg font-bold text-sm gap-2">
                         <span class="material-symbols-outlined text-[20px] text-white">shopping_cart</span>
                         <span class="hidden sm:inline text-white">Cart (0)</span>
                         <span class="flex h-5 w-5 items-center justify-center rounded-full bg-black/10 text-[10px] font-bold text-white">0</span>
@@ -549,26 +549,7 @@ require_once '../../../config/session_Detils.php';
         </main>
     </div>
 </body>
-<script>
-    // Profile dropdown toggle
-    document.addEventListener('DOMContentLoaded', function() {
-        const profileMenuBtn = document.getElementById('profileMenuBtn');
-        const profileDropdown = document.getElementById('profileDropdown');
 
-        if (profileMenuBtn && profileDropdown) {
-            profileMenuBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                profileDropdown.classList.toggle('hidden');
-            });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!profileMenuBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
-                    profileDropdown.classList.add('hidden');
-                }
-            });
-        }
-    });
-</script>
+<script src="../Cart/js/script.js"></script>
 
 </html>

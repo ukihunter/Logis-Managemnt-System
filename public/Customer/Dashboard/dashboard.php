@@ -76,14 +76,35 @@ require_once '../../../config/session_Detils.php';
                     </nav>
                     <!-- Action Icons -->
                     <div class="flex gap-2">
-                        <button class="flex items-center justify-center size-10 rounded-lg bg-slate-200/50 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 transition-colors">
-                            <span class="material-symbols-outlined text-[20px]">notifications</span>
-                        </button>
-                        <button class="flex items-center justify-center size-10 rounded-lg bg-slate-200/50 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 transition-colors relative">
+                        <div class="relative">
+                            <button
+                                id="notificationsBtn"
+                                class="flex items-center justify-center size-10 rounded-lg bg-slate-200/50 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 transition-colors">
+
+                                <span class="material-symbols-outlined text-[20px]">notifications</span>
+                            </button>
+
+                            <div
+                                id="notificationsDropdown"
+                                class="hidden absolute right-0 mt-5 w-48 bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg overflow-hidden z-50">
+
+                                <div class="px-4 py-3 border-b border-slate-200 text-text-secondary dark:border-slate-800 flex flex-col items-center gap-1">
+                                    <span class="material-symbols-outlined text-3xl">
+                                        deceased
+                                    </span>
+                                    <span class="text-sm text-text-secondary dark:text-emerald-400/70">
+                                        No notifications
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <button onclick="location.href='../../Customer/Cart/cart.php'" class="flex items-center justify-center size-10 rounded-lg bg-slate-200/50 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 transition-colors relative">
                             <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
                             <span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full"></span>
                         </button>
-                        <button class="hidden sm:flex h-10 px-4 items-center justify-center rounded-lg bg-primary text-black font-bold text-sm hover:brightness-110 transition-all">
+                        <button onclick="location.href='../../Customer/Catalog/catalog.php'" class="hidden sm:flex h-10 px-4 items-center justify-center rounded-lg bg-primary text-black font-bold text-sm hover:brightness-110 transition-all">
                             <span class="mr-2 material-symbols-outlined text-[18px]">add</span> New Order
                         </button>
                         <!-- Profile Dropdown -->
@@ -363,27 +384,8 @@ require_once '../../../config/session_Detils.php';
             </button>
         </div>
     </div>
-    <script>
-        // Profile dropdown toggle
-        document.addEventListener('DOMContentLoaded', function() {
-            const profileMenuBtn = document.getElementById('profileMenuBtn');
-            const profileDropdown = document.getElementById('profileDropdown');
 
-            if (profileMenuBtn && profileDropdown) {
-                profileMenuBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    profileDropdown.classList.toggle('hidden');
-                });
-
-                // Close dropdown when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (!profileMenuBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
-                        profileDropdown.classList.add('hidden');
-                    }
-                });
-            }
-        });
-    </script>
 </body>
+<script src="../Dashboard/js/script.js"></script>
 
 </html>
