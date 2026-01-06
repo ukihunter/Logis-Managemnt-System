@@ -105,30 +105,31 @@ $full_name = $_SESSION['full_name'] ?? 'User';
         <main class="flex-1 px-4 md:px-10 py-8 w-full max-w-[1440px] mx-auto">
             <!-- Page Heading -->
             <div class="mb-8">
-                <h1 class="text-3xl md:text-4xl font-black tracking-tight mb-2">Welcome back, Sunshine Mart</h1>
-                <p class="text-text-secondary dark:text-emerald-400 font-medium">Here is your account overview for today, October 24th.</p>
+                <h1 class="text-2xl md:text-4xl font-bold tracking-tight mb-2">Welcome back, <?php echo htmlspecialchars($_SESSION['business_name'] ?? 'Customer'); ?>
+                </h1>
+                <p class="text-green-500 md:text-sm font-semibold dark:text-emerald-400 ">Here is your account overview for today, <?php echo date('F jS'); ?></p>
             </div>
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col gap-1">
                     <p class="text-sm font-medium text-text-secondary dark:text-emerald-400">Active Orders</p>
                     <div class="flex items-baseline justify-between">
-                        <p class="text-3xl font-bold">3</p>
-                        <span class="bg-primary/20 text-emerald-800 dark:text-primary text-xs font-bold px-2 py-1 rounded-full">2 Arriving</span>
+                        <p class="text-3xl font-bold">0</p>
+                        <span class="bg-primary/20 text-emerald-800 dark:text-primary text-xs font-bold px-2 py-1 rounded-full">0 Arriving</span>
                     </div>
                 </div>
                 <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col gap-1">
                     <p class="text-sm font-medium text-text-secondary dark:text-emerald-400">Pending Payment</p>
-                    <p class="text-3xl font-bold">$1,240</p>
+                    <p class="text-3xl font-bold">Rs.0</p>
                 </div>
                 <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col gap-1">
                     <p class="text-sm font-medium text-text-secondary dark:text-emerald-400">Total Spend YTD</p>
-                    <p class="text-3xl font-bold">$45,200</p>
+                    <p class="text-3xl font-bold">Rs.0</p>
                 </div>
                 <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col gap-1">
                     <p class="text-sm font-medium text-text-secondary dark:text-emerald-400">Loyalty Points</p>
                     <div class="flex items-baseline justify-between">
-                        <p class="text-3xl font-bold">850</p>
+                        <p class="text-3xl font-bold">0</p>
                         <span class="text-xs font-bold text-primary cursor-pointer hover:underline">Redeem</span>
                     </div>
                 </div>
@@ -138,14 +139,17 @@ $full_name = $_SESSION['full_name'] ?? 'User';
                 <div class="lg:col-span-8 flex flex-col gap-8">
                     <!-- Track Delivery Widget -->
                     <div class="flex flex-col gap-4">
-                        <h2 class="text-xl font-bold">Track My Delivery</h2>
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-bold">Track my Delivery</h2>
+                            <a class="text-primary text-sm font-bold hover:underline" href="#">View All</a>
+                        </div>
                         <div class="bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
                             <div class="flex flex-col md:flex-row">
                                 <!-- Map Image -->
                                 <div class="w-full md:w-1/3 h-48 md:h-auto bg-slate-200 dark:bg-slate-800 relative">
                                     <div class="absolute inset-0 bg-cover bg-center opacity-80" data-alt="Map showing delivery route in Kingston" data-location="Kingston" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAciHolyBMnId5Pk6xtowzRZhgUEfPI_8azy3xn2Bxx8nMhLWsa9tDtNlIZg6khtZwF-N7NB-Vyuzl-oFMKnd_yA5hkkOYkFQrohTgE3XsRo5wxwXJg50WZcDQ9GDPpLqiYd_H7yckTX8Dn8AdyDwmWah5yBGeDcgx7iHFojQgKcps1B9fbOcrggSoZQXYROEWElqQcLgUsU8jTyaupBImmq2rJxT1942sq1tm3y154Vq8WplpiV5DP2vLdhezJVx62jim4N9V5MrQ");'></div>
                                     <div class="absolute inset-0 flex items-center justify-center">
-                                        <div class="bg-primary text-black p-2 rounded-full shadow-lg">
+                                        <div class="bg-primary text-white p-2 rounded-full shadow-lg">
                                             <span class="material-symbols-outlined block">local_shipping</span>
                                         </div>
                                     </div>
@@ -154,7 +158,7 @@ $full_name = $_SESSION['full_name'] ?? 'User';
                                 <div class="p-6 flex flex-col justify-center flex-1">
                                     <div class="flex justify-between items-start mb-4">
                                         <div>
-                                            <h3 class="text-lg font-bold mb-1">Order #2291 - Out for Delivery</h3>
+                                            <h3 class="text-lg font-bold mb-1">Order #0001 - Out for Delivery</h3>
                                             <p class="text-text-secondary dark:text-emerald-400 text-sm">Processed at Distribution Center A</p>
                                         </div>
                                         <span class="px-3 py-1 bg-primary text-black text-xs font-bold rounded-full animate-pulse">Live</span>
@@ -171,10 +175,10 @@ $full_name = $_SESSION['full_name'] ?? 'User';
                                             </div>
                                             <div class="flex items-center gap-2 text-sm text-text-secondary dark:text-emerald-400">
                                                 <span class="material-symbols-outlined text-[18px]">person</span>
-                                                <span>Driver: John D.</span>
+                                                <span>Driver: Mahinda</span>
                                             </div>
                                         </div>
-                                        <button class="px-4 py-2 bg-slate-200 dark:bg-white/10 text-sm font-bold rounded-lg hover:bg-slate-300 dark:hover:bg-white/20 transition-colors">
+                                        <button class="px-4 py-2 bg-slate-200 dark:bg-white/10 text-sm font-bold rounded-lg hover:bg-green-500 hover:text-white dark:hover:bg-white/20 transition-colors">
                                             Contact Driver
                                         </button>
                                     </div>
@@ -201,40 +205,79 @@ $full_name = $_SESSION['full_name'] ?? 'User';
                                 </thead>
                                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                                     <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="px-6 py-4 font-medium">#2290</td>
-                                        <td class="px-6 py-4 text-text-secondary dark:text-emerald-400">Oct 22, 2023</td>
+                                        <td class="px-6 py-4 font-medium">#0000</td>
+                                        <td class="px-6 py-4 text-text-secondary dark:text-emerald-400">jan , 2026</td>
                                         <td class="px-6 py-4">
                                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                                                 <span class="size-1.5 rounded-full bg-green-600 dark:bg-green-400"></span> Delivered
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 font-bold">$840.50</td>
+                                        <td class="px-6 py-4 font-bold">Rs.0</td>
                                         <td class="px-6 py-4 text-right">
                                             <button class="text-primary hover:text-green-400 font-bold text-sm">Reorder</button>
                                         </td>
                                     </tr>
                                     <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="px-6 py-4 font-medium">#2289</td>
-                                        <td class="px-6 py-4 text-text-secondary dark:text-emerald-400">Oct 18, 2023</td>
+                                        <td class="px-6 py-4 font-medium">#0001</td>
+                                        <td class="px-6 py-4 text-text-secondary dark:text-emerald-400">jan , 2026</td>
                                         <td class="px-6 py-4">
                                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                                                 <span class="size-1.5 rounded-full bg-green-600 dark:bg-green-400"></span> Delivered
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 font-bold">$1,205.00</td>
+                                        <td class="px-6 py-4 font-bold">Rs.0</td>
                                         <td class="px-6 py-4 text-right">
                                             <button class="text-primary hover:text-green-400 font-bold text-sm">Reorder</button>
                                         </td>
                                     </tr>
                                     <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="px-6 py-4 font-medium">#2288</td>
-                                        <td class="px-6 py-4 text-text-secondary dark:text-emerald-400">Oct 15, 2023</td>
+                                        <td class="px-6 py-4 font-medium">#0002</td>
+                                        <td class="px-6 py-4 text-text-secondary dark:text-emerald-400">jan , 2026</td>
                                         <td class="px-6 py-4">
                                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
                                                 <span class="size-1.5 rounded-full bg-yellow-600 dark:bg-yellow-400"></span> Processing
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 font-bold">$450.25</td>
+                                        <td class="px-6 py-4 font-bold">Rs.0</td>
+                                        <td class="px-6 py-4 text-right">
+                                            <button class="text-primary hover:text-green-400 font-bold text-sm">View</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                        <td class="px-6 py-4 font-medium">#0002</td>
+                                        <td class="px-6 py-4 text-text-secondary dark:text-emerald-400">jan , 2026</td>
+                                        <td class="px-6 py-4">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                                                <span class="size-1.5 rounded-full bg-yellow-600 dark:bg-yellow-400"></span> Processing
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 font-bold">Rs.0</td>
+                                        <td class="px-6 py-4 text-right">
+                                            <button class="text-primary hover:text-green-400 font-bold text-sm">View</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                        <td class="px-6 py-4 font-medium">#0003</td>
+                                        <td class="px-6 py-4 text-text-secondary dark:text-emerald-400">jan , 2026</td>
+                                        <td class="px-6 py-4">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                                                <span class="size-1.5 rounded-full bg-yellow-600 dark:bg-yellow-400"></span> Processing
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 font-bold">Rs.0</td>
+                                        <td class="px-6 py-4 text-right">
+                                            <button class="text-primary hover:text-green-400 font-bold text-sm">View</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                        <td class="px-6 py-4 font-medium">#0004</td>
+                                        <td class="px-6 py-4 text-text-secondary dark:text-emerald-400">jan , 2026</td>
+                                        <td class="px-6 py-4">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                                                <span class="size-1.5 rounded-full bg-yellow-600 dark:bg-yellow-400"></span> Processing
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 font-bold">Rs.0</td>
                                         <td class="px-6 py-4 text-right">
                                             <button class="text-primary hover:text-green-400 font-bold text-sm">View</button>
                                         </td>
@@ -251,15 +294,15 @@ $full_name = $_SESSION['full_name'] ?? 'User';
                         <h2 class="text-xl font-bold">Quick Categories</h2>
                         <div class="grid grid-cols-2 gap-3">
                             <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-all group">
-                                <span class="material-symbols-outlined text-3xl mb-2 text-text-secondary dark:text-emerald-400 group-hover:text-primary transition-colors">local_cafe</span>
-                                <span class="text-sm font-bold">Beverages</span>
+                                <span class="material-symbols-outlined text-3xl mb-2 text-text-secondary dark:text-emerald-400 group-hover:text-primary transition-colors">toys</span>
+                                <span class="text-sm font-bold">Toys</span>
                             </button>
                             <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-all group">
-                                <span class="material-symbols-outlined text-3xl mb-2 text-text-secondary dark:text-emerald-400 group-hover:text-primary transition-colors">bakery_dining</span>
-                                <span class="text-sm font-bold">Snacks</span>
+                                <span class="material-symbols-outlined text-3xl mb-2 text-text-secondary dark:text-emerald-400 group-hover:text-primary transition-colors">apparel</span>
+                                <span class="text-sm font-bold">Cloth</span>
                             </button>
                             <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-all group">
-                                <span class="material-symbols-outlined text-3xl mb-2 text-text-secondary dark:text-emerald-400 group-hover:text-primary transition-colors">inventory_2</span>
+                                <span class="material-symbols-outlined text-3xl mb-2 text-text-secondary dark:text-emerald-400 group-hover:text-primary transition-colors">devices_other</span>
                                 <span class="text-sm font-bold">Dry Goods</span>
                             </button>
                             <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-all group">
@@ -272,7 +315,7 @@ $full_name = $_SESSION['full_name'] ?? 'User';
                     <div class="flex flex-col gap-4 grow">
                         <h2 class="text-xl font-bold">Exclusive for You</h2>
                         <div class="bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm flex flex-col h-full">
-                            <div class="h-40 bg-cover bg-center" data-alt="Gradient background representing a special discount offer" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDQNlvogTIQCP-3DJBOtDJtMxHZTA1MV3Z2QEbOojVih35OHMj3dytlcLGfT2xCAZ2hHagD61cIYvdUQv0Ilz3Ns1iIZvYMfXjXWeWPLkrXiW5Io9ZrSLHwgr8vJIDZdKKZI00ekPI_NvkjEKITMWmdD-c_DGSKHENUfoIGL2qpJAyfYrb1OVepJ1rw5ZK-cgt1OaI1eamFU-YMfIecjfTPGE1-ZmMxOWrKdpZHhEDYjvO3as4BZfDIKQuTZ_mP0JFjJ7lieZ_eneE");'></div>
+                            <div class="h-40 bg-cover bg-center" data-alt="Gradient background representing a special discount offer" style='background-image: url("https://static.vecteezy.com/system/resources/thumbnails/060/192/542/small/discount-a-red-sale-label-with-large-50-off-text-attached-to-a-clothing-hanger-free-photo.jpg");'></div>
                             <div class="p-5 flex flex-col grow">
                                 <div class="mb-4">
                                     <span class="text-xs font-bold tracking-wider uppercase text-primary mb-1 block">Limited Time</span>
