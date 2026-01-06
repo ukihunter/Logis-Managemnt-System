@@ -1,3 +1,6 @@
+<?php
+require_once '../../../config/session_Detils.php';
+?>
 <!DOCTYPE html>
 
 <html class="light" lang="en">
@@ -75,13 +78,10 @@
             <!-- Brand & Search -->
             <div class="flex items-center gap-8 flex-1">
                 <div class="flex items-center gap-3 text-text-main dark:text-white shrink-0">
-                    <div class="size-8 bg-primary/50 rounded-lg flex items-center justify-center text-primary">
-                        <img
-                            src="../../../assest/icons/store.svg"
-                            alt="Inventory"
-                            class="w-5 h-5 object-contain filter invert brightness-0">
+                    <div class="size-8 bg-primary/70 rounded-lg flex items-center justify-center text-primary">
+                        <span class="material-symbols-outlined text-white">shopping_bag_speed</span>
                     </div>
-                    <h2 class="text-lg font-bold leading-tight tracking-tight hidden md:block">DistroSystem</h2>
+                    <h2 class="text-lg font-bold leading-tight tracking-tight hidden md:F">IslandDistro</h2>
                 </div>
                 <!-- Search Bar -->
                 <label class="flex w-full max-w-lg items-center relative group">
@@ -100,16 +100,32 @@
                     <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="../Dashboard/dashboard.php">Dashboard</a>
                     <a class="text-primary text-sm font-bold" href="#">Catalog</a>
                     <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Orders</a>
-                    <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Reports</a>
+                    <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Invoices</a>
                 </nav>
                 <div class="flex items-center gap-4">
                     <button class="relative flex items-center justify-center h-10 px-4 bg-primary hover:bg-green-500 transition-colors text-text-main rounded-lg font-bold text-sm gap-2">
-                        <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
-                        <span class="hidden sm:inline">Cart (3)</span>
-                        <span class="flex h-5 w-5 items-center justify-center rounded-full bg-black/10 text-[10px] font-bold">3</span>
+                        <span class="material-symbols-outlined text-[20px] text-white">shopping_cart</span>
+                        <span class="hidden sm:inline text-white">Cart (0)</span>
+                        <span class="flex h-5 w-5 items-center justify-center rounded-full bg-black/10 text-[10px] font-bold text-white">0</span>
                     </button>
                     <button class="flex items-center gap-2">
-                        <div class="bg-center bg-no-repeat bg-cover rounded-full size-10 border-2 border-border-light dark:border-border-dark" data-alt="User profile picture showing a professional portrait" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDRg_ojAPIOOKxRLo3YcPTMr3f5dlY56q4015k5zG2hvJ0Tm78QdFCFKIu97mf5IL7RvHJBy_Y_mUb8MmPD7uHaxlvv5sVNCQXlvH0YtrY6JE2KDPHovwXRYC0vTqPncUk2mwHjBsp48ajkeAjZAHukJm_xtXPB6xHRN4Pra1Bp9YsE4UzwPSoUw1Nq1GrHVp5gz5WFbOS8Qlk8rQfXDgWsrLwHAw0sEHoGe9u0j86ig8wiOixgktZLS4qGvkyrg7kpUN3mO6pPyho");'>
+                        <div class="relative ml-2">
+                            <button id="profileMenuBtn" class="size-10 rounded-full bg-slate-300 dark:bg-slate-700 bg-cover bg-center border-2 border-slate-100 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-colors" data-alt="User profile avatar showing a store logo or generic user icon" style='background-image: url("https://avatar.iran.liara.run/username?username=<?php echo urlencode($business_name); ?>");'></button>
+                            <!-- Dropdown Menu -->
+                            <div id="profileDropdown" class="hidden absolute right-40 mt-60 w-48 bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg overflow-hidden z-50">
+                                <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+                                    <p class="text-sm font-bold"><?php echo htmlspecialchars($full_name); ?></p>
+                                    <p class="text-xs text-text-secondary dark:text-emerald-400"><?php echo htmlspecialchars($business_name); ?></p>
+                                </div>
+                                <a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+                                    <span class="material-symbols-outlined text-[20px]">person</span>
+                                    <span class="text-sm font-medium">Edit Profile</span>
+                                </a>
+                                <a href="../../logout/logout.php" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors text-red-600 dark:text-red-400">
+                                    <span class="material-symbols-outlined text-[20px]">logout</span>
+                                    <span class="text-sm font-medium">Logout</span>
+                                </a>
+                            </div>
                         </div>
                     </button>
                 </div>
@@ -134,20 +150,20 @@
                     <span class="text-sm">All Products</span>
                 </button>
                 <button class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main dark:text-gray-300 hover:bg-border-light dark:hover:bg-border-dark transition-colors group">
-                    <span class="material-symbols-outlined text-[20px] text-gray-400 group-hover:text-primary">local_bar</span>
-                    <span class="text-sm font-medium">Beverages</span>
+                    <span class="material-symbols-outlined text-[20px] text-gray-400 group-hover:text-primary">toys</span>
+                    <span class="text-sm font-medium">Toys</span>
                 </button>
                 <button class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main dark:text-gray-300 hover:bg-border-light dark:hover:bg-border-dark transition-colors group">
-                    <span class="material-symbols-outlined text-[20px] text-gray-400 group-hover:text-primary">cookie</span>
-                    <span class="text-sm font-medium">Snacks</span>
+                    <span class="material-symbols-outlined text-[20px] text-gray-400 group-hover:text-primary">devices_other</span>
+                    <span class="text-sm font-medium">Electronics</span>
                 </button>
                 <button class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main dark:text-gray-300 hover:bg-border-light dark:hover:bg-border-dark transition-colors group">
-                    <span class="material-symbols-outlined text-[20px] text-gray-400 group-hover:text-primary">inventory_2</span>
-                    <span class="text-sm font-medium">Pantry</span>
+                    <span class="material-symbols-outlined text-[20px] text-gray-400 group-hover:text-primary">apparel</span>
+                    <span class="text-sm font-medium">Clothes</span>
                 </button>
                 <button class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main dark:text-gray-300 hover:bg-border-light dark:hover:bg-border-dark transition-colors group">
-                    <span class="material-symbols-outlined text-[20px] text-gray-400 group-hover:text-primary">soap</span>
-                    <span class="text-sm font-medium">Personal Care</span>
+                    <span class="material-symbols-outlined text-[20px] text-gray-400 group-hover:text-primary">clean_hands</span>
+                    <span class="text-sm font-medium">Cleaning</span>
                 </button>
             </div>
             <hr class="border-border-light dark:border-border-dark mx-2" />
@@ -208,12 +224,12 @@
                     <div class="pt-3 pb-2 flex flex-col gap-3">
                         <div class="flex items-center gap-2">
                             <div class="relative w-full">
-                                <span class="absolute left-2 top-1.5 text-xs text-gray-500">$</span>
+                                <span class="absolute left-1 top-1.5 text-xs text-gray-500">Rs</span>
                                 <input class="w-full pl-5 py-1 text-sm border border-gray-300 rounded focus:ring-primary focus:border-primary" placeholder="Min" type="number" />
                             </div>
                             <span class="text-gray-400">-</span>
                             <div class="relative w-full">
-                                <span class="absolute left-2 top-1.5 text-xs text-gray-500">$</span>
+                                <span class="absolute left-1 top-1.5 text-xs text-gray-500">Rs</span>
                                 <input class="w-full pl-5 py-1 text-sm border border-gray-300 rounded focus:ring-primary focus:border-primary" placeholder="Max" type="number" />
                             </div>
                         </div>
@@ -234,7 +250,7 @@
                 <div class="flex flex-wrap items-end justify-between gap-4">
                     <div>
                         <h1 class="text-3xl font-black text-text-main dark:text-white tracking-tight">Fast-Moving Consumer Goods</h1>
-                        <p class="text-text-muted mt-1">Showing 1-12 of 1,204 products</p>
+                        <p class="text-text-muted mt-1">Showing 1-12 of 6 products</p>
                     </div>
                 </div>
             </div>
@@ -288,11 +304,11 @@
                         <div class="mt-auto pt-4 flex flex-col gap-3">
                             <div class="flex items-baseline justify-between border-b border-dashed border-border-light dark:border-border-dark pb-3">
                                 <div class="flex flex-col">
-                                    <span class="text-2xl font-black text-text-main dark:text-white">$0.85</span>
+                                    <span class="text-2xl font-black text-text-main dark:text-white">Rs 0.85</span>
                                     <span class="text-[10px] uppercase text-text-muted font-bold tracking-wide">Per Unit</span>
                                 </div>
                                 <div class="flex flex-col items-end">
-                                    <span class="text-sm font-bold text-text-main dark:text-gray-300">$20.40</span>
+                                    <span class="text-sm font-bold text-text-main dark:text-gray-300">Rs 20.40</span>
                                     <span class="text-[10px] text-text-muted">Per Carton (24)</span>
                                 </div>
                             </div>
@@ -328,11 +344,11 @@
                         <div class="mt-auto pt-4 flex flex-col gap-3">
                             <div class="flex items-baseline justify-between border-b border-dashed border-border-light dark:border-border-dark pb-3">
                                 <div class="flex flex-col">
-                                    <span class="text-2xl font-black text-text-main dark:text-white">$1.20</span>
+                                    <span class="text-2xl font-black text-text-main dark:text-white">Rs 1.20</span>
                                     <span class="text-[10px] uppercase text-text-muted font-bold tracking-wide">Per Unit</span>
                                 </div>
                                 <div class="flex flex-col items-end">
-                                    <span class="text-sm font-bold text-text-main dark:text-gray-300">$19.20</span>
+                                    <span class="text-sm font-bold text-text-main dark:text-gray-300">Rs 19.20</span>
                                     <span class="text-[10px] text-text-muted">Per Carton (16)</span>
                                 </div>
                             </div>
@@ -372,13 +388,13 @@
                             <div class="flex items-baseline justify-between border-b border-dashed border-border-light dark:border-border-dark pb-3">
                                 <div class="flex flex-col">
                                     <div class="flex items-center gap-2">
-                                        <span class="text-2xl font-black text-text-main dark:text-white">$4.50</span>
-                                        <span class="text-xs text-red-500 line-through font-medium">$5.30</span>
+                                        <span class="text-2xl font-black text-text-main dark:text-white">Rs 4.50</span>
+                                        <span class="text-xs text-red-500 line-through font-medium">Rs 5.30</span>
                                     </div>
                                     <span class="text-[10px] uppercase text-text-muted font-bold tracking-wide">Per Unit</span>
                                 </div>
                                 <div class="flex flex-col items-end">
-                                    <span class="text-sm font-bold text-text-main dark:text-gray-300">$54.00</span>
+                                    <span class="text-sm font-bold text-text-main dark:text-gray-300">Rs 54.00</span>
                                     <span class="text-[10px] text-text-muted">Per Carton (12)</span>
                                 </div>
                             </div>
@@ -414,11 +430,11 @@
                         <div class="mt-auto pt-4 flex flex-col gap-3">
                             <div class="flex items-baseline justify-between border-b border-dashed border-border-light dark:border-border-dark pb-3">
                                 <div class="flex flex-col">
-                                    <span class="text-2xl font-black text-text-main dark:text-white">$1.80</span>
+                                    <span class="text-2xl font-black text-text-main dark:text-white">Rs 1.80</span>
                                     <span class="text-[10px] uppercase text-text-muted font-bold tracking-wide">Per Unit</span>
                                 </div>
                                 <div class="flex flex-col items-end">
-                                    <span class="text-sm font-bold text-text-main dark:text-gray-300">$36.00</span>
+                                    <span class="text-sm font-bold text-text-main dark:text-gray-300">Rs 36.00</span>
                                     <span class="text-[10px] text-text-muted">Per Carton (20)</span>
                                 </div>
                             </div>
@@ -454,11 +470,11 @@
                         <div class="mt-auto pt-4 flex flex-col gap-3">
                             <div class="flex items-baseline justify-between border-b border-dashed border-border-light dark:border-border-dark pb-3">
                                 <div class="flex flex-col">
-                                    <span class="text-2xl font-black text-text-main dark:text-white">$2.10</span>
+                                    <span class="text-2xl font-black text-text-main dark:text-white">Rs 2.10</span>
                                     <span class="text-[10px] uppercase text-text-muted font-bold tracking-wide">Per Unit</span>
                                 </div>
                                 <div class="flex flex-col items-end">
-                                    <span class="text-sm font-bold text-text-main dark:text-gray-300">$25.20</span>
+                                    <span class="text-sm font-bold text-text-main dark:text-gray-300">Rs 25.20</span>
                                     <span class="text-[10px] text-text-muted">Per Carton (12)</span>
                                 </div>
                             </div>
@@ -493,11 +509,11 @@
                         <div class="mt-auto pt-4 flex flex-col gap-3">
                             <div class="flex items-baseline justify-between border-b border-dashed border-border-light dark:border-border-dark pb-3">
                                 <div class="flex flex-col">
-                                    <span class="text-2xl font-black text-text-main dark:text-white">$3.25</span>
+                                    <span class="text-2xl font-black text-text-main dark:text-white">Rs 3.25</span>
                                     <span class="text-[10px] uppercase text-text-muted font-bold tracking-wide">Per Unit</span>
                                 </div>
                                 <div class="flex flex-col items-end">
-                                    <span class="text-sm font-bold text-text-main dark:text-gray-300">$32.50</span>
+                                    <span class="text-sm font-bold text-text-main dark:text-gray-300">Rs 32.50</span>
                                     <span class="text-[10px] text-text-muted">Per Carton (10)</span>
                                 </div>
                             </div>
@@ -533,5 +549,26 @@
         </main>
     </div>
 </body>
+<script>
+    // Profile dropdown toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileMenuBtn = document.getElementById('profileMenuBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        if (profileMenuBtn && profileDropdown) {
+            profileMenuBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!profileMenuBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+        }
+    });
+</script>
 
 </html>

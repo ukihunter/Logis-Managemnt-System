@@ -1,15 +1,7 @@
 <?php
-session_start();
-
-// Check if user is logged in
-if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'customer') {
-    header('Location: ../../login/login.php');
-    exit;
-}
-
-$business_name = $_SESSION['business_name'] ?? 'Customer';
-$full_name = $_SESSION['full_name'] ?? 'User';
+require_once '../../../config/session_Detils.php';
 ?>
+
 <!DOCTYPE html>
 
 <html class="light" lang="en">
@@ -59,9 +51,7 @@ $full_name = $_SESSION['full_name'] ?? 'User';
                     <!-- Logo & Brand -->
                     <div class="flex items-center gap-3">
                         <div class="size-8 text-primary">
-                            <svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                                <path clip-rule="evenodd" d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill="currentColor" fill-rule="evenodd"></path>
-                            </svg>
+                            <span class="material-symbols-outlined">shopping_bag_speed</span>
                         </div>
                         <h2 class="text-lg font-bold tracking-tight hidden sm:block">IslandDistro</h2>
                     </div>
@@ -96,7 +86,25 @@ $full_name = $_SESSION['full_name'] ?? 'User';
                         <button class="hidden sm:flex h-10 px-4 items-center justify-center rounded-lg bg-primary text-black font-bold text-sm hover:brightness-110 transition-all">
                             <span class="mr-2 material-symbols-outlined text-[18px]">add</span> New Order
                         </button>
-                        <div class="size-10 rounded-full bg-slate-300 dark:bg-slate-700 bg-cover bg-center ml-2 border-2 border-slate-100 dark:border-slate-800" data-alt="User profile avatar showing a store logo or generic user icon" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD6z3y47DuCRcPJllBKIiAhuhtpN2_42Z9uxlOYlGHOU4jeQTvBLaaxjdKHmjXogo5XI-sBMnoNOWMgeDToQ95Fa0OiKUb9fhCu0lgqjbWSrHQ-ieYR3FExD0rzZKE9tJ6HSepBmObRcbQxodXApJ7EJ0T9sCH1g7P21qDrFil2VdMAOC_o1zC_m623BuqRtA0YXQNNk00YsIDsLJDAwgK9bLehPWLnV5ttF-NOpfFnPh3k5urWISRG8dS24xnHe33X2WRfZh3wcqo");'></div>
+                        <!-- Profile Dropdown -->
+                        <div class="relative ml-2">
+                            <button id="profileMenuBtn" class="size-10 rounded-full bg-slate-300 dark:bg-slate-700 bg-cover bg-center border-2 border-slate-100 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-colors" data-alt="User profile avatar showing a store logo or generic user icon" style='background-image: url("https://avatar.iran.liara.run/username?username=<?php echo urlencode($business_name); ?>");'></button>
+                            <!-- Dropdown Menu -->
+                            <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg overflow-hidden z-50">
+                                <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+                                    <p class="text-sm font-bold"><?php echo htmlspecialchars($full_name); ?></p>
+                                    <p class="text-xs text-text-secondary dark:text-emerald-400"><?php echo htmlspecialchars($business_name); ?></p>
+                                </div>
+                                <a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+                                    <span class="material-symbols-outlined text-[20px]">person</span>
+                                    <span class="text-sm font-medium">Edit Profile</span>
+                                </a>
+                                <a href="../../logout/logout.php" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors text-red-600 dark:text-red-400">
+                                    <span class="material-symbols-outlined text-[20px]">logout</span>
+                                    <span class="text-sm font-medium">Logout</span>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -303,7 +311,7 @@ $full_name = $_SESSION['full_name'] ?? 'User';
                             </button>
                             <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-all group">
                                 <span class="material-symbols-outlined text-3xl mb-2 text-text-secondary dark:text-emerald-400 group-hover:text-primary transition-colors">devices_other</span>
-                                <span class="text-sm font-bold">Dry Goods</span>
+                                <span class="text-sm font-bold">Electronics</span>
                             </button>
                             <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-all group">
                                 <span class="material-symbols-outlined text-3xl mb-2 text-text-secondary dark:text-emerald-400 group-hover:text-primary transition-colors">clean_hands</span>
@@ -355,6 +363,27 @@ $full_name = $_SESSION['full_name'] ?? 'User';
             </button>
         </div>
     </div>
+    <script>
+        // Profile dropdown toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileMenuBtn = document.getElementById('profileMenuBtn');
+            const profileDropdown = document.getElementById('profileDropdown');
+
+            if (profileMenuBtn && profileDropdown) {
+                profileMenuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    profileDropdown.classList.toggle('hidden');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!profileMenuBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                        profileDropdown.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>
