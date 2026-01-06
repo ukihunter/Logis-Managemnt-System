@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn = getDBConnection();
 
     // Prepare and execute query
-    $stmt = $conn->prepare("SELECT id, business_name, full_name, username, password, user_type, status FROM users WHERE username = ? OR email = ?");
+    $stmt = $conn->prepare("SELECT id, business_name, full_name, username, password, phone_number, address, user_type, status FROM users WHERE username = ? OR email = ?");
     $stmt->bind_param("ss", $username, $username);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -40,6 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['full_name'] = $user['full_name'];
             $_SESSION['business_name'] = $user['business_name'];
             $_SESSION['user_type'] = $user['user_type'];
+            $_SESSION['logged_in'] = true;
+            $_SESSION['address'] = $user['address'] ?? 'N/A';
+            $_SESSION['contact_number'] = $user['contact_number'] ?? 'N/A';
 
             // Redirect based on user type
             $redirect_url = '';

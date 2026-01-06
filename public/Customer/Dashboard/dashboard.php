@@ -71,7 +71,7 @@ require_once '../../../config/session_Detils.php';
                     <nav class="hidden lg:flex items-center gap-6 mr-4">
                         <a class="text-sm font-bold text-primary" href="#">Dashboard</a>
                         <a class="text-sm font-medium hover:text-primary transition-colors" href="../Catalog/catalog.php">Catalog</a>
-                        <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Orders</a>
+                        <a class="text-sm font-medium hover:text-primary transition-colors" href="../Orders/order.php">Orders</a>
                         <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Invoices</a>
                     </nav>
                     <!-- Action Icons -->

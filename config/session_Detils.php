@@ -11,3 +11,5 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'customer') {
 $business_name = $_SESSION['business_name'] ?? 'Customer';
 $full_name     = $_SESSION['full_name'] ?? 'User';
 $username      = $_SESSION['username'] ?? 'guest';
+$address       = $_SESSION['address'] ?? 'N/A';
+$contact_number = $_SESSION['contact_number'] ?? 'N/A';
