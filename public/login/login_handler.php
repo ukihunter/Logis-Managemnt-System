@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn = getDBConnection();
 
     // Prepare and execute query
-    $stmt = $conn->prepare("SELECT id, business_name, full_name, username, password, phone_number, address, user_type, status FROM users WHERE username = ? OR email = ?");
+    $stmt = $conn->prepare("SELECT id, business_name, full_name, username, password, phone_number, address,province, user_type, status FROM users WHERE username = ? OR email = ?");
     $stmt->bind_param("ss", $username, $username);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -43,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['logged_in'] = true;
             $_SESSION['address'] = $user['address'] ?? 'N/A';
             $_SESSION['contact_number'] = $user['contact_number'] ?? 'N/A';
+            $_SESSION['province'] = $user['province'] ?? '';
 
             // Redirect based on user type
             $redirect_url = '';
@@ -54,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $redirect_url = '../admin/dashboard/dashboard.php';
                     break;
                 case 'staff':
-                    $redirect_url = '../staff/dashboard/dashboard.php';
+                    $redirect_url = '../../public/Admin/Dasboard/dasboard.php';
                     break;
                 default:
                     $redirect_url = '../customer/dashboard/dashboard.php';
