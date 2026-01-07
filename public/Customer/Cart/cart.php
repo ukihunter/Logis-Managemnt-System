@@ -1,5 +1,68 @@
 <?php
 require_once '../../../config/session_Detils.php';
+require_once '../../../config/database.php';
+
+$conn = getDBConnection();
+$user_id = $_SESSION['user_id'];
+
+// Fetch cart items
+$cart_query = "SELECT c.id as cart_id, c.quantity,
+                      p.id as product_id, p.name, p.sku, p.image_path,
+                      p.unit_price, p.carton_quantity, p.carton_price,
+                      p.stock_level, p.discount_percentage, p.offer_label, p.is_featured
+               FROM cart c
+               JOIN products p ON c.product_id = p.id
+               WHERE c.user_id = ? AND p.status = 'active'
+               ORDER BY c.added_at DESC";
+
+$stmt = $conn->prepare($cart_query);
+$stmt->bind_param('i', $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$cart_items = [];
+$subtotal = 0;
+
+while ($row = $result->fetch_assoc()) {
+    $unit_price = floatval($row['unit_price']);
+    $discount_percentage = floatval($row['discount_percentage']);
+
+    $discounted_price = $unit_price;
+    if ($discount_percentage > 0) {
+        $discounted_price = $unit_price * (1 - $discount_percentage / 100);
+    }
+
+    $item_total = $discounted_price * $row['quantity'];
+    $subtotal += $item_total;
+
+    $is_low_stock = $row['stock_level'] < 50;
+    $is_out_of_stock = $row['stock_level'] <= 0;
+
+    $cart_items[] = [
+        'cart_id' => $row['cart_id'],
+        'product_id' => $row['product_id'],
+        'name' => $row['name'],
+        'sku' => $row['sku'],
+        'image_path' => $row['image_path'],
+        'unit_price' => $unit_price,
+        'discounted_price' => $discounted_price,
+        'discount_percentage' => $discount_percentage,
+        'quantity' => intval($row['quantity']),
+        'stock_level' => intval($row['stock_level']),
+        'is_low_stock' => $is_low_stock,
+        'is_out_of_stock' => $is_out_of_stock,
+        'is_featured' => boolval($row['is_featured']),
+        'offer_label' => $row['offer_label'],
+        'item_total' => $item_total
+    ];
+}
+
+$tax_rate = 0.0;
+$shipping_fee = 0.0;
+$tax_amount = $subtotal * $tax_rate;
+$total = $subtotal + $tax_amount + $shipping_fee;
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -158,85 +221,101 @@ require_once '../../../config/session_Detils.php';
             <span class="material-symbols-outlined text-sm text-gray-400">chevron_right</span>
             <span class="font-semibold text-text-main dark:text-white">Shopping Cart</span>
         </div>
+        
+        <!-- Success/Error Messages -->
+        <?php if (isset($_SESSION['success'])): ?>
+        <div class="mb-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 px-4 py-3 rounded-lg flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span><?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></span>
+            </div>
+        </div>
+        <?php endif; ?>
+        
+        <?php if (isset($_SESSION['error'])): ?>
+        <div class="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined">error</span>
+                <span><?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></span>
+            </div>
+        </div>
+        <?php endif; ?>
+        
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- Left Column: Cart Items -->
             <div class="lg:col-span-8 space-y-6">
                 <!-- Page Heading -->
                 <div class="flex flex-col gap-1 pb-4 border-b border-gray-200 dark:border-gray-800">
-                    <h1 class="text-3xl md:text-4xl font-black tracking-tight text-text-main dark:text-white">Your Cart (2 items)</h1>
+                    <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-text-main dark:text-white">Your Cart (<span id="cartCount"><?php echo count($cart_items); ?></span> items)</h1>
                     <p class="text-text-secondary dark:text-gray-400">Review your items for island-wide distribution.</p>
                 </div>
+
                 <!-- Cart List -->
-                <div class="flex flex-col gap-4">
-                    <!-- Item 1 -->
-                    <div class="group flex flex-col md:flex-row gap-6 bg-surface-light dark:bg-surface-dark p-5 rounded-xl shadow-sm border border-transparent hover:border-primary/20 transition-all">
-                        <div class="relative shrink-0">
-                            <div class="bg-gray-100 dark:bg-white/5 rounded-lg w-full md:w-[120px] aspect-square bg-center bg-cover" data-alt="Sack of premium white rice with branding" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCZSrNtcItsSg7e_nZ0SDY4BdbZJcLDQ-K6qOyKDKGohoRCawc7n1vB-LcUay2sLJ8FzU9RonzyMO9zHyfomEevq2rGx1ZKrY3mSN7xc3DbfOpU1FBQUgS134xKyCxGO6b2RqbygPfIh-GGJcqdUJZB2CjQxVVJmRTLL2tUH-iGPxyWSwX0HsdwG4yd_MZS0BIw1ZB4RTsTnpIq5MCgcnjW_uWLwsZlrkQ_2oaP4gZACQLF2ZqZrWxNnjFGbfXfYsQ5MzRXNb1Cjk8");'></div>
-                            <div class="absolute -top-2 -left-2 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">BESTSELLER</div>
+                <div id="cartItemsContainer" class="flex flex-col gap-4">
+                    <?php if (empty($cart_items)): ?>
+                        <div class="text-center py-20">
+                            <span class="material-symbols-outlined text-6xl text-gray-300 mb-4">shopping_cart</span>
+                            <p class="text-gray-500 text-lg mb-2">Your cart is empty</p>
+                            <a href="../Catalog/catalog.php" class="text-primary hover:underline">Continue Shopping</a>
                         </div>
-                        <div class="flex flex-1 flex-col justify-between gap-4">
-                            <div>
-                                <div class="flex justify-between items-start">
-                                    <h3 class="text-lg font-bold text-text-main dark:text-white">Premium Rice 25kg Sack</h3>
-                                    <span class="text-lg font-bold text-text-main dark:text-white">Rs 450.00</span>
+                    <?php else: ?>
+                        <?php foreach ($cart_items as $item): ?>
+                            <div class="cart-item group flex flex-col md:flex-row gap-6 bg-surface-light dark:bg-surface-dark p-5 rounded-xl shadow-sm border border-transparent hover:border-primary/20 transition-all" data-cart-id="<?php echo $item['cart_id']; ?>">
+                                <div class="relative shrink-0">
+                                    <?php if (!empty($item['image_path']) && file_exists('../../../' . $item['image_path'])): ?>
+                                        <div class="bg-gray-100 dark:bg-white/5 rounded-lg w-full md:w-[120px] aspect-square bg-center bg-cover" style='background-image: url("../../../<?php echo htmlspecialchars($item['image_path']); ?>");'></div>
+                                    <?php else: ?>
+                                        <div class="bg-gray-100 dark:bg-white/5 rounded-lg w-full md:w-[120px] aspect-square flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-gray-400 text-4xl">inventory_2</span>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if ($item['is_featured'] && !empty($item['offer_label'])): ?>
+                                        <div class="absolute -top-2 -left-2 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm"><?php echo htmlspecialchars($item['offer_label']); ?></div>
+                                    <?php endif; ?>
                                 </div>
-                                <p class="text-sm text-text-secondary dark:text-gray-400 mt-1">SKU: RICE-001 • Unit Price: Rs 450.00</p>
-                                <div class="flex items-center gap-1.5 mt-2 text-primary font-medium text-xs bg-primary/10 w-fit px-2 py-1 rounded">
-                                    <span class="material-symbols-outlined text-sm">check_circle</span>
-                                    In Stock at Central Warehouse
+                                <div class="flex flex-1 flex-col justify-between gap-4">
+                                    <div>
+                                        <div class="flex justify-between items-start">
+                                            <h3 class="text-lg font-bold text-text-main dark:text-white"><?php echo htmlspecialchars($item['name']); ?></h3>
+                                            <span class="item-total text-lg font-bold text-text-main dark:text-white">Rs <?php echo number_format($item['item_total'], 2); ?></span>
+                                        </div>
+                                        <p class="text-sm text-text-secondary dark:text-gray-400 mt-1">SKU: <?php echo htmlspecialchars($item['sku']); ?> • Unit Price: Rs <?php echo number_format($item['discounted_price'], 2); ?></p>
+                                        <?php if ($item['is_out_of_stock']): ?>
+                                            <div class="flex items-center gap-1.5 mt-2 text-red-500 font-medium text-xs bg-red-50 dark:bg-red-900/20 w-fit px-2 py-1 rounded">
+                                                <span class="material-symbols-outlined text-sm">error</span>
+                                                Out of Stock
+                                            </div>
+                                        <?php elseif ($item['is_low_stock']): ?>
+                                            <div class="flex items-center gap-1.5 mt-2 text-yellow-600 font-medium text-xs bg-yellow-50 dark:bg-yellow-900/20 w-fit px-2 py-1 rounded">
+                                                <span class="material-symbols-outlined text-sm">inventory</span>
+                                                Low Stock (Only <?php echo $item['stock_level']; ?> left)
+                                            </div>
+                                        <?php else: ?>
+                                            <div class="flex items-center gap-1.5 mt-2 text-primary font-medium text-xs bg-primary/10 w-fit px-2 py-1 rounded">
+                                                <span class="material-symbols-outlined text-sm">check_circle</span>
+                                                In Stock at Central Warehouse
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="flex justify-between items-end border-t border-gray-100 dark:border-white/5 pt-4">
+                                        <button onclick="removeFromCart(<?php echo $item['cart_id']; ?>)" class="text-sm font-medium text-red-500 hover:text-red-600 flex items-center gap-1 transition-colors">
+                                            <span class="material-symbols-outlined text-lg">delete</span>
+                                            <span class="hidden sm:inline">Remove</span>
+                                        </button>
+                                        <div class="flex items-center gap-3 bg-[#f0f4f1] dark:bg-black/20 rounded-lg p-1">
+                                            <button onclick="updateQuantity(<?php echo $item['cart_id']; ?>, -1)" class="w-8 h-8 flex items-center justify-center rounded bg-white dark:bg-white/10 shadow-sm hover:text-primary transition-colors text-text-main dark:text-white">
+                                                <span class="material-symbols-outlined text-sm">remove</span>
+                                            </button>
+                                            <input class="input-stepper cart-quantity" data-cart-id="<?php echo $item['cart_id']; ?>" type="number" value="<?php echo $item['quantity']; ?>" min="1" max="<?php echo $item['stock_level']; ?>" readonly />
+                                            <button onclick="updateQuantity(<?php echo $item['cart_id']; ?>, 1)" class="w-8 h-8 flex items-center justify-center rounded bg-white dark:bg-white/10 shadow-sm hover:text-primary transition-colors text-text-main dark:text-white">
+                                                <span class="material-symbols-outlined text-sm">add</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex justify-between items-end border-t border-gray-100 dark:border-white/5 pt-4">
-                                <button class="text-sm font-medium text-red-500 hover:text-red-600 flex items-center gap-1 transition-colors">
-                                    <span class="material-symbols-outlined text-lg">delete</span>
-                                    <span class="hidden sm:inline">Remove</span>
-                                </button>
-                                <div class="flex items-center gap-3 bg-[#f0f4f1] dark:bg-black/20 rounded-lg p-1">
-                                    <button class="w-8 h-8 flex items-center justify-center rounded bg-white dark:bg-white/10 shadow-sm hover:text-primary transition-colors text-text-main dark:text-white">
-                                        <span class="material-symbols-outlined text-sm">remove</span>
-                                    </button>
-                                    <input class="input-stepper" type="number" value="10" />
-                                    <button class="w-8 h-8 flex items-center justify-center rounded bg-white dark:bg-white/10 shadow-sm hover:text-primary transition-colors text-text-main dark:text-white">
-                                        <span class="material-symbols-outlined text-sm">add</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Item 2 -->
-                    <div class="group flex flex-col md:flex-row gap-6 bg-surface-light dark:bg-surface-dark p-5 rounded-xl shadow-sm border border-transparent hover:border-primary/20 transition-all">
-                        <div class="shrink-0">
-                            <div class="bg-gray-100 dark:bg-white/5 rounded-lg w-full md:w-[120px] aspect-square bg-center bg-cover" data-alt="Clear plastic bottle of sunflower cooking oil" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCu_uWU592BHT-rTolvjaFpkq4qw1JrxfELn6tV9nqlRsDCIXxJsgvRpQziHDnvlltT6-xs46fGQj2Je698eD75YFZG-pxDyLU_N_cpuREmaxvqMrC2Sioi3-nkT46yeydKMc54wdxX0bYxkDCodtmlYioVQ5GSI3CY90DNYJmQbXa8yyrghRdqMzX5r7K3BDRkpBCD1gtFfuxJjJjLrQyt1sq-7DxRXvR2Hl_9j8W7vAdblKue5KFVbHOtQ72v_iq3PbUIWhXjw-0");'></div>
-                        </div>
-                        <div class="flex flex-1 flex-col justify-between gap-4">
-                            <div>
-                                <div class="flex justify-between items-start">
-                                    <h3 class="text-lg font-bold text-text-main dark:text-white">Sunflower Oil 5L Case</h3>
-                                    <span class="text-lg font-bold text-text-main dark:text-white">Rs 150.00</span>
-                                </div>
-                                <p class="text-sm text-text-secondary dark:text-gray-400 mt-1">SKU: OIL-552 • Unit Price: Rs 30.00</p>
-                                <div class="flex items-center gap-1.5 mt-2 text-text-secondary dark:text-gray-400 font-medium text-xs">
-                                    <span class="material-symbols-outlined text-sm text-yellow-500">inventory</span>
-                                    Low Stock (Only 12 left)
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-end border-t border-gray-100 dark:border-white/5 pt-4">
-                                <button class="text-sm font-medium text-red-500 hover:text-red-600 flex items-center gap-1 transition-colors">
-                                    <span class="material-symbols-outlined text-lg">delete</span>
-                                    <span class="hidden sm:inline">Remove</span>
-                                </button>
-                                <div class="flex items-center gap-3 bg-[#f0f4f1] dark:bg-black/20 rounded-lg p-1">
-                                    <button class="w-8 h-8 flex items-center justify-center rounded bg-white dark:bg-white/10 shadow-sm hover:text-primary transition-colors text-text-main dark:text-white">
-                                        <span class="material-symbols-outlined text-sm">remove</span>
-                                    </button>
-                                    <input class="input-stepper" type="number" value="5" />
-                                    <button class="w-8 h-8 flex items-center justify-center rounded bg-white dark:bg-white/10 shadow-sm hover:text-primary transition-colors text-text-main dark:text-white">
-                                        <span class="material-symbols-outlined text-sm">add</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
                 <!-- Cross Sell -->
                 <div class="mt-12">
@@ -285,16 +364,16 @@ require_once '../../../config/session_Detils.php';
                             <!-- Costs Breakdown -->
                             <div class="space-y-3 mb-6">
                                 <div class="flex justify-between text-sm">
-                                    <span class="text-text-secondary dark:text-gray-400">Subtotal (2 items)</span>
-                                    <span class="font-semibold text-text-main dark:text-white">Rs 600.00</span>
+                                    <span class="text-text-secondary dark:text-gray-400">Subtotal (<span id="itemCount"><?php echo count($cart_items); ?></span> items)</span>
+                                    <span id="subtotalDisplay" class="font-semibold text-text-main dark:text-white">Rs <?php echo number_format($subtotal, 2); ?></span>
                                 </div>
                                 <div class="flex justify-between text-sm">
                                     <span class="text-text-secondary dark:text-gray-400">Distribution Fee</span>
-                                    <span class="font-semibold text-text-main dark:text-white">Rs 25.00</span>
+                                    <span id="shippingDisplay" class="font-semibold text-text-main dark:text-white">Rs <?php echo number_format($shipping_fee, 2); ?></span>
                                 </div>
                                 <div class="flex justify-between text-sm">
-                                    <span class="text-text-secondary dark:text-gray-400">Tax (8%)</span>
-                                    <span class="font-semibold text-text-main dark:text-white">Rs 48.00</span>
+                                    <span class="text-text-secondary dark:text-gray-400">Tax (12%)</span>
+                                    <span id="taxDisplay" class="font-semibold text-text-main dark:text-white">Rs <?php echo number_format($tax_amount, 2); ?></span>
                                 </div>
                             </div>
                             <div class="border-t border-dashed border-gray-200 dark:border-gray-700 my-4"></div>
@@ -302,7 +381,7 @@ require_once '../../../config/session_Detils.php';
                             <div class="flex justify-between items-end mb-6">
                                 <span class="text-base font-bold text-text-main dark:text-white">Total</span>
                                 <div class="text-right">
-                                    <span class="block text-2xl font-black text-primary tracking-tight">Rs 673.00</span>
+                                    <span id="totalDisplay" class="block text-2xl font-black text-primary tracking-tight">Rs <?php echo number_format($total, 2); ?></span>
                                     <span class="text-xs text-text-secondary dark:text-gray-500">LKR, inclusive of all taxes</span>
                                 </div>
                             </div>
@@ -315,10 +394,18 @@ require_once '../../../config/session_Detils.php';
                                 </div>
                             </div>
                             <!-- Checkout Button -->
-                            <button class="w-full bg-primary hover:bg-primary-dark text-white font-bold text-lg py-4 rounded-xl shadow-lg shadow-primary/30 transition-all transform active:scale-[0.99] flex items-center justify-center gap-2">
-                                <span class="material-symbols-outlined">lock</span>
-                                Secure Checkout
-                            </button>
+                            <?php if (!empty($cart_items)): ?>
+                                <form action="checkout.php" method="POST">
+                                    <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-bold text-lg py-4 rounded-xl shadow-lg shadow-primary/30 transition-all transform active:scale-[0.99] flex items-center justify-center gap-2">
+                                        <span class="material-symbols-outlined">lock</span>
+                                        Secure Checkout
+                                    </button>
+                                </form>
+                            <?php else: ?>
+                                <a href="../Catalog/catalog.php" class="w-full block text-center bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-bold text-lg py-4 rounded-xl">
+                                    Continue Shopping
+                                </a>
+                            <?php endif; ?>
                             <!-- Trust Badges -->
                             <div class="mt-6 flex justify-center gap-4 opacity-60 grayscale">
                                 <div class="flex flex-col items-center gap-1">

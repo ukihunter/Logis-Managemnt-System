@@ -401,6 +401,72 @@ function decrementQuantity(id) {
 function addToCart(id) {
   const quantity = parseInt(document.getElementById(`qty-${id}`).value);
   console.log(`Adding product ${id} with quantity ${quantity} to cart`);
-  alert(`Added ${quantity} units to cart!`);
-  // TODO: Implement actual cart functionality
+
+  // Send to cart handler
+  const formData = new FormData();
+  formData.append("action", "add");
+  formData.append("product_id", id);
+  formData.append("quantity", quantity);
+
+  fetch("../Cart/cart_handler.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        showNotification(`Added ${quantity} units to cart!`, "success");
+        // Update cart count in header if exists
+        updateCartCount();
+      } else {
+        showNotification(data.message || "Failed to add to cart", "error");
+      }
+    })
+    .catch((error) => {
+      console.error("Error adding to cart:", error);
+      showNotification("An error occurred. Please try again.", "error");
+    });
+}
+
+// Update cart count in header
+function updateCartCount() {
+  fetch("../Cart/cart_handler.php?action=get")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success && data.cart) {
+        const cartCountEl = document.getElementById("cartCount");
+        if (cartCountEl) {
+          cartCountEl.textContent = data.cart.item_count;
+        }
+      }
+    })
+    .catch((error) => console.error("Error updating cart count:", error));
+}
+
+// Show notification
+function showNotification(message, type = "info") {
+  const notification = document.createElement("div");
+  notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium transform transition-all duration-300 ${
+    type === "success"
+      ? "bg-green-500"
+      : type === "error"
+      ? "bg-red-500"
+      : "bg-blue-500"
+  }`;
+  notification.textContent = message;
+  notification.style.opacity = "0";
+  notification.style.transform = "translateY(-20px)";
+
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.style.opacity = "1";
+    notification.style.transform = "translateY(0)";
+  }, 10);
+
+  setTimeout(() => {
+    notification.style.opacity = "0";
+    notification.style.transform = "translateY(-20px)";
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
 }
