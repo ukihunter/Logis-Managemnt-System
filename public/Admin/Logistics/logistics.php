@@ -80,11 +80,11 @@ require_once '../../../config/admin_session.php';
     <main class="flex-1 flex flex-col h-full overflow-hidden relative">
         <header class="h-16 bg-surface-light dark:bg-surface-dark border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 shrink-0 z-10">
             <div class="flex items-center gap-4">
-                <h2 class="text-lg font-bold">Delivery Management</h2>
+                <h2 class="text-lg font-bold">Live Tracker</h2>
                 <div class="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-2"></div>
                 <div class="flex items-center text-sm text-slate-500">
                     <span class="material-symbols-outlined text-[18px] mr-1">location_on</span>
-                    <span>North Island Zone</span>
+                    <span><?php echo htmlspecialchars($province) . " RDC"; ?></span>
                 </div>
             </div>
             <div class="flex items-center gap-4">
@@ -99,7 +99,7 @@ require_once '../../../config/admin_session.php';
             </div>
         </header>
         <div class="flex flex-1 overflow-hidden">
-            <div class="w-[420px] bg-surface-light dark:bg-surface-dark border-r border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden z-10 shadow-xl">
+            <div id="deliveryListSection" class="w-full transition-all duration-300 bg-surface-light dark:bg-surface-dark border-r border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden z-10 shadow-xl">
                 <div class="flex border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-surface-dark shrink-0">
                     <button class="flex-1 pb-3 pt-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-medium text-xs uppercase tracking-wide transition-colors">Pending (12)</button>
                     <button class="flex-1 pb-3 pt-4 border-b-2 border-primary text-primary font-bold text-xs uppercase tracking-wide transition-colors bg-primary/5">In Progress (5)</button>
@@ -113,7 +113,7 @@ require_once '../../../config/admin_session.php';
                 </div>
                 <div class="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#122218] p-4 space-y-3">
                     <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Individual Deliveries</h3>
-                    <div class="bg-white dark:bg-surface-dark p-4 rounded-xl border-2 border-primary shadow-lg shadow-primary/5 cursor-pointer relative overflow-hidden group">
+                    <div onclick="showDeliveryMap('ORD-408')" class="bg-white dark:bg-surface-dark p-4 rounded-xl border-2 border-primary shadow-lg shadow-primary/5 cursor-pointer relative overflow-hidden group">
                         <div class="absolute top-0 left-0 w-1.5 h-full bg-primary"></div>
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-2">
@@ -139,7 +139,7 @@ require_once '../../../config/admin_session.php';
                             </button>
                         </div>
                     </div>
-                    <div class="bg-white dark:bg-surface-dark p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm cursor-pointer transition-all hover:shadow-md">
+                    <div onclick="showDeliveryMap('ORD-412')" class="bg-white dark:bg-surface-dark p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm cursor-pointer transition-all hover:shadow-md">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-2">
                                 <span class="text-xs font-bold text-slate-500">#ORD-412</span>
@@ -161,7 +161,7 @@ require_once '../../../config/admin_session.php';
                             </div>
                         </div>
                     </div>
-                    <div class="bg-white dark:bg-surface-dark p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm cursor-pointer transition-all hover:shadow-md">
+                    <div onclick="showDeliveryMap('ORD-415')" class="bg-white dark:bg-surface-dark p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm cursor-pointer transition-all hover:shadow-md">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-2">
                                 <span class="text-xs font-bold text-slate-500">#ORD-415</span>
@@ -185,7 +185,7 @@ require_once '../../../config/admin_session.php';
                             </div>
                         </div>
                     </div>
-                    <div class="bg-white dark:bg-surface-dark p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm cursor-pointer transition-all hover:shadow-md">
+                    <div onclick="showDeliveryMap('ORD-421')" class="bg-white dark:bg-surface-dark p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm cursor-pointer transition-all hover:shadow-md">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-2">
                                 <span class="text-xs font-bold text-slate-500">#ORD-421</span>
@@ -209,7 +209,12 @@ require_once '../../../config/admin_session.php';
                     </div>
                 </div>
             </div>
-            <div class="flex-1 relative bg-slate-200 dark:bg-slate-800 overflow-hidden">
+            <div id="mapSection" class="flex-1 relative bg-slate-200 dark:bg-slate-800 overflow-hidden transition-all duration-300 hidden">
+                <!-- Close Map Button -->
+                <button onclick="closeDeliveryMap()" class="absolute top-4 right-4 z-50 w-10 h-10 bg-white dark:bg-surface-dark rounded-lg shadow-lg flex items-center justify-center text-slate-600 hover:text-red-500 dark:text-slate-400 dark:hover:text-red-400 transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+
                 <div class="absolute inset-0 z-0">
                     <img class="w-full h-full object-cover opacity-80 mix-blend-multiply dark:mix-blend-overlay" data-alt="Stylized map background showing city streets" data-location="City Map" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaE897LTkuARXY-HinVU11cfdZ4spwIY8dKVMUq-UWrzxOTdc5h806doa3NUJPq5VSVHZTBSRURqlArkIclxV6jSZ-40sezJTPJHDzlUb4agA1Dfsj8_TWdrmJoAjLN2b6Qx5-5iASed4eWKUm3etE8_ScOMNNORbqEvm6tibauMFJqhtRgGWssCkeHbWl6Bs6T3JuHPtdyiYdkBD0mNrU5sqG8lChBve4HiYFWfjY6UyAdQe0iDbzTYONyzKQIA_yPo0r4rtrDhE" />
                     <div class="absolute inset-0 bg-slate-200/10 dark:bg-slate-900/30"></div>
@@ -314,6 +319,33 @@ require_once '../../../config/admin_session.php';
     </main>
 
     <?php include '../components/scripts.php'; ?>
+    <script>
+        function showDeliveryMap(orderId) {
+            const mapSection = document.getElementById('mapSection');
+            const deliveryListSection = document.getElementById('deliveryListSection');
+
+            // Show map
+            mapSection.classList.remove('hidden');
+
+            // Shrink delivery list to fixed width
+            deliveryListSection.classList.remove('w-full');
+            deliveryListSection.classList.add('w-[420px]');
+
+            console.log('Showing delivery map for:', orderId);
+        }
+
+        function closeDeliveryMap() {
+            const mapSection = document.getElementById('mapSection');
+            const deliveryListSection = document.getElementById('deliveryListSection');
+
+            // Hide map
+            mapSection.classList.add('hidden');
+
+            // Expand delivery list to full width
+            deliveryListSection.classList.remove('w-[420px]');
+            deliveryListSection.classList.add('w-full');
+        }
+    </script>
 </body>
 
 </html>

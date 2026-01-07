@@ -78,9 +78,7 @@
     }
 
     .sidebar-collapsed .sidebar-text {
-        opacity: 0;
-        width: 0;
-        overflow: hidden;
+        display: none !important;
     }
 
     /* Right panel slide-in animation */

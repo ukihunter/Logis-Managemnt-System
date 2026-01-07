@@ -16,12 +16,35 @@
 
     // Toggle logistics dropdown
     function toggleDropdown() {
-        const dropdown = document.getElementById('logisticsDropdown');
-        const arrow = document.getElementById('arrow');
+        const dropdown = document.getElementById("logisticsDropdown");
+        const arrow = document.getElementById("arrow");
 
-        if (dropdown && arrow) {
-            dropdown.classList.toggle('hidden');
-            arrow.classList.toggle('rotate-180');
+        dropdown.classList.toggle("hidden");
+        dropdown.classList.toggle("max-h-[500px]");
+        arrow.classList.toggle("rotate-180");
+    }
+
+    // Close dropdown when sidebar collapses
+    function closeDropdownOnCollapse() {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar && sidebar.classList.contains('sidebar-collapsed')) {
+            const dropdown = document.getElementById("logisticsDropdown");
+            const arrow = document.getElementById("arrow");
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                dropdown.classList.add("hidden");
+                dropdown.classList.remove("max-h-[500px]");
+                arrow.classList.remove("rotate-180");
+            }
         }
+    }
+
+    // Watch for sidebar collapse and close dropdown
+    const sidebarObserver = new MutationObserver(closeDropdownOnCollapse);
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+        sidebarObserver.observe(sidebar, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
     }
 </script>

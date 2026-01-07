@@ -3,10 +3,19 @@ function showOrderDetail() {
   const sidebar = document.getElementById("sidebar");
   const detailPanel = document.getElementById("detailPanel");
   const orderListSection = document.getElementById("orderListSection");
+  const dropdown = document.getElementById("logisticsDropdown");
+  const arrow = document.getElementById("arrow");
 
   // Collapse sidebar to icon-only mode
   sidebar.classList.remove("sidebar-expanded");
   sidebar.classList.add("sidebar-collapsed");
+
+  // Close dropdown if it's open
+  if (dropdown && !dropdown.classList.contains("hidden")) {
+    dropdown.classList.add("hidden");
+    dropdown.classList.remove("max-h-[500px]");
+    if (arrow) arrow.classList.remove("rotate-180");
+  }
 
   // Adjust order list width
   orderListSection.classList.remove("w-full");
