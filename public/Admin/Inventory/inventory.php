@@ -19,93 +19,8 @@ require_once '../../../config/admin_session.php';
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#11d452",
-                        "background-light": "#f6f8f6",
-                        "background-dark": "#102216",
-                        "surface-light": "#ffffff",
-                        "surface-dark": "#1a2e22",
-                    },
-                    fontFamily: {
-                        "display": ["Manrope", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.375rem", // rounded-md
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                },
-            },
-        }
-    </script>
+    <?php include '../components/styles.php'; ?>
     <style>
-        body {
-            font-family: 'Manrope', sans-serif;
-        }
-
-        /* Custom scrollbar for webkit */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-
-        .dark ::-webkit-scrollbar-thumb {
-            background: #2d4a3e;
-        }
-
-        /* Sidebar transition */
-        .sidebar-collapsed {
-            width: 5rem;
-        }
-
-        .sidebar-expanded {
-            width: 18rem;
-        }
-
-        aside {
-            transition: width 0.3s ease-in-out;
-        }
-
-        .sidebar-text {
-            opacity: 1;
-            transition: opacity 0.2s ease-in-out;
-        }
-
-        .sidebar-collapsed .sidebar-text {
-            opacity: 0;
-            width: 0;
-            overflow: hidden;
-        }
-
-        /* Right panel slide-in animation */
-        .detail-panel {
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .detail-panel.active {
-            transform: translateX(0);
-        }
-
         /* Image preview */
         .image-preview {
             display: none;
@@ -119,84 +34,8 @@ require_once '../../../config/admin_session.php';
 
 <body class="bg-background-light dark:bg-background-dark text-[#0d1b12] dark:text-white transition-colors duration-200">
     <div class="flex h-screen w-full overflow-hidden">
-        <!-- Side Navigation -->
-        <aside id="sidebar" class="sidebar-expanded flex-shrink-0 flex flex-col bg-surface-light dark:bg-surface-dark border-r border-[#e7f3eb] dark:border-[#2a4034] hidden lg:flex">
-            <div class="p-6 border-b border-[#e7f3eb] dark:border-[#2a4034]">
-                <div class="flex items-center gap-3">
-                    <div class="bg-primary/20 p-2 rounded-lg text-primary">
-                        <span class="material-symbols-outlined text-3xl text-primary">shopping_bag_speed</span>
-                    </div>
-                    <div class="flex flex-col sidebar-text">
-                        <h1 class="text-base font-bold leading-none whitespace-nowrap"><?php echo htmlspecialchars($province) . " RDC"; ?></h1>
-                        <p class="text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium mt-1">Staff Portal</p>
-                    </div>
-                </div>
-            </div>
-            <nav class="flex-1 overflow-y-auto py-4 px-3 flex flex-col gap-5">
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors font-medium group" href="../Dasboard/dasboard.php">
-                    <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">dashboard</span>
-                    <span class="sidebar-text">Dashboard</span>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors font-medium group" href="../Orders/orders.php">
+        <?php include '../components/sidebar.php'; ?>
 
-                    <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">shopping_cart</span>
-                    <span class="sidebar-text">Orders</span>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary font-medium group" href="../Inventory/inventory.php">
-
-                    <span class="material-symbols-outlined group-hover:scale-110 transition-transform">inventory_2</span>
-                    <span class="sidebar-text">Inventory</span>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors font-medium group" href="#">
-                    <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">local_shipping</span>
-                    <span class="sidebar-text">Logistics</span>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors font-medium group" href="#">
-                    <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">account_child_invert</span>
-                    <span class="sidebar-text">User Management</span>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors font-medium group" href="#">
-                    <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">description</span>
-                    <span class="sidebar-text">Reports</span>
-                </a>
-            </nav>
-            <div class="p-4 border-t border-[#e7f3eb] dark:border-[#2a4034] relative">
-                <div class="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-background-light dark:hover:bg-[#2a4034]">
-                    <!-- User Info -->
-                    <div class="flex items-center gap-3 min-w-0">
-                        <div class="size-8 rounded-full bg-cover bg-center flex-shrink-0"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCHud_yjkjGz0pDgk3H4D4QYFsrO1s3InLEFvPAxiEQkwg2F8faGX2QWPTL1Xnz6nbukCyc6NjyJvbc997p3MJOzuvktnvnnByG5JwKvmnQyZygnoQBbmSGSu2aVDrbxPT9exPDEJ47vOpaj5hv_IcyKxCEaXMrHa3AdEfaM-Bm0Z3ablCWaVQf5UCa1raIfHzwXSaKoDYjNyzK4F6u1QMBAW5fvIqczinJn1QMGMwubGxZnlCQuyqOjuS2aOVX86NCpwnuBdGUrcU');">
-                        </div>
-                        <div class="flex flex-col sidebar-text min-w-0">
-                            <p class="text-sm font-bold truncate">
-                                <?php echo htmlspecialchars($full_name); ?>
-                            </p>
-                            <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark truncate">
-                                <?php echo htmlspecialchars($user_type); ?>
-                            </p>
-                        </div>
-                    </div>
-                    <!-- Vertical Dots Menu -->
-                    <div class="relative sidebar-text flex-shrink-0">
-                        <button onclick="toggleUserMenu(event)"
-                            class="p-2 rounded hover:bg-gray-200 dark:hover:bg-[#2a4034] focus:outline-none">
-                            &#8942;
-                        </button>
-                        <!-- Dropdown -->
-                        <div id="userMenu"
-                            class="hidden absolute right-0 bottom-full mb-2 w-32 bg-white dark:bg-[#1f2f26]
-                       border border-gray-200 dark:border-[#2a4034]
-                       rounded-lg shadow-lg z-[100]">
-                            <a href="../../logout/logout.php"
-                                class="block px-4 py-2 text-sm text-red-600
-                           hover:bg-gray-100 dark:hover:bg-[#2a4034]">
-                                Logout
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </aside>
         <!-- Main Content -->
         <main id="mainContent" class="flex-1 flex flex-col h-full overflow-hidden relative transition-all duration-300">
 
@@ -697,6 +536,7 @@ require_once '../../../config/admin_session.php';
         </aside>
     </div>
 
+    <?php include '../components/scripts.php'; ?>
     <script src="js/scripts.js"></script>
 </body>
 

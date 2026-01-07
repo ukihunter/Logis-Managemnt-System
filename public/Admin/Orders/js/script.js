@@ -1,18 +1,3 @@
-// Toggle user menu
-function toggleUserMenu(event) {
-  event.stopPropagation();
-  const menu = document.getElementById("userMenu");
-  menu.classList.toggle("hidden");
-}
-
-// Close menu when clicking outside
-document.addEventListener("click", function (event) {
-  const menu = document.getElementById("userMenu");
-  if (!menu.classList.contains("hidden")) {
-    menu.classList.add("hidden");
-  }
-});
-
 // Show order detail panel and collapse sidebar
 function showOrderDetail() {
   const sidebar = document.getElementById("sidebar");

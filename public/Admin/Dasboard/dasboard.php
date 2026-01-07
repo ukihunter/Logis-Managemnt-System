@@ -42,97 +42,12 @@ require_once '../../../config/admin_session.php';
             },
         }
     </script>
-    <style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-    </style>
+    <?php include '../components/styles.php'; ?>
 </head>
 
 <body class="bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark font-display antialiased overflow-hidden">
     <div class="flex h-screen w-full overflow-hidden">
-        <!-- Sidebar -->
-        <aside class="w-64 flex-shrink-0 flex flex-col bg-surface-light dark:bg-surface-dark border-r border-[#e7f3eb] dark:border-[#2a4034] hidden lg:flex">
-            <div class="p-6 border-b border-[#e7f3eb] dark:border-[#2a4034]">
-                <div class="flex items-center gap-3">
-                    <div class="bg-primary/20 p-2 rounded-lg text-primary">
-                        <span class="material-symbols-outlined text-3xl text-primary">shopping_bag_speed</span>
-                    </div>
-                    <div class="flex flex-col">
-                        <h1 class="text-base font-bold leading-none"><?php echo htmlspecialchars($province) . " RDC"; ?></h1>
-                        <p class="text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium mt-1">Staff Portal</p>
-                    </div>
-                </div>
-            </div>
-            <nav class="flex-1 overflow-y-auto py-4 px-3 flex flex-col gap-5">
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary font-medium group" href="#">
-                    <span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
-                    Dashboard
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors font-medium group" href="../Orders/orders.php">
-                    <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">shopping_cart</span>
-                    Orders
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors font-medium group" href="../Inventory/inventory.php">
-                    <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">inventory_2</span>
-                    Inventory
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors font-medium group" href="#">
-                    <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">local_shipping</span>
-                    Logistics
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors font-medium group" href="#">
-                    <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">account_child_invert</span>
-                    User Management
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors font-medium group" href="#">
-                    <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">description</span>
-                    Reports
-                </a>
-            </nav>
-            <div class="p-4 border-t border-[#e7f3eb] dark:border-[#2a4034] relative">
-
-                <div class="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-background-light dark:hover:bg-[#2a4034]">
-
-                    <!-- User Info -->
-                    <div class="flex items-center gap-3">
-                        <div class="size-8 rounded-full bg-cover bg-center"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCHud_yjkjGz0pDgk3H4D4QYFsrO1s3InLEFvPAxiEQkwg2F8faGX2QWPTL1Xnz6nbukCyc6NjyJvbc997p3MJOzuvktnvnnByG5JwKvmnQyZygnoQBbmSGSu2aVDrbxPT9exPDEJ47vOpaj5hv_IcyKxCEaXMrHa3AdEfaM-Bm0Z3ablCWaVQf5UCa1raIfHzwXSaKoDYjNyzK4F6u1QMBAW5fvIqczinJn1QMGMwubGxZnlCQuyqOjuS2aOVX86NCpwnuBdGUrcU');">
-                        </div>
-
-                        <div class="flex flex-col">
-                            <p class="text-sm font-bold">
-                                <?php echo htmlspecialchars($full_name); ?>
-                            </p>
-                            <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">
-                                <?php echo htmlspecialchars($user_type); ?>
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Vertical Dots Menu -->
-                    <div class="relative">
-                        <button onclick="toggleUserMenu(event)"
-                            class="p-2 rounded hover:bg-gray-200 dark:hover:bg-[#2a4034] focus:outline-none">
-                            &#8942;
-                        </button>
-
-                        <!-- Dropdown -->
-                        <div id="userMenu"
-                            class="hidden absolute right-0 bottom-full mb-2 w-32 bg-white dark:bg-[#1f2f26]
-                       border border-gray-200 dark:border-[#2a4034]
-                       rounded-lg shadow-lg z-[100]">
-                            <a href="../../logout/logout.php"
-                                class="block px-4 py-2 text-sm text-red-600
-                           hover:bg-gray-100 dark:hover:bg-[#2a4034]">
-                                Logout
-                            </a>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </aside>
+        <?php include '../components/sidebar.php'; ?>
         <!-- Main Content -->
         <main class="flex-1 flex flex-col h-full overflow-hidden bg-background-light dark:bg-background-dark relative">
             <!-- Top Navbar -->
@@ -477,8 +392,8 @@ require_once '../../../config/admin_session.php';
             </div>
         </main>
     </div>
-    <script src="js/script.js"></script>
-</body>
 
+    <?php include '../components/scripts.php'; ?>
+</body>
 
 </html>
