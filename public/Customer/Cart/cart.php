@@ -221,26 +221,28 @@ $conn->close();
             <span class="material-symbols-outlined text-sm text-gray-400">chevron_right</span>
             <span class="font-semibold text-text-main dark:text-white">Shopping Cart</span>
         </div>
-        
+
         <!-- Success/Error Messages -->
         <?php if (isset($_SESSION['success'])): ?>
-        <div class="mb-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 px-4 py-3 rounded-lg flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined">check_circle</span>
-                <span><?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></span>
+            <div class="mb-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 px-4 py-3 rounded-lg flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined">check_circle</span>
+                    <span><?php echo htmlspecialchars($_SESSION['success']);
+                            unset($_SESSION['success']); ?></span>
+                </div>
             </div>
-        </div>
         <?php endif; ?>
-        
+
         <?php if (isset($_SESSION['error'])): ?>
-        <div class="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined">error</span>
-                <span><?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></span>
+            <div class="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined">error</span>
+                    <span><?php echo htmlspecialchars($_SESSION['error']);
+                            unset($_SESSION['error']); ?></span>
+                </div>
             </div>
-        </div>
         <?php endif; ?>
-        
+
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- Left Column: Cart Items -->
             <div class="lg:col-span-8 space-y-6">

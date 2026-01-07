@@ -95,7 +95,7 @@ $conn->close();
                     </div>
                     <span class="px-3 py-1 bg-green-600 text-white text-sm font-bold rounded-full">PAID</span>
                 </div>
-                
+
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Order Number</p>

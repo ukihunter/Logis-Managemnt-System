@@ -26,13 +26,13 @@ try {
     $stmt_user->execute();
     $user_result = $stmt_user->get_result();
     $user = $user_result->fetch_assoc();
-    
+
     if (!$user) {
         $_SESSION['error'] = 'User account not found';
         header('Location: cart.php');
         exit;
     }
-    
+
     // Get cart items
     $cart_query = "SELECT c.id as cart_id, c.quantity,
                           p.id as product_id, p.name, p.sku, p.image_path,
