@@ -93,12 +93,12 @@ if ($action === 'add') {
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
 
     $stmt = $conn->prepare($insertQuery);
-    
+
     if (!$stmt) {
         echo json_encode(['success' => false, 'message' => 'Database error: ' . $conn->error]);
         exit();
     }
-    
+
     $stmt->bind_param("ssssssdidiiissdi", $sku, $name, $description, $category, $brand, $image_path, $unit_price, $carton_quantity, $carton_price, $stock_level, $max_level, $allocated, $status, $offer_label, $discount_percentage, $is_featured);
 
     if ($stmt->execute()) {
