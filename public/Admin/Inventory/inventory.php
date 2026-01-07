@@ -1,5 +1,48 @@
 <?php
 require_once '../../../config/admin_session.php';
+require_once '../../../config/database.php';
+
+$conn = getDBConnection();
+
+// Fetch products from database
+$query = "SELECT * FROM products ORDER BY created_at DESC";
+$result = $conn->query($query);
+$products = [];
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $products[] = $row;
+    }
+}
+
+// Fetch categories
+$categories_query = "SELECT * FROM categories ORDER BY name";
+$categories_result = $conn->query($categories_query);
+$categories = [];
+if ($categories_result) {
+    while ($row = $categories_result->fetch_assoc()) {
+        $categories[] = $row;
+    }
+}
+
+// Fetch brands
+$brands_query = "SELECT * FROM brands ORDER BY name";
+$brands_result = $conn->query($brands_query);
+$brands = [];
+if ($brands_result) {
+    while ($row = $brands_result->fetch_assoc()) {
+        $brands[] = $row;
+    }
+}
+
+// Calculate statistics
+$total_stock_value = 0;
+$low_stock_items = 0;
+foreach ($products as $product) {
+    $total_stock_value += $product['stock_level'] * $product['unit_price'];
+    if ($product['stock_level'] < ($product['max_level'] * 0.2)) {
+        $low_stock_items++;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -154,263 +197,87 @@ require_once '../../../config/admin_session.php';
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-[#e7f3eb] dark:divide-white/5">
-                                        <!-- Row 1 -->
-                                        <tr class="group hover:bg-[#f6f8f6] dark:hover:bg-white/5 transition-colors cursor-pointer">
-                                            <td class="py-4 px-6">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="size-10 rounded-lg bg-gray-100 dark:bg-gray-800 bg-center bg-cover" data-alt="Can of premium tuna fish" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCSROr5BtDMAAsEjm0QUNbw2bNIKTYracstmIDSd0TLqYNaWLCVnDY-QC_lNtaUjAu-uc-cPP7-eZMtQAU1tbuAMjYYwnDXY9ASq0VrOfliM5FEol7MaZc3_Gnq7XZGJfHMp-GgzJNqPtZSWk8YSFj8Zcv3A1H68UOFM4SQkSXP3Lh2ZucKOmuzQefDiIEFtoYapzbccHZw-DIsCCSQYJNc3-nz_RJzrpNyAs28h5OMP1zFUJdHMEI1FMgr8YRHS4mzBzHtptadxWQ");'></div>
-                                                    <div>
-                                                        <p class="text-sm font-bold text-[#0d1b12] dark:text-white">Canned Tuna 180g</p>
-                                                        <p class="text-xs text-[#4c9a66] dark:text-gray-500">SKU: TN-180-ORG</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-4 px-6">
-                                                <span class="inline-flex items-center rounded-md bg-[#e7f3eb] dark:bg-white/10 px-2 py-1 text-xs font-medium text-[#0d1b12] dark:text-white ring-1 ring-inset ring-gray-500/10">Staples</span>
-                                            </td>
-                                            <td class="py-4 px-6">
-                                                <div class="flex flex-col gap-1 w-24">
-                                                    <div class="flex justify-between text-xs">
-                                                        <span class="font-bold text-[#0d1b12] dark:text-white">2,450</span>
-                                                        <span class="text-gray-400">/ 3k</span>
-                                                    </div>
-                                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-                                                        <div class="bg-primary h-1.5 rounded-full" style="width: 80%"></div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-4 px-6 text-sm text-[#0d1b12] dark:text-white">120</td>
-                                            <td class="py-4 px-6 text-sm font-medium text-[#0d1b12] dark:text-white">$1.85</td>
-                                            <td class="py-4 px-6">
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-green-50 dark:bg-green-900/20 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20">
-                                                    <span class="size-1.5 rounded-full bg-green-600 dark:bg-green-400"></span>
-                                                    In Stock
-                                                </span>
-                                            </td>
-                                            <td class="py-4 px-6 text-right">
-                                                <div class="flex items-center justify-end gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                                        <?php if (empty($products)): ?>
+                                            <tr>
+                                                <td colspan="7" class="py-8 px-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                                                    No products found. Click "New Stock Entry" to add your first product.
+                                                </td>
+                                            </tr>
+                                        <?php else: ?>
+                                            <?php foreach ($products as $product):
+                                                // Calculate stock status
+                                                $stock_percentage = ($product['max_level'] > 0) ? ($product['stock_level'] / $product['max_level']) * 100 : 0;
+                                                $is_low_stock = $product['stock_level'] < ($product['max_level'] * 0.2);
+                                                $is_out_of_stock = $product['stock_level'] <= 0 || $product['status'] === 'out_of_stock';
 
-                                                    <button onclick="openProductPanel('edit', 'Canned Tuna 180g', 'TN-180-ORG')" class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 hover:text-primary transition-colors" title="Edit Details">
-                                                        <span class="material-symbols-outlined text-[20px]">edit</span>
-                                                    </button>
-                                                    <button class="p-1.5 rounded-md text-red-500 hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 hover:text-primary transition-colors" title="Transfer Stock">
-                                                        <span class="material-symbols-outlined text-[20px] ">heart_broken</span>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <!-- Row 2 -->
-                                        <tr class="group hover:bg-[#f6f8f6] dark:hover:bg-white/5 transition-colors cursor-pointer">
-                                            <td class="py-4 px-6">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="size-10 rounded-lg bg-gray-100 dark:bg-gray-800 bg-center bg-cover" data-alt="Pack of gourmet coffee beans" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBuqW0rCKpzzrXLr-J7tx3iAQkuvuxL_dd_MfIdxRcsEJNumuNAw51F1hqc1UJHxDAniMULSmJwb3rmRw4-ncocOWi9rFdtcUwy5d4U8zoCuibvgQoCjdyiKzdhN3uwccpjIMLwgyp0FUZCpUnw4FNb7ij8ijYAQ1xchUfkWqRDMOp9mv_JHndndsl7Rtoc92XUzm1KEZXL0ODu6tA5tOudA6r3d1rrRJuq9ZcSFn51R8YsVTGR3_UUrvom_ASz1e1Hpf8NMixIN90");'></div>
-                                                    <div>
-                                                        <p class="text-sm font-bold text-[#0d1b12] dark:text-white">Arabica Coffee 500g</p>
-                                                        <p class="text-xs text-[#4c9a66] dark:text-gray-500">SKU: CF-500-AR</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-4 px-6">
-                                                <span class="inline-flex items-center rounded-md bg-[#e7f3eb] dark:bg-white/10 px-2 py-1 text-xs font-medium text-[#0d1b12] dark:text-white ring-1 ring-inset ring-gray-500/10">Beverages</span>
-                                            </td>
-                                            <td class="py-4 px-6">
-                                                <div class="flex flex-col gap-1 w-24">
-                                                    <div class="flex justify-between text-xs">
-                                                        <span class="font-bold text-red-600 dark:text-red-400">45</span>
-                                                        <span class="text-gray-400">/ 500</span>
-                                                    </div>
-                                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-                                                        <div class="bg-red-500 h-1.5 rounded-full" style="width: 10%"></div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-4 px-6 text-sm text-[#0d1b12] dark:text-white">10</td>
-                                            <td class="py-4 px-6 text-sm font-medium text-[#0d1b12] dark:text-white">$12.50</td>
-                                            <td class="py-4 px-6">
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-red-50 dark:bg-red-900/20 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/10">
-                                                    <span class="size-1.5 rounded-full bg-red-600 dark:bg-red-400"></span>
-                                                    Low Stock
-                                                </span>
-                                            </td>
-                                            <td class="py-4 px-6 text-right">
-                                                <div class="flex items-center justify-end gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                                                // Stock status badge
+                                                if ($is_out_of_stock) {
+                                                    $status_badge = '<span class="inline-flex items-center gap-1 rounded-full bg-gray-50 dark:bg-gray-900/20 px-2 py-1 text-xs font-medium text-gray-700 dark:text-gray-400 ring-1 ring-inset ring-gray-600/20"><span class="size-1.5 rounded-full bg-gray-600 dark:bg-gray-400"></span>Out of Stock</span>';
+                                                } elseif ($is_low_stock) {
+                                                    $status_badge = '<span class="inline-flex items-center gap-1 rounded-full bg-red-50 dark:bg-red-900/20 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/10"><span class="size-1.5 rounded-full bg-red-600 dark:bg-red-400"></span>Low Stock</span>';
+                                                } else {
+                                                    $status_badge = '<span class="inline-flex items-center gap-1 rounded-full bg-green-50 dark:bg-green-900/20 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20"><span class="size-1.5 rounded-full bg-green-600 dark:bg-green-400"></span>In Stock</span>';
+                                                }
 
-                                                    <button onclick="openProductPanel('edit', 'Canned Tuna 180g', 'TN-180-ORG')" class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 hover:text-primary transition-colors" title="Edit Details">
-                                                        <span class="material-symbols-outlined text-[20px]">edit</span>
-                                                    </button>
-                                                    <button class="p-1.5 rounded-md text-red-500 hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 hover:text-primary transition-colors" title="Transfer Stock">
-                                                        <span class="material-symbols-outlined text-[20px] ">heart_broken</span>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <!-- Row 3 -->
-                                        <tr class="group hover:bg-[#f6f8f6] dark:hover:bg-white/5 transition-colors cursor-pointer">
-                                            <td class="py-4 px-6">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="size-10 rounded-lg bg-gray-100 dark:bg-gray-800 bg-center bg-cover" data-alt="Bag of basmati rice" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCDJqwPdyP_8h8bQBK273daOCb4zwnXgzbuVkuqQxv_4GsbUODnD5SqOk1mBA1HCV-5eN7QNnlOFdGm7NGJw1SGQY4jK-NUysqaBlBR0ZljpApn1LADBgfZeVpPWiemBYLHv9FAerYSUkRZDQIH8i6DkO-qqgB9cCHXx_Y9XuGvJ8fZHYaxTANcHvY4rHewUiJ5dZlbg3ZxC-0n6sdDRCgHRvNnzzz_s55uK8h2IyvrCFC2aCVpr8nmB7inJAhgnvB6oDwx7WmIHlM");'></div>
-                                                    <div>
-                                                        <p class="text-sm font-bold text-[#0d1b12] dark:text-white">Basmati Rice 5kg</p>
-                                                        <p class="text-xs text-[#4c9a66] dark:text-gray-500">SKU: RC-5KG-BAS</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-4 px-6">
-                                                <span class="inline-flex items-center rounded-md bg-[#e7f3eb] dark:bg-white/10 px-2 py-1 text-xs font-medium text-[#0d1b12] dark:text-white ring-1 ring-inset ring-gray-500/10">Staples</span>
-                                            </td>
-                                            <td class="py-4 px-6">
-                                                <div class="flex flex-col gap-1 w-24">
-                                                    <div class="flex justify-between text-xs">
-                                                        <span class="font-bold text-[#0d1b12] dark:text-white">850</span>
-                                                        <span class="text-gray-400">/ 1k</span>
-                                                    </div>
-                                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-                                                        <div class="bg-primary h-1.5 rounded-full" style="width: 85%"></div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-4 px-6 text-sm text-[#0d1b12] dark:text-white">200</td>
-                                            <td class="py-4 px-6 text-sm font-medium text-[#0d1b12] dark:text-white">$8.99</td>
-                                            <td class="py-4 px-6">
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-green-50 dark:bg-green-900/20 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20">
-                                                    <span class="size-1.5 rounded-full bg-green-600 dark:bg-green-400"></span>
-                                                    In Stock
-                                                </span>
-                                            </td>
-                                            <td class="py-4 px-6 text-right">
-                                                <div class="flex items-center justify-end gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
-
-                                                    <button onclick="openProductPanel('edit', 'Canned Tuna 180g', 'TN-180-ORG')" class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 hover:text-primary transition-colors" title="Edit Details">
-                                                        <span class="material-symbols-outlined text-[20px]">edit</span>
-                                                    </button>
-                                                    <button class="p-1.5 rounded-md text-red-500 hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 hover:text-primary transition-colors" title="Transfer Stock">
-                                                        <span class="material-symbols-outlined text-[20px] ">heart_broken</span>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <!-- Row 4 -->
-                                        <tr class="group hover:bg-[#f6f8f6] dark:hover:bg-white/5 transition-colors cursor-pointer">
-                                            <td class="py-4 px-6">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="size-10 rounded-lg bg-gray-100 dark:bg-gray-800 bg-center bg-cover" data-alt="Bottle of sparkling water" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCqHQJ8RlZpRUcl-G4TO1Sub_PPqWwqG_oEzQYtu5DSCl38jCXYubYvJhbEQU-MHTvF53cCaWMDD3nhnfSMAUeq5H0kgCCx4fKATR_HP47AWCTeX47yjVZDUqnMSEh03J5sVmN3_Ozzwl13aIJHkgof_7_Hmk2jVUWvXVwBqz3faalevoJXiMyfeCbhLSzER7EYduy4UIpN_I-EbZvWUu3Z20qH2buG9dfjckR3UDS2cBtH9FILPLDjOVmEu6VC25C43Sx1T8S17vk");'></div>
-                                                    <div>
-                                                        <p class="text-sm font-bold text-[#0d1b12] dark:text-white">Sparkling Water 1L</p>
-                                                        <p class="text-xs text-[#4c9a66] dark:text-gray-500">SKU: WT-1L-SPK</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-4 px-6">
-                                                <span class="inline-flex items-center rounded-md bg-[#e7f3eb] dark:bg-white/10 px-2 py-1 text-xs font-medium text-[#0d1b12] dark:text-white ring-1 ring-inset ring-gray-500/10">Beverages</span>
-                                            </td>
-                                            <td class="py-4 px-6">
-                                                <div class="flex flex-col gap-1 w-24">
-                                                    <div class="flex justify-between text-xs">
-                                                        <span class="font-bold text-gray-400">0</span>
-                                                        <span class="text-gray-400">/ 2k</span>
-                                                    </div>
-                                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-                                                        <div class="bg-gray-400 h-1.5 rounded-full" style="width: 0%"></div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-4 px-6 text-sm text-[#0d1b12] dark:text-white">0</td>
-                                            <td class="py-4 px-6 text-sm font-medium text-[#0d1b12] dark:text-white">$0.99</td>
-                                            <td class="py-4 px-6">
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 ring-1 ring-inset ring-gray-500/10">
-                                                    <span class="size-1.5 rounded-full bg-gray-500"></span>
-                                                    Out of Stock
-                                                </span>
-                                            </td>
-                                            <td class="py-4 px-6 text-right">
-                                                <div class="flex items-center justify-end gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
-
-                                                    <button onclick="openProductPanel('edit', 'Canned Tuna 180g', 'TN-180-ORG')" class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 hover:text-primary transition-colors" title="Edit Details">
-                                                        <span class="material-symbols-outlined text-[20px]">edit</span>
-                                                    </button>
-                                                    <button class="p-1.5 rounded-md text-red-500 hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 hover:text-primary transition-colors" title="Transfer Stock">
-                                                        <span class="material-symbols-outlined text-[20px] ">heart_broken</span>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <!-- Row 5 -->
-                                        <tr class="group hover:bg-[#f6f8f6] dark:hover:bg-white/5 transition-colors cursor-pointer">
-                                            <td class="py-4 px-6">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="size-10 rounded-lg bg-gray-100 dark:bg-gray-800 bg-center bg-cover" data-alt="Pack of spicy chips" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBjmZAe_jsT13WzEVhDGACVSLX89FqowcJEKwEApuH5CkhnDfwRcHZGz47m77TkLwuRQC3-3KT3G54oLUwQDBLjr1iJkUBDMGP0_cgH3ZeKeTPQOUkFzrPwvsgWM2iFl-y7_bJ94JkglBEW5xDPbbSblwpuaetb_Jk5s-uVoPtgS6cpRo_KkQV9Iirk5QOEeBtFC-MtkHh_9VKJ30HUaCEDOVf0x5PJSQF4LVtCnVHDjXsaE1q-0hIaoEMQrTs-8YrD-Bwmr49x8Kc");'></div>
-                                                    <div>
-                                                        <p class="text-sm font-bold text-[#0d1b12] dark:text-white">Spicy Chips 150g</p>
-                                                        <p class="text-xs text-[#4c9a66] dark:text-gray-500">SKU: SN-150-SPC</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-4 px-6">
-                                                <span class="inline-flex items-center rounded-md bg-[#e7f3eb] dark:bg-white/10 px-2 py-1 text-xs font-medium text-[#0d1b12] dark:text-white ring-1 ring-inset ring-gray-500/10">Snacks</span>
-                                            </td>
-                                            <td class="py-4 px-6">
-                                                <div class="flex flex-col gap-1 w-24">
-                                                    <div class="flex justify-between text-xs">
-                                                        <span class="font-bold text-[#0d1b12] dark:text-white">1,200</span>
-                                                        <span class="text-gray-400">/ 1.5k</span>
-                                                    </div>
-                                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-                                                        <div class="bg-primary h-1.5 rounded-full" style="width: 80%"></div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-4 px-6 text-sm text-[#0d1b12] dark:text-white">50</td>
-                                            <td class="py-4 px-6 text-sm font-medium text-[#0d1b12] dark:text-white">$2.49</td>
-                                            <td class="py-4 px-6">
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-green-50 dark:bg-green-900/20 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20">
-                                                    <span class="size-1.5 rounded-full bg-green-600 dark:bg-green-400"></span>
-                                                    In Stock
-                                                </span>
-                                            </td>
-                                            <td class="py-4 px-6 text-right">
-                                                <div class="flex items-center justify-end gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
-
-                                                    <button onclick="openProductPanel('edit', 'Canned Tuna 180g', 'TN-180-ORG')" class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 hover:text-primary transition-colors" title="Edit Details">
-                                                        <span class="material-symbols-outlined text-[20px]">edit</span>
-                                                    </button>
-                                                    <button class="p-1.5 rounded-md text-red-500 hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 hover:text-primary transition-colors" title="Transfer Stock">
-                                                        <span class="material-symbols-outlined text-[20px] ">heart_broken</span>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                                // Progress bar color
+                                                $bar_color = $is_low_stock ? 'bg-red-500' : 'bg-primary';
+                                                $stock_text_color = $is_low_stock ? 'text-red-600 dark:text-red-400' : 'text-[#0d1b12] dark:text-white';
+                                            ?>
+                                                <tr class="group hover:bg-[#f6f8f6] dark:hover:bg-white/5 transition-colors cursor-pointer">
+                                                    <td class="py-4 px-6">
+                                                        <div class="flex items-center gap-3">
+                                                            <?php if (!empty($product['image_path']) && file_exists('../../../' . $product['image_path'])): ?>
+                                                                <div class="size-10 rounded-lg bg-gray-100 dark:bg-gray-800 bg-center bg-cover" style='background-image: url("../../../<?php echo htmlspecialchars($product['image_path']); ?>");'></div>
+                                                            <?php else: ?>
+                                                                <div class="size-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                                                                    <span class="material-symbols-outlined text-gray-400 text-[20px]">inventory_2</span>
+                                                                </div>
+                                                            <?php endif; ?>
+                                                            <div>
+                                                                <p class="text-sm font-bold text-[#0d1b12] dark:text-white"><?php echo htmlspecialchars($product['name']); ?></p>
+                                                                <p class="text-xs text-[#4c9a66] dark:text-gray-500">SKU: <?php echo htmlspecialchars($product['sku']); ?></p>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="py-4 px-6">
+                                                        <span class="inline-flex items-center rounded-md bg-[#e7f3eb] dark:bg-white/10 px-2 py-1 text-xs font-medium text-[#0d1b12] dark:text-white ring-1 ring-inset ring-gray-500/10"><?php echo htmlspecialchars($product['category']); ?></span>
+                                                    </td>
+                                                    <td class="py-4 px-6">
+                                                        <div class="flex flex-col gap-1 w-24">
+                                                            <div class="flex justify-between text-xs">
+                                                                <span class="font-bold <?php echo $stock_text_color; ?>"><?php echo number_format($product['stock_level']); ?></span>
+                                                                <span class="text-gray-400">/ <?php echo number_format($product['max_level']); ?></span>
+                                                            </div>
+                                                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                                                                <div class="<?php echo $bar_color; ?> h-1.5 rounded-full" style="width: <?php echo min($stock_percentage, 100); ?>%"></div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="py-4 px-6 text-sm text-[#0d1b12] dark:text-white"><?php echo number_format($product['allocated']); ?></td>
+                                                    <td class="py-4 px-6 text-sm font-medium text-[#0d1b12] dark:text-white">Rs <?php echo number_format($product['unit_price'], 2); ?></td>
+                                                    <td class="py-4 px-6">
+                                                        <?php echo $status_badge; ?>
+                                                    </td>
+                                                    <td class="py-4 px-6 text-right">
+                                                        <div class="flex items-center justify-end gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                                                            <button onclick="openProductPanel('edit', <?php echo $product['id']; ?>)" class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 hover:text-primary transition-colors" title="Edit Details">
+                                                                <span class="material-symbols-outlined text-[20px]">edit</span>
+                                                            </button>
+                                                            <button onclick="deleteProduct(<?php echo $product['id']; ?>)" class="p-1.5 rounded-md text-red-500 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors" title="Delete Product">
+                                                                <span class="material-symbols-outlined text-[20px]">delete</span>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
-                            <!-- Pagination -->
-                            <div class="flex items-center justify-between border-t border-[#cfe7d7] dark:border-white/10 bg-[#f8fcf9] dark:bg-surface-dark px-4 py-3 sm:px-6">
-                                <div class="hidden sm:flex flex-1 items-center justify-between">
-                                    <div>
-                                        <p class="text-sm text-[#4c9a66] dark:text-gray-400">
-                                            Showing <span class="font-medium text-[#0d1b12] dark:text-white">1</span> to <span class="font-medium text-[#0d1b12] dark:text-white">5</span> of <span class="font-medium text-[#0d1b12] dark:text-white">124</span> results
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <nav aria-label="Pagination" class="isolate inline-flex -space-x-px rounded-md shadow-sm">
-                                            <a class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-white/10 hover:bg-gray-50 dark:hover:bg-white/5 focus:z-20 focus:outline-offset-0" href="#">
-                                                <span class="sr-only">Previous</span>
-                                                <span class="material-symbols-outlined text-[20px]">chevron_left</span>
-                                            </a>
-                                            <a aria-current="page" class="relative z-10 inline-flex items-center bg-primary px-4 py-2 text-sm font-semibold text-[#0d1b12] focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" href="#">1</a>
-                                            <a class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-[#0d1b12] dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-white/10 hover:bg-gray-50 dark:hover:bg-white/5 focus:z-20 focus:outline-offset-0" href="#">2</a>
-                                            <a class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-[#0d1b12] dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-white/10 hover:bg-gray-50 dark:hover:bg-white/5 focus:z-20 focus:outline-offset-0" href="#">3</a>
-                                            <a class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-white/10 hover:bg-gray-50 dark:hover:bg-white/5 focus:z-20 focus:outline-offset-0" href="#">
-                                                <span class="sr-only">Next</span>
-                                                <span class="material-symbols-outlined text-[20px]">chevron_right</span>
-                                            </a>
-                                        </nav>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
+
                     </div>
                 </div>
-            </div>
         </main>
 
         <!-- Right Panel: Product Form -->
@@ -428,7 +295,10 @@ require_once '../../../config/admin_session.php';
 
             <!-- Scrollable Form Content -->
             <div class="flex-1 overflow-y-auto p-6">
-                <form id="productForm" class="space-y-6">
+                <form id="productForm" enctype="multipart/form-data" class="space-y-6">
+                    <input type="hidden" id="productId" name="product_id" value="">
+                    <input type="hidden" id="formAction" name="action" value="add">
+
                     <!-- Product Image Upload -->
                     <div>
                         <label class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Product Image</label>
@@ -445,7 +315,7 @@ require_once '../../../config/admin_session.php';
                                     <p class="text-xs text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
                                     <p class="text-xs text-gray-400">PNG, JPG up to 5MB</p>
                                 </div>
-                                <input id="productImage" type="file" class="hidden" accept="image/*" onchange="previewImage(event)">
+                                <input id="productImage" name="product_image" type="file" class="hidden" accept="image/*" onchange="previewImage(event)">
                             </label>
                         </div>
                     </div>
@@ -453,58 +323,92 @@ require_once '../../../config/admin_session.php';
                     <!-- Product Name -->
                     <div>
                         <label for="productName" class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Product Name <span class="text-red-500">*</span></label>
-                        <input type="text" id="productName" required class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g., Premium Jasmine Rice">
+                        <input type="text" id="productName" name="name" required class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g., Coca-Cola Original Taste 330ml Can">
                     </div>
 
                     <!-- SKU -->
                     <div>
                         <label for="productSKU" class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">SKU <span class="text-red-500">*</span></label>
-                        <input type="text" id="productSKU" required class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g., RC-5KG-JAS">
+                        <input type="text" id="productSKU" name="sku" required class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g., BV-001-COKE">
                     </div>
 
-                    <!-- Category -->
-                    <div>
-                        <label for="productCategory" class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Category <span class="text-red-500">*</span></label>
-                        <select id="productCategory" required class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                            <option value="">Select a category</option>
-                            <option value="Beverages">Beverages</option>
-                            <option value="Snacks">Snacks</option>
-                            <option value="Staples">Staples</option>
-                            <option value="Home Care">Home Care</option>
-                        </select>
+                    <!-- Category and Brand -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="productCategory" class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Category <span class="text-red-500">*</span></label>
+                            <select id="productCategory" name="category" required class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="">Select category</option>
+                                <?php foreach ($categories as $cat): ?>
+                                    <option value="<?php echo htmlspecialchars($cat['name']); ?>"><?php echo htmlspecialchars($cat['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="productBrand" class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Brand</label>
+                            <select id="productBrand" name="brand" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="">Select brand</option>
+                                <?php foreach ($brands as $brand): ?>
+                                    <option value="<?php echo htmlspecialchars($brand['name']); ?>"><?php echo htmlspecialchars($brand['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Unit Price and Carton Quantity -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="unitPrice" class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Unit Price (Rs) <span class="text-red-500">*</span></label>
+                            <input type="number" id="unitPrice" name="unit_price" required min="0" step="0.01" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0.85">
+                        </div>
+                        <div>
+                            <label for="cartonQuantity" class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Carton Qty</label>
+                            <input type="number" id="cartonQuantity" name="carton_quantity" min="1" value="1" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="24">
+                        </div>
                     </div>
 
                     <!-- Stock Quantity and Max Level -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label for="stockLevel" class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Stock Level <span class="text-red-500">*</span></label>
-                            <input type="number" id="stockLevel" required min="0" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0">
+                            <input type="number" id="stockLevel" name="stock_level" required min="0" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0">
                         </div>
                         <div>
                             <label for="maxLevel" class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Max Level</label>
-                            <input type="number" id="maxLevel" min="0" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0">
+                            <input type="number" id="maxLevel" name="max_level" min="0" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0">
                         </div>
                     </div>
 
-                    <!-- Allocated and Unit Price -->
+                    <!-- Allocated -->
+                    <div>
+                        <label for="allocated" class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Allocated</label>
+                        <input type="number" id="allocated" name="allocated" min="0" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0">
+                    </div>
+
+                    <!-- Offer Label and Discount -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label for="allocated" class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Allocated</label>
-                            <input type="number" id="allocated" min="0" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0">
+                            <label for="offerLabel" class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Offer Label</label>
+                            <select id="offerLabel" name="offer_label" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="">None</option>
+                                <option value="Best Seller">Best Seller</option>
+                                <option value="New Arrival">New Arrival</option>
+                                <option value="Sale">Sale</option>
+                                <option value="Limited Stock">Limited Stock</option>
+                            </select>
                         </div>
                         <div>
-                            <label for="unitPrice" class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Unit Price ($) <span class="text-red-500">*</span></label>
-                            <input type="number" id="unitPrice" required min="0" step="0.01" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0.00">
+                            <label for="discount" class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Discount %</label>
+                            <input type="number" id="discount" name="discount_percentage" min="0" max="100" step="0.1" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0">
                         </div>
                     </div>
 
                     <!-- Description -->
                     <div>
                         <label for="description" class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Description</label>
-                        <textarea id="description" rows="3" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none" placeholder="Add product description..."></textarea>
+                        <textarea id="description" name="description" rows="3" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none" placeholder="Add product description..."></textarea>
                     </div>
 
-                    <!-- Status -->
+                    <!-- Status and Featured -->
                     <div>
                         <label class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Status</label>
                         <div class="flex gap-4">
@@ -518,6 +422,17 @@ require_once '../../../config/admin_session.php';
                             </label>
                         </div>
                     </div>
+
+                    <!-- Featured Product -->
+                    <div>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="isFeatured" name="is_featured" value="1" class="w-5 h-5 text-primary rounded focus:ring-primary">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-bold text-[#0d1b12] dark:text-white">Featured Product</span>
+                                <span class="text-xs text-gray-500">Display this product prominently in the catalog</span>
+                            </div>
+                        </label>
+                    </div>
                 </form>
             </div>
 
@@ -527,7 +442,7 @@ require_once '../../../config/admin_session.php';
                     <button onclick="closeProductPanel()" type="button" class="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 dark:border-gray-700 text-[#0d1b12] dark:text-white rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 font-bold text-sm transition-colors">
                         Cancel
                     </button>
-                    <button type="submit" form="productForm" class="flex-[2] flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-[#0ebf49] text-[#0d1b12] rounded-lg font-bold text-sm shadow-md shadow-primary/20 transition-all active:scale-[0.98]">
+                    <button type="button" onclick="submitProduct()" class="flex-[2] flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-[#0ebf49] text-[#0d1b12] rounded-lg font-bold text-sm shadow-md shadow-primary/20 transition-all active:scale-[0.98]">
                         <span class="material-symbols-outlined text-[18px]">check</span>
                         <span id="submitButtonText">Add Product</span>
                     </button>

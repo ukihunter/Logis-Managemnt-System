@@ -107,7 +107,7 @@
                     class="hidden absolute right-0 bottom-full mb-2 w-32 bg-white dark:bg-[#1f2f26]
                border border-gray-200 dark:border-[#2a4034]
                rounded-lg shadow-lg z-[100]">
-                    <a href="<?php echo getRelativePath('logout/logout.php', true); ?>"
+                    <a href="<?php echo getRelativePath('/public/logout/logout.php', true); ?>"
                         class="block px-4 py-2 text-sm text-red-600
                    hover:bg-gray-100 dark:hover:bg-[#2a4034]">
                         Logout
