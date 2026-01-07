@@ -1,0 +1,58 @@
+// Toggle user menu
+function toggleUserMenu(event) {
+  event.stopPropagation();
+  const menu = document.getElementById("userMenu");
+  menu.classList.toggle("hidden");
+}
+
+// Close menu when clicking outside
+document.addEventListener("click", function (event) {
+  const menu = document.getElementById("userMenu");
+  if (!menu.classList.contains("hidden")) {
+    menu.classList.add("hidden");
+  }
+});
+
+// Show order detail panel and collapse sidebar
+function showOrderDetail() {
+  const sidebar = document.getElementById("sidebar");
+  const detailPanel = document.getElementById("detailPanel");
+  const orderListSection = document.getElementById("orderListSection");
+
+  // Collapse sidebar to icon-only mode
+  sidebar.classList.remove("sidebar-expanded");
+  sidebar.classList.add("sidebar-collapsed");
+
+  // Adjust order list width
+  orderListSection.classList.remove("w-full");
+  orderListSection.classList.add("w-7/12", "xl:w-8/12");
+
+  // Show detail panel
+  detailPanel.classList.remove("hidden");
+  detailPanel.classList.add("flex");
+  setTimeout(() => {
+    detailPanel.classList.add("active");
+  }, 10);
+}
+
+// Close order detail panel and expand sidebar
+function closeOrderDetail() {
+  const sidebar = document.getElementById("sidebar");
+  const detailPanel = document.getElementById("detailPanel");
+  const orderListSection = document.getElementById("orderListSection");
+
+  // Hide detail panel
+  detailPanel.classList.remove("active");
+  setTimeout(() => {
+    detailPanel.classList.add("hidden");
+    detailPanel.classList.remove("flex");
+  }, 300);
+
+  // Restore order list to full width
+  orderListSection.classList.remove("w-7/12", "xl:w-8/12");
+  orderListSection.classList.add("w-full");
+
+  // Expand sidebar back to full width
+  sidebar.classList.remove("sidebar-collapsed");
+  sidebar.classList.add("sidebar-expanded");
+}

@@ -69,11 +69,11 @@ require_once '../../../config/admin_session.php';
                     <span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
                     Dashboard
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors font-medium group" href="#">
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors font-medium group" href="../Orders/orders.php">
                     <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">shopping_cart</span>
                     Orders
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors font-medium group" href="#">
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors font-medium group" href="../Inventory/inventory.php">
                     <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">inventory_2</span>
                     Inventory
                 </a>
