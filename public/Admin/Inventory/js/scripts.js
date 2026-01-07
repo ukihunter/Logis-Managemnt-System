@@ -259,3 +259,429 @@ function deleteProduct(productId) {
       console.error("Error:", error);
     });
 }
+
+// Filter by category
+function filterByCategory(category) {
+  const urlParams = new URLSearchParams(window.location.search);
+  const search = urlParams.get("search") || "";
+
+  if (category) {
+    window.location.href = `?category=${encodeURIComponent(
+      category
+    )}&search=${encodeURIComponent(search)}`;
+  } else {
+    window.location.href = `?search=${encodeURIComponent(search)}`;
+  }
+}
+
+// AJAX Filter Products
+let currentPage = 1;
+
+function filterProducts(page = 1) {
+  currentPage = page;
+  const search = document.getElementById("searchInput").value;
+  const category = document.getElementById("categoryFilter").value;
+  const brand = document.getElementById("brandFilter").value;
+
+  const params = new URLSearchParams();
+  if (search) params.append("search", search);
+  if (category) params.append("category", category);
+  if (brand) params.append("brand", brand);
+  params.append("page", page);
+
+  fetch(`filter_products.php?${params.toString()}`)
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        document.getElementById("productTableBody").innerHTML = data.html;
+
+        // Update pagination
+        const paginationContainer = document.getElementById(
+          "paginationContainer"
+        );
+        if (paginationContainer) {
+          paginationContainer.innerHTML = data.pagination;
+        }
+      }
+    })
+    .catch((error) => {
+      console.error("Filter error:", error);
+    });
+}
+
+// Search functionality
+document.addEventListener("DOMContentLoaded", function () {
+  const searchInput = document.getElementById("searchInput");
+  const categoryFilter = document.getElementById("categoryFilter");
+  const brandFilter = document.getElementById("brandFilter");
+
+  if (searchInput) {
+    // Debounce search
+    let searchTimeout;
+    searchInput.addEventListener("keyup", function (e) {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        filterProducts(1);
+      }, 500);
+    });
+  }
+
+  if (categoryFilter) {
+    categoryFilter.addEventListener("change", () => filterProducts(1));
+  }
+
+  if (brandFilter) {
+    brandFilter.addEventListener("change", () => filterProducts(1));
+  }
+});
+
+// Open Category Panel
+function openCategoryPanel() {
+  const sidebar = document.getElementById("sidebar");
+  const categoryPanel = document.getElementById("categoryPanel");
+  const mainContent = document.getElementById("mainContent");
+
+  sidebar.classList.remove("sidebar-expanded");
+  sidebar.classList.add("sidebar-collapsed");
+  mainContent.style.marginRight = "28rem";
+
+  document.getElementById("categoryForm").reset();
+  categoryPanel.classList.remove("hidden");
+  categoryPanel.classList.add("flex");
+  setTimeout(() => categoryPanel.classList.add("active"), 10);
+}
+
+function closeCategoryPanel() {
+  const sidebar = document.getElementById("sidebar");
+  const categoryPanel = document.getElementById("categoryPanel");
+  const mainContent = document.getElementById("mainContent");
+
+  categoryPanel.classList.remove("active");
+  setTimeout(() => {
+    categoryPanel.classList.remove("flex");
+    categoryPanel.classList.add("hidden");
+    sidebar.classList.remove("sidebar-collapsed");
+    sidebar.classList.add("sidebar-expanded");
+    mainContent.style.marginRight = "0";
+  }, 300);
+}
+
+function submitCategory() {
+  const formData = new FormData();
+  formData.append("action", "add_category");
+  formData.append("name", document.getElementById("categoryName").value);
+
+  fetch("category_handler.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        showNotification(data.message, "success");
+        setTimeout(() => location.reload(), 1000);
+      } else {
+        showNotification(data.message, "error");
+      }
+    })
+    .catch((error) => {
+      showNotification("An error occurred", "error");
+      console.error("Error:", error);
+    });
+}
+
+function deleteCategory(id) {
+  if (!confirm("Delete this category? Products will not be deleted.")) return;
+
+  const formData = new FormData();
+  formData.append("action", "delete_category");
+  formData.append("category_id", id);
+
+  fetch("category_handler.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        showNotification(data.message, "success");
+        setTimeout(() => location.reload(), 1000);
+      } else {
+        showNotification(data.message, "error");
+      }
+    })
+    .catch((error) => {
+      showNotification("An error occurred", "error");
+      console.error("Error:", error);
+    });
+}
+
+// Open Brand Panel
+function openBrandPanel() {
+  const sidebar = document.getElementById("sidebar");
+  const brandPanel = document.getElementById("brandPanel");
+  const mainContent = document.getElementById("mainContent");
+
+  sidebar.classList.remove("sidebar-expanded");
+  sidebar.classList.add("sidebar-collapsed");
+  mainContent.style.marginRight = "28rem";
+
+  document.getElementById("brandForm").reset();
+  brandPanel.classList.remove("hidden");
+  brandPanel.classList.add("flex");
+  setTimeout(() => brandPanel.classList.add("active"), 10);
+}
+
+function closeBrandPanel() {
+  const sidebar = document.getElementById("sidebar");
+  const brandPanel = document.getElementById("brandPanel");
+  const mainContent = document.getElementById("mainContent");
+
+  brandPanel.classList.remove("active");
+  setTimeout(() => {
+    brandPanel.classList.remove("flex");
+    brandPanel.classList.add("hidden");
+    sidebar.classList.remove("sidebar-collapsed");
+    sidebar.classList.add("sidebar-expanded");
+    mainContent.style.marginRight = "0";
+  }, 300);
+}
+
+function submitBrand() {
+  const formData = new FormData();
+  formData.append("action", "add_brand");
+  formData.append("name", document.getElementById("brandName").value);
+
+  fetch("brand_handler.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        showNotification(data.message, "success");
+        setTimeout(() => location.reload(), 1000);
+      } else {
+        showNotification(data.message, "error");
+      }
+    })
+    .catch((error) => {
+      showNotification("An error occurred", "error");
+      console.error("Error:", error);
+    });
+}
+
+function deleteBrand(id) {
+  if (!confirm("Delete this brand? Products will not be deleted.")) return;
+
+  const formData = new FormData();
+  formData.append("action", "delete_brand");
+  formData.append("brand_id", id);
+
+  fetch("brand_handler.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        showNotification(data.message, "success");
+        setTimeout(() => location.reload(), 1000);
+      } else {
+        showNotification(data.message, "error");
+      }
+    })
+    .catch((error) => {
+      showNotification("An error occurred", "error");
+      console.error("Error:", error);
+    });
+}
+
+// Open Details Panel
+function openDetailsPanel(productId) {
+  const sidebar = document.getElementById("sidebar");
+  const detailsPanel = document.getElementById("detailsPanel");
+  const mainContent = document.getElementById("mainContent");
+
+  sidebar.classList.remove("sidebar-expanded");
+  sidebar.classList.add("sidebar-collapsed");
+  mainContent.style.marginRight = "28rem";
+
+  // Fetch product details
+  const formData = new FormData();
+  formData.append("action", "get");
+  formData.append("product_id", productId);
+
+  fetch("product_handler.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        displayProductDetails(data.product);
+      } else {
+        showNotification(data.message, "error");
+      }
+    })
+    .catch((error) => {
+      showNotification("Error loading details", "error");
+      console.error("Error:", error);
+    });
+
+  detailsPanel.classList.remove("hidden");
+  detailsPanel.classList.add("flex");
+  setTimeout(() => detailsPanel.classList.add("active"), 10);
+}
+
+function closeDetailsPanel() {
+  const sidebar = document.getElementById("sidebar");
+  const detailsPanel = document.getElementById("detailsPanel");
+  const mainContent = document.getElementById("mainContent");
+
+  detailsPanel.classList.remove("active");
+  setTimeout(() => {
+    detailsPanel.classList.remove("flex");
+    detailsPanel.classList.add("hidden");
+    sidebar.classList.remove("sidebar-collapsed");
+    sidebar.classList.add("sidebar-expanded");
+    mainContent.style.marginRight = "0";
+  }, 300);
+}
+
+function displayProductDetails(product) {
+  const container = document.getElementById("productDetails");
+  const stockPercentage =
+    product.max_level > 0 ? (product.stock_level / product.max_level) * 100 : 0;
+  const isLowStock = product.stock_level < product.max_level * 0.2;
+
+  container.innerHTML = `
+    ${
+      product.image_path
+        ? `
+      <div class="w-full h-48 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+        <img src="../../../${product.image_path}" alt="${product.name}" class="w-full h-full object-cover">
+      </div>
+    `
+        : ""
+    }
+    
+    <div>
+      <h3 class="text-lg font-bold text-[#0d1b12] dark:text-white">${
+        product.name
+      }</h3>
+      <p class="text-sm text-primary font-medium mt-1">SKU: ${product.sku}</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
+        <p class="text-xs text-gray-500 dark:text-gray-400">Category</p>
+        <p class="text-sm font-bold text-[#0d1b12] dark:text-white mt-1">${
+          product.category
+        }</p>
+      </div>
+      <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
+        <p class="text-xs text-gray-500 dark:text-gray-400">Brand</p>
+        <p class="text-sm font-bold text-[#0d1b12] dark:text-white mt-1">${
+          product.brand || "N/A"
+        }</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
+        <p class="text-xs text-gray-500 dark:text-gray-400">Unit Price</p>
+        <p class="text-lg font-bold text-[#0d1b12] dark:text-white mt-1">Rs ${parseFloat(
+          product.unit_price
+        ).toFixed(2)}</p>
+      </div>
+      <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
+        <p class="text-xs text-gray-500 dark:text-gray-400">Carton Price</p>
+        <p class="text-lg font-bold text-[#0d1b12] dark:text-white mt-1">Rs ${parseFloat(
+          product.carton_price
+        ).toFixed(2)}</p>
+      </div>
+    </div>
+
+    <div class="p-4 bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 rounded-lg border border-primary/20">
+      <div class="flex justify-between items-center mb-2">
+        <p class="text-sm font-bold text-[#0d1b12] dark:text-white">Stock Level</p>
+        <span class="${
+          isLowStock ? "text-red-600 dark:text-red-400" : "text-primary"
+        } font-bold">${product.stock_level} / ${product.max_level}</span>
+      </div>
+      <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+        <div class="${
+          isLowStock ? "bg-red-500" : "bg-primary"
+        } h-2 rounded-full transition-all" style="width: ${Math.min(
+    stockPercentage,
+    100
+  )}%"></div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-3">
+      <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-lg text-center">
+        <p class="text-xs text-gray-500 dark:text-gray-400">Carton Qty</p>
+        <p class="text-lg font-bold text-[#0d1b12] dark:text-white mt-1">${
+          product.carton_quantity
+        }</p>
+      </div>
+      <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-lg text-center">
+        <p class="text-xs text-gray-500 dark:text-gray-400">Allocated</p>
+        <p class="text-lg font-bold text-[#0d1b12] dark:text-white mt-1">${
+          product.allocated
+        }</p>
+      </div>
+      <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-lg text-center">
+        <p class="text-xs text-gray-500 dark:text-gray-400">Available</p>
+        <p class="text-lg font-bold text-primary mt-1">${
+          product.stock_level - product.allocated
+        }</p>
+      </div>
+    </div>
+
+    ${
+      product.description
+        ? `
+      <div>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Description</p>
+        <p class="text-sm text-[#0d1b12] dark:text-white">${product.description}</p>
+      </div>
+    `
+        : ""
+    }
+
+    ${
+      product.offer_label || product.discount_percentage > 0
+        ? `
+      <div class="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+        ${
+          product.offer_label
+            ? `<p class="text-sm font-bold text-orange-700 dark:text-orange-400">${product.offer_label}</p>`
+            : ""
+        }
+        ${
+          product.discount_percentage > 0
+            ? `<p class="text-xs text-orange-600 dark:text-orange-300 mt-1">${product.discount_percentage}% Discount</p>`
+            : ""
+        }
+      </div>
+    `
+        : ""
+    }
+
+    <div class="flex gap-2 pt-4">
+      <button onclick="closeDetailsPanel(); openProductPanel('edit', ${
+        product.id
+      })" class="flex-1 px-4 py-2 bg-primary hover:bg-[#0ebf49] text-[#0d1b12] rounded-lg font-bold text-sm transition-colors">
+        Edit Product
+      </button>
+      <button onclick="deleteProduct(${
+        product.id
+      })" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-bold text-sm transition-colors">
+        Delete
+      </button>
+    </div>
+  `;
+}
