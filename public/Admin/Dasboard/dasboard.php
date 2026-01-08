@@ -93,9 +93,9 @@ require_once '../../../config/admin_session.php';
                             <div class="relative z-10">
                                 <p class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium">Pending Orders</p>
                                 <div class="flex items-end gap-2 mt-1">
-                                    <h2 class="text-3xl font-bold text-text-main-light dark:text-text-main-dark">42</h2>
-                                    <span class="text-xs font-bold text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-1.5 py-0.5 rounded flex items-center mb-1">
-                                        <span class="material-symbols-outlined text-[14px] mr-0.5">trending_up</span> 12%
+                                    <h2 id="pending-orders-count" class="text-3xl font-bold text-text-main-light dark:text-text-main-dark">0</h2>
+                                    <span id="pending-orders-badge" class="text-xs font-bold text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-1.5 py-0.5 rounded flex items-center mb-1">
+                                        <span id="pending-orders-icon" class="material-symbols-outlined text-[14px] mr-0.5">trending_up</span> 0%
                                     </span>
                                 </div>
                                 <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-2">Requires immediate processing</p>
@@ -108,9 +108,9 @@ require_once '../../../config/admin_session.php';
                             <div class="relative z-10">
                                 <p class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium">Low Stock Items</p>
                                 <div class="flex items-end gap-2 mt-1">
-                                    <h2 class="text-3xl font-bold text-text-main-light dark:text-text-main-dark">15</h2>
+                                    <h2 id="low-stock-count" class="text-3xl font-bold text-text-main-light dark:text-text-main-dark">0</h2>
                                     <span class="text-xs font-bold text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-400 px-1.5 py-0.5 rounded flex items-center mb-1">
-                                        <span class="material-symbols-outlined text-[14px] mr-0.5">priority_high</span> 5 New
+                                        <span class="material-symbols-outlined text-[14px] mr-0.5">priority_high</span> <span id="new-low-stock">0 New</span>
                                     </span>
                                 </div>
                                 <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-2">Below safety threshold</p>
@@ -123,7 +123,7 @@ require_once '../../../config/admin_session.php';
                             <div class="relative z-10">
                                 <p class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium">Active Trucks</p>
                                 <div class="flex items-end gap-2 mt-1">
-                                    <h2 class="text-3xl font-bold text-text-main-light dark:text-text-main-dark">8</h2>
+                                    <h2 id="active-trucks-count" class="text-3xl font-bold text-text-main-light dark:text-text-main-dark">0</h2>
                                     <span class="text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded flex items-center mb-1">
                                         <span class="material-symbols-outlined text-[14px] mr-0.5">remove</span> Stable
                                     </span>
@@ -138,9 +138,9 @@ require_once '../../../config/admin_session.php';
                             <div class="relative z-10">
                                 <p class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium">Today's Revenue</p>
                                 <div class="flex items-end gap-2 mt-1">
-                                    <h2 class="text-3xl font-bold text-text-main-light dark:text-text-main-dark">$12.4k</h2>
-                                    <span class="text-xs font-bold text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-1.5 py-0.5 rounded flex items-center mb-1">
-                                        <span class="material-symbols-outlined text-[14px] mr-0.5">trending_up</span> 8%
+                                    <h2 id="today-revenue" class="text-3xl font-bold text-text-main-light dark:text-text-main-dark">Rs 0.00</h2>
+                                    <span id="revenue-badge" class="text-xs font-bold text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-1.5 py-0.5 rounded flex items-center mb-1">
+                                        <span id="revenue-icon" class="material-symbols-outlined text-[14px] mr-0.5">trending_up</span> 0%
                                     </span>
                                 </div>
                                 <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-2">Vs. yesterday average</p>
@@ -168,7 +168,7 @@ require_once '../../../config/admin_session.php';
                                                 <th class="p-4 text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider text-center">Action</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="divide-y divide-[#e7f3eb] dark:divide-[#2a4034]">
+                                        <tbody id="pending-orders-table" class="divide-y divide-[#e7f3eb] dark:divide-[#2a4034]">
                                             <tr class="group hover:bg-background-light dark:hover:bg-[#22362b] transition-colors">
                                                 <td class="p-4 text-sm font-medium text-text-main-light dark:text-text-main-dark">ORD-2023-001</td>
                                                 <td class="p-4 text-sm text-text-secondary-light dark:text-text-secondary-dark">Supermart A</td>
@@ -252,7 +252,7 @@ require_once '../../../config/admin_session.php';
                         <!-- Inventory Alerts Widget (Spans 1 column) -->
                         <section class="flex flex-col gap-4">
                             <h2 class="text-xl font-bold text-text-main-light dark:text-text-main-dark">Critical Inventory Alerts</h2>
-                            <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-[#e7f3eb] dark:border-[#2a4034] shadow-sm p-4 flex flex-col gap-3 h-full max-h-[500px] overflow-y-auto">
+                            <div id="low-stock-container" class="bg-surface-light dark:bg-surface-dark rounded-xl border border-[#e7f3eb] dark:border-[#2a4034] shadow-sm p-4 flex flex-col gap-3 h-full max-h-[500px] overflow-y-auto">
                                 <div class="flex items-start gap-3 p-3 rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30">
                                     <div class="bg-white dark:bg-surface-dark p-2 rounded-md shadow-sm shrink-0">
                                         <div class="size-8 bg-cover bg-center rounded" data-alt="Product image of a bag of premium rice" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuADtOz5vQAkCrPVdmLLnFklFdp6-UcjkKlaAOqWPQwRyLI8ljPjh3SOFef85XKC1RzvzI1mPPNgd7vk-tN9IxyXRu9tDENm6LM7Lx_x7wevUqhg_fIlKlhp-Kf1SpUGBxDnZ-_n86QG6_90gupUsXe-OgySpvnvIRuTZA_ZgVbc0dAXuQgVd_nlhpaNBwAnVBOB4Zk3ehBjzdxIhvbkJ_ZBh49PWLaKqGswVUU_wKYZKXg2MtSQNPweb2M5O5VNOfd7nj0l6KRsC9k');"></div>
@@ -342,7 +342,7 @@ require_once '../../../config/admin_session.php';
                                 </div>
                             </div>
                             <!-- Timeline Rows -->
-                            <div class="flex flex-col gap-4 min-w-[800px]">
+                            <div id="logistics-schedule" class="flex flex-col gap-4 min-w-[800px]">
                                 <!-- Truck 1 -->
                                 <div class="flex items-center group">
                                     <div class="w-32 shrink-0 font-bold text-sm text-text-main-light dark:text-text-main-dark">TRK-092</div>
@@ -394,6 +394,7 @@ require_once '../../../config/admin_session.php';
     </div>
 
     <?php include '../components/scripts.php'; ?>
+    <script src="js/script.js"></script>
 </body>
 
 </html>
