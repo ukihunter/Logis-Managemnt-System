@@ -1,5 +1,41 @@
-<?php
+﻿<?php
 require_once '../../../config/admin_session.php';
+require_once '../../../config/database.php';
+
+// Get order stats
+$conn = getDBConnection();
+$statsQuery = "SELECT 
+                COUNT(CASE WHEN order_status = 'pending' THEN 1 END) as pending_count,
+                COUNT(CASE WHEN order_status = 'processing' THEN 1 END) as processing_count,
+                COUNT(CASE WHEN order_status = 'packed' THEN 1 END) as packed_count,
+                COUNT(CASE WHEN order_status = 'shipped' THEN 1 END) as shipped_count,
+                COUNT(CASE WHEN order_status = 'delivered' THEN 1 END) as delivered_count
+            FROM orders";
+$statsResult = $conn->query($statsQuery);
+$stats = $statsResult->fetch_assoc();
+
+// Get all orders
+$ordersQuery = "SELECT 
+                o.id,
+                o.order_number,
+                o.customer_name,
+                o.business_name,
+                o.shipping_city,
+                o.shipping_province,
+                o.total_amount,
+                o.order_status,
+                o.payment_status,
+                o.created_at,
+                o.driver_id,
+                d.full_name as driver_name,
+                d.employee_id as driver_employee_id,
+                COUNT(oi.id) as total_items
+            FROM orders o
+            LEFT JOIN drivers d ON o.driver_id = d.id
+            LEFT JOIN order_items oi ON o.id = oi.order_id
+            GROUP BY o.id
+            ORDER BY o.created_at DESC";
+$ordersResult = $conn->query($ordersQuery);
 ?>
 <!DOCTYPE html>
 
@@ -75,30 +111,49 @@ require_once '../../../config/admin_session.php';
                     <!-- Heading -->
                     <div class="flex flex-col gap-2">
                         <h1 class="text-[#0d1b12] dark:text-white text-3xl font-black leading-tight tracking-[-0.033em]">Order Management</h1>
-                        <p class="text-[#4c9a66] dark:text-gray-400 text-sm font-medium">Central Region • 45 Active Orders</p>
+                        <p class="text-[#4c9a66] dark:text-gray-400 text-sm font-medium">Central Region â€¢ 45 Active Orders</p>
                     </div>
                     <!-- Stats Cards -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                        <!-- Pending Orders -->
                         <div class="flex flex-col gap-1 rounded-xl p-4 border border-[#cfe7d7] dark:border-gray-700 bg-white dark:bg-[#152e1e] shadow-sm">
                             <div class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-primary" style="font-size: 20px;">new_releases</span>
-                                <p class="text-[#0d1b12] dark:text-gray-300 text-sm font-medium">New Orders</p>
+                                <span class="material-symbols-outlined text-amber-500" style="font-size: 20px;">schedule</span>
+                                <p class="text-[#0d1b12] dark:text-gray-300 text-xs font-medium">Pending</p>
                             </div>
-                            <p class="text-[#0d1b12] dark:text-white text-2xl font-bold">12</p>
+                            <p class="text-[#0d1b12] dark:text-white text-2xl font-bold"><?php echo $stats['pending_count'] ?? 0; ?></p>
                         </div>
+                        <!-- Processing Orders -->
                         <div class="flex flex-col gap-1 rounded-xl p-4 border border-[#cfe7d7] dark:border-gray-700 bg-white dark:bg-[#152e1e] shadow-sm">
                             <div class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-orange-500" style="font-size: 20px;">pending_actions</span>
-                                <p class="text-[#0d1b12] dark:text-gray-300 text-sm font-medium">Pending Dispatch</p>
+                                <span class="material-symbols-outlined text-blue-500" style="font-size: 20px;">autorenew</span>
+                                <p class="text-[#0d1b12] dark:text-gray-300 text-xs font-medium">Processing</p>
                             </div>
-                            <p class="text-[#0d1b12] dark:text-white text-2xl font-bold">4</p>
+                            <p class="text-[#0d1b12] dark:text-white text-2xl font-bold"><?php echo $stats['processing_count'] ?? 0; ?></p>
                         </div>
+                        <!-- Packed Orders -->
                         <div class="flex flex-col gap-1 rounded-xl p-4 border border-[#cfe7d7] dark:border-gray-700 bg-white dark:bg-[#152e1e] shadow-sm">
                             <div class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-blue-500" style="font-size: 20px;">analytics</span>
-                                <p class="text-[#0d1b12] dark:text-gray-300 text-sm font-medium">Fill Rate</p>
+                                <span class="material-symbols-outlined text-purple-500" style="font-size: 20px;">inventory_2</span>
+                                <p class="text-[#0d1b12] dark:text-gray-300 text-xs font-medium">Packed</p>
                             </div>
-                            <p class="text-[#0d1b12] dark:text-white text-2xl font-bold">98%</p>
+                            <p class="text-[#0d1b12] dark:text-white text-2xl font-bold"><?php echo $stats['packed_count'] ?? 0; ?></p>
+                        </div>
+                        <!-- Shipped Orders -->
+                        <div class="flex flex-col gap-1 rounded-xl p-4 border border-[#cfe7d7] dark:border-gray-700 bg-white dark:bg-[#152e1e] shadow-sm">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-indigo-500" style="font-size: 20px;">local_shipping</span>
+                                <p class="text-[#0d1b12] dark:text-gray-300 text-xs font-medium">Shipped</p>
+                            </div>
+                            <p class="text-[#0d1b12] dark:text-white text-2xl font-bold"><?php echo $stats['shipped_count'] ?? 0; ?></p>
+                        </div>
+                        <!-- Delivered Orders -->
+                        <div class="flex flex-col gap-1 rounded-xl p-4 border border-[#cfe7d7] dark:border-gray-700 bg-white dark:bg-[#152e1e] shadow-sm">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-green-500" style="font-size: 20px;">check_circle</span>
+                                <p class="text-[#0d1b12] dark:text-gray-300 text-xs font-medium">Delivered</p>
+                            </div>
+                            <p class="text-[#0d1b12] dark:text-white text-2xl font-bold"><?php echo $stats['delivered_count'] ?? 0; ?></p>
                         </div>
                     </div>
                     <!-- Search & Filters -->
@@ -108,26 +163,29 @@ require_once '../../../config/admin_session.php';
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="material-symbols-outlined text-[#4c9a66]">search</span>
                             </div>
-                            <input class="block w-full pl-10 pr-3 py-3 border border-transparent rounded-lg leading-5 bg-[#e7f3eb] dark:bg-[#1e3b29] text-[#0d1b12] dark:text-white placeholder-[#4c9a66] focus:outline-none focus:bg-white dark:focus:bg-[#152e1e] focus:ring-2 focus:ring-primary focus:border-transparent sm:text-sm transition-all shadow-sm" placeholder="Search by Order ID, Customer Name, or Zone..." type="text" />
+                            <input id="searchInput" class="block w-full pl-10 pr-3 py-3 border border-transparent rounded-lg leading-5 bg-[#e7f3eb] dark:bg-[#1e3b29] text-[#0d1b12] dark:text-white placeholder-[#4c9a66] focus:outline-none focus:bg-white dark:focus:bg-[#152e1e] focus:ring-2 focus:ring-primary focus:border-transparent sm:text-sm transition-all shadow-sm" placeholder="Search by Order ID, Customer Name, or Zone..." type="text" />
                         </div>
                         <!-- Chips -->
                         <div class="flex gap-2 flex-wrap pb-2">
-                            <button class="flex items-center justify-center gap-2 rounded-full bg-[#102216] dark:bg-white text-white dark:text-black px-4 py-1.5 shadow-sm transition-transform active:scale-95">
+                            <button onclick="filterByStatus('all')" id="filterAll" class="flex items-center justify-center gap-2 rounded-full bg-[#102216] dark:bg-white text-white dark:text-black px-4 py-1.5 shadow-sm transition-transform active:scale-95">
                                 <span class="material-symbols-outlined text-[18px]">filter_list</span>
                                 <span class="text-xs font-bold">All Orders</span>
                             </button>
-                            <button class="flex items-center justify-center gap-2 rounded-full bg-white dark:bg-[#152e1e] border border-[#e7f3eb] dark:border-gray-700 hover:border-primary px-4 py-1.5 transition-colors shadow-sm text-[#0d1b12] dark:text-gray-300">
-                                <span class="text-xs font-semibold">Status: New</span>
-                                <span class="material-symbols-outlined text-[16px]">expand_more</span>
-                            </button>
-                            <button class="flex items-center justify-center gap-2 rounded-full bg-white dark:bg-[#152e1e] border border-[#e7f3eb] dark:border-gray-700 hover:border-primary px-4 py-1.5 transition-colors shadow-sm text-[#0d1b12] dark:text-gray-300">
-                                <span class="text-xs font-semibold">Zone: North-East</span>
-                                <span class="material-symbols-outlined text-[16px]">expand_more</span>
-                            </button>
-                            <button class="flex items-center justify-center gap-2 rounded-full bg-white dark:bg-[#152e1e] border border-[#e7f3eb] dark:border-gray-700 hover:border-primary px-4 py-1.5 transition-colors shadow-sm text-[#0d1b12] dark:text-gray-300">
-                                <span class="text-xs font-semibold">Date: Today</span>
-                                <span class="material-symbols-outlined text-[16px]">calendar_today</span>
-                            </button>
+                            <div class="relative">
+                                <button onclick="toggleStatusFilter()" class="flex items-center justify-center gap-2 rounded-full bg-white dark:bg-[#152e1e] border border-[#e7f3eb] dark:border-gray-700 hover:border-primary px-4 py-1.5 transition-colors shadow-sm text-[#0d1b12] dark:text-gray-300">
+                                    <span class="text-xs font-semibold" id="statusFilterLabel">Status: All</span>
+                                    <span class="material-symbols-outlined text-[16px]">expand_more</span>
+                                </button>
+                                <div id="statusFilterDropdown" class="hidden absolute top-full mt-1 bg-white dark:bg-[#152e1e] border border-[#e7f3eb] dark:border-gray-700 rounded-lg shadow-lg z-50 min-w-[150px]">
+                                    <button onclick="filterByStatus('all')" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 text-[#0d1b12] dark:text-gray-300">All</button>
+                                    <button onclick="filterByStatus('pending')" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 text-[#0d1b12] dark:text-gray-300">Pending</button>
+                                    <button onclick="filterByStatus('processing')" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 text-[#0d1b12] dark:text-gray-300">Processing</button>
+                                    <button onclick="filterByStatus('packed')" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 text-[#0d1b12] dark:text-gray-300">Packed</button>
+                                    <button onclick="filterByStatus('shipped')" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 text-[#0d1b12] dark:text-gray-300">Shipped</button>
+                                    <button onclick="filterByStatus('delivered')" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 text-[#0d1b12] dark:text-gray-300">Delivered</button>
+                                    <button onclick="filterByStatus('cancelled')" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 text-[#0d1b12] dark:text-gray-300">Cancelled</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -146,102 +204,59 @@ require_once '../../../config/admin_session.php';
                                 <th class="py-3 px-2 text-xs font-semibold text-[#4c9a66] uppercase tracking-wider"></th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-[#e7f3eb] dark:divide-gray-800 text-sm">
-                            <!-- Row 1 (Active) -->
-                            <tr onclick="showOrderDetail()" class="group hover:bg-white dark:hover:bg-[#152e1e] cursor-pointer transition-colors bg-white dark:bg-[#152e1e] border-l-4 border-l-primary shadow-sm rounded-lg mb-2 block md:table-row">
-                                <td class="py-4 px-2 font-bold text-[#0d1b12] dark:text-white">#ORD-2023-849</td>
-                                <td class="py-4 px-2">
-                                    <div class="font-bold text-[#0d1b12] dark:text-white">Island Grocers Ltd.</div>
-                                    <div class="text-xs text-gray-500">Just now</div>
-                                </td>
-                                <td class="py-4 px-2 text-[#0d1b12] dark:text-gray-300">North-East</td>
-                                <td class="py-4 px-2 text-right text-[#0d1b12] dark:text-gray-300">45</td>
-                                <td class="py-4 px-2 text-right font-bold text-[#0d1b12] dark:text-white">$4,250.00</td>
-                                <td class="py-4 px-2 text-center">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border border-green-200 dark:border-green-800">
-                                        New
-                                    </span>
-                                </td>
-                                <td class="py-4 px-2 text-right">
-                                    <span class="material-symbols-outlined text-gray-400 group-hover:text-primary">chevron_right</span>
-                                </td>
-                            </tr>
-                            <!-- Row 2 -->
-                            <tr onclick="showOrderDetail()" class="group hover:bg-white dark:hover:bg-[#152e1e] cursor-pointer transition-colors">
-                                <td class="py-4 px-2 font-bold text-[#0d1b12] dark:text-white">#ORD-2023-848</td>
-                                <td class="py-4 px-2">
-                                    <div class="font-bold text-[#0d1b12] dark:text-white">Sunny Minimart</div>
-                                    <div class="text-xs text-gray-500">1 hour ago</div>
-                                </td>
-                                <td class="py-4 px-2 text-[#0d1b12] dark:text-gray-300">Central</td>
-                                <td class="py-4 px-2 text-right text-[#0d1b12] dark:text-gray-300">12</td>
-                                <td class="py-4 px-2 text-right font-bold text-[#0d1b12] dark:text-white">$890.50</td>
-                                <td class="py-4 px-2 text-center">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border border-green-200 dark:border-green-800">
-                                        New
-                                    </span>
-                                </td>
-                                <td class="py-4 px-2 text-right">
-                                    <span class="material-symbols-outlined text-gray-400 group-hover:text-primary">chevron_right</span>
-                                </td>
-                            </tr>
-                            <!-- Row 3 -->
-                            <tr onclick="showOrderDetail()" class="group hover:bg-white dark:hover:bg-[#152e1e] cursor-pointer transition-colors">
-                                <td class="py-4 px-2 font-bold text-[#0d1b12] dark:text-white">#ORD-2023-847</td>
-                                <td class="py-4 px-2">
-                                    <div class="font-bold text-[#0d1b12] dark:text-white">Metro Wholesalers</div>
-                                    <div class="text-xs text-gray-500">2 hours ago</div>
-                                </td>
-                                <td class="py-4 px-2 text-[#0d1b12] dark:text-gray-300">South</td>
-                                <td class="py-4 px-2 text-right text-[#0d1b12] dark:text-gray-300">120</td>
-                                <td class="py-4 px-2 text-right font-bold text-[#0d1b12] dark:text-white">$12,400.00</td>
-                                <td class="py-4 px-2 text-center">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 border border-blue-200 dark:border-blue-800">
-                                        Processing
-                                    </span>
-                                </td>
-                                <td class="py-4 px-2 text-right">
-                                    <span class="material-symbols-outlined text-gray-400 group-hover:text-primary">chevron_right</span>
-                                </td>
-                            </tr>
-                            <!-- Row 4 -->
-                            <tr onclick="showOrderDetail()" class="group hover:bg-white dark:hover:bg-[#152e1e] cursor-pointer transition-colors">
-                                <td class="py-4 px-2 font-bold text-[#0d1b12] dark:text-white">#ORD-2023-846</td>
-                                <td class="py-4 px-2">
-                                    <div class="font-bold text-[#0d1b12] dark:text-white">Corner Shop LLC</div>
-                                    <div class="text-xs text-gray-500">3 hours ago</div>
-                                </td>
-                                <td class="py-4 px-2 text-[#0d1b12] dark:text-gray-300">North-East</td>
-                                <td class="py-4 px-2 text-right text-[#0d1b12] dark:text-gray-300">8</td>
-                                <td class="py-4 px-2 text-right font-bold text-[#0d1b12] dark:text-white">$450.00</td>
-                                <td class="py-4 px-2 text-center">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 border border-amber-200 dark:border-amber-800">
-                                        Pending Payment
-                                    </span>
-                                </td>
-                                <td class="py-4 px-2 text-right">
-                                    <span class="material-symbols-outlined text-gray-400 group-hover:text-primary">chevron_right</span>
-                                </td>
-                            </tr>
-                            <!-- Row 5 -->
-                            <tr onclick="showOrderDetail()" class="group hover:bg-white dark:hover:bg-[#152e1e] cursor-pointer transition-colors opacity-60">
-                                <td class="py-4 px-2 font-bold text-[#0d1b12] dark:text-white">#ORD-2023-845</td>
-                                <td class="py-4 px-2">
-                                    <div class="font-bold text-[#0d1b12] dark:text-white">Beachside Cafe</div>
-                                    <div class="text-xs text-gray-500">Yesterday</div>
-                                </td>
-                                <td class="py-4 px-2 text-[#0d1b12] dark:text-gray-300">East Coast</td>
-                                <td class="py-4 px-2 text-right text-[#0d1b12] dark:text-gray-300">22</td>
-                                <td class="py-4 px-2 text-right font-bold text-[#0d1b12] dark:text-white">$1,100.00</td>
-                                <td class="py-4 px-2 text-center">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
-                                        Dispatched
-                                    </span>
-                                </td>
-                                <td class="py-4 px-2 text-right">
-                                    <span class="material-symbols-outlined text-gray-400 group-hover:text-primary">chevron_right</span>
-                                </td>
-                            </tr>
+                        <tbody id="ordersTableBody" class="divide-y divide-[#e7f3eb] dark:divide-gray-800 text-sm">
+                            <?php
+                            function getStatusBadge($status)
+                            {
+                                $badges = [
+                                    'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-800',
+                                    'processing' => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 border border-blue-200 dark:border-blue-800',
+                                    'packed' => 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 border border-purple-200 dark:border-purple-800',
+                                    'shipped' => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 border border-indigo-200 dark:border-indigo-800',
+                                    'delivered' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border border-green-200 dark:border-green-800',
+                                    'cancelled' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 border border-red-200 dark:border-red-800'
+                                ];
+                                return $badges[$status] ?? 'bg-gray-100 text-gray-800';
+                            }
+
+                            function getTimeAgo($datetime)
+                            {
+                                $timestamp = strtotime($datetime);
+                                $diff = time() - $timestamp;
+
+                                if ($diff < 60) return 'Just now';
+                                if ($diff < 3600) return floor($diff / 60) . ' mins ago';
+                                if ($diff < 86400) return floor($diff / 3600) . ' hours ago';
+                                if ($diff < 604800) return floor($diff / 86400) . ' days ago';
+                                return date('M d, Y', $timestamp);
+                            }
+
+                            while ($order = $ordersResult->fetch_assoc()):
+                            ?>
+                                <tr onclick="showOrderDetail(<?php echo $order['id']; ?>)"
+                                    class="order-row group hover:bg-white dark:hover:bg-[#152e1e] cursor-pointer transition-colors <?php echo $order['order_status'] == 'pending' ? 'bg-white dark:bg-[#152e1e] border-l-4 border-l-primary shadow-sm' : ''; ?>"
+                                    data-order-id="<?php echo htmlspecialchars($order['order_number']); ?>"
+                                    data-customer="<?php echo htmlspecialchars($order['business_name'] ?? $order['customer_name']); ?>"
+                                    data-zone="<?php echo htmlspecialchars($order['shipping_city']); ?>"
+                                    data-status="<?php echo htmlspecialchars($order['order_status']); ?>">
+                                    <td class="py-4 px-2 font-bold text-[#0d1b12] dark:text-white">#<?php echo htmlspecialchars($order['order_number']); ?></td>
+                                    <td class="py-4 px-2">
+                                        <div class="font-bold text-[#0d1b12] dark:text-white"><?php echo htmlspecialchars($order['business_name'] ?? $order['customer_name']); ?></div>
+                                        <div class="text-xs text-gray-500"><?php echo getTimeAgo($order['created_at']); ?></div>
+                                    </td>
+                                    <td class="py-4 px-2 text-[#0d1b12] dark:text-gray-300"><?php echo htmlspecialchars(($order['shipping_city'] ?? '') . ($order['shipping_province'] ? ', ' . $order['shipping_province'] : '') ?: 'N/A'); ?></td>
+                                    <td class="py-4 px-2 text-right text-[#0d1b12] dark:text-gray-300"><?php echo $order['total_items']; ?></td>
+                                    <td class="py-4 px-2 text-right font-bold text-[#0d1b12] dark:text-white">$<?php echo number_format($order['total_amount'], 2); ?></td>
+                                    <td class="py-4 px-2 text-center">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo getStatusBadge($order['order_status']); ?>">
+                                            <?php echo ucfirst($order['order_status']); ?>
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-2 text-right">
+                                        <span class="material-symbols-outlined text-gray-400 group-hover:text-primary">chevron_right</span>
+                                    </td>
+                                </tr>
+                            <?php endwhile; ?>
                         </tbody>
                     </table>
                 </div>
@@ -252,12 +267,12 @@ require_once '../../../config/admin_session.php';
                 <div class="px-6 py-5 border-b border-[#e7f3eb] dark:border-gray-800 flex justify-between items-start bg-white dark:bg-[#152e1e]">
                     <div>
                         <div class="flex items-center gap-2 mb-1">
-                            <h2 class="text-xl font-black text-[#0d1b12] dark:text-white">#ORD-2023-849</h2>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-primary/10 text-primary border border-primary/20">
-                                New Order
+                            <h2 id="orderNumber" class="text-xl font-black text-[#0d1b12] dark:text-white">Loading...</h2>
+                            <span id="orderStatus" class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-gray-100 text-gray-800 border border-gray-200">
+                                ...
                             </span>
                         </div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Created: Oct 24, 2023 • 09:42 AM</p>
+                        <p id="orderDate" class="text-xs text-gray-500 dark:text-gray-400">Loading...</p>
                     </div>
                     <button onclick="closeOrderDetail()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
                         <span class="material-symbols-outlined">close</span>
@@ -301,32 +316,31 @@ require_once '../../../config/admin_session.php';
                                     <span class="material-symbols-outlined text-gray-600 dark:text-gray-300">storefront</span>
                                 </div>
                                 <div>
-                                    <h3 class="text-sm font-bold text-[#0d1b12] dark:text-white">Island Grocers Ltd.</h3>
-                                    <p class="text-xs text-primary font-medium">Regular Customer • Tier 1</p>
+                                    <h3 id="customerName" class="text-sm font-bold text-[#0d1b12] dark:text-white">Loading...</h3>
+                                    <p id="customerTier" class="text-xs text-primary font-medium">...</p>
                                 </div>
                             </div>
-                            <button class="text-xs text-[#4c9a66] hover:underline font-medium">View Profile</button>
+                            <!--    <button class="text-xs text-[#4c9a66] hover:underline font-medium">View Profile</button>-->
                         </div>
                         <div class="grid grid-cols-2 gap-y-3 gap-x-2 text-xs">
                             <div>
                                 <p class="text-gray-400 mb-0.5">Contact Person</p>
-                                <p class="font-medium text-[#0d1b12] dark:text-gray-200">John Doe</p>
+                                <p id="contactPerson" class="font-medium text-[#0d1b12] dark:text-gray-200">...</p>
                             </div>
                             <div>
                                 <p class="text-gray-400 mb-0.5">Phone</p>
-                                <p class="font-medium text-[#0d1b12] dark:text-gray-200">+1 555-0199</p>
+                                <p id="contactPhone" class="font-medium text-[#0d1b12] dark:text-gray-200">...</p>
                             </div>
                             <div class="col-span-2">
                                 <p class="text-gray-400 mb-0.5">Shipping Address</p>
-                                <p class="font-medium text-[#0d1b12] dark:text-gray-200">142 Market Street, North-East Zone, Logistics Hub A</p>
+                                <p id="shippingAddress" class="font-medium text-[#0d1b12] dark:text-gray-200">Loading...</p>
                             </div>
                         </div>
                     </div>
                     <!-- Line Items -->
                     <div>
                         <div class="flex justify-between items-end mb-3">
-                            <h3 class="text-sm font-bold text-[#0d1b12] dark:text-white">Order Items (3)</h3>
-                            <span class="text-xs text-gray-500">Total Wt: 1,100kg</span>
+                            <h3 class="text-sm font-bold text-[#0d1b12] dark:text-white">Order Items (<span id="orderItemCount">0</span>)</h3>
                         </div>
                         <div class="border border-[#e7f3eb] dark:border-gray-800 rounded-lg overflow-hidden">
                             <table class="w-full text-left text-xs">
@@ -337,42 +351,13 @@ require_once '../../../config/admin_session.php';
                                         <th class="py-2 px-3 font-medium text-gray-500 text-right">Total</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-[#e7f3eb] dark:divide-gray-800 bg-white dark:bg-[#152e1e]">
-                                    <tr>
-                                        <td class="py-3 px-3">
-                                            <div class="font-bold text-[#0d1b12] dark:text-white">Premium Jasmine Rice (20kg)</div>
-                                            <div class="text-[10px] text-primary flex items-center gap-1 mt-0.5">
-                                                <span class="material-symbols-outlined text-[10px]">check_circle</span> In Stock (400)
-                                            </div>
-                                        </td>
-                                        <td class="py-3 px-3 text-center font-medium">50</td>
-                                        <td class="py-3 px-3 text-right font-medium">$2,500.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-3 px-3">
-                                            <div class="font-bold text-[#0d1b12] dark:text-white">Sunflower Cooking Oil (5L)</div>
-                                            <div class="text-[10px] text-amber-500 flex items-center gap-1 mt-0.5">
-                                                <span class="material-symbols-outlined text-[10px]">warning</span> Low Stock (25)
-                                            </div>
-                                        </td>
-                                        <td class="py-3 px-3 text-center font-medium">20</td>
-                                        <td class="py-3 px-3 text-right font-medium">$800.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-3 px-3">
-                                            <div class="font-bold text-[#0d1b12] dark:text-white">Canned Tuna (Case of 24)</div>
-                                            <div class="text-[10px] text-red-500 flex items-center gap-1 mt-0.5">
-                                                <span class="material-symbols-outlined text-[10px]">block</span> Out of Stock
-                                            </div>
-                                        </td>
-                                        <td class="py-3 px-3 text-center font-medium">10</td>
-                                        <td class="py-3 px-3 text-right font-medium text-gray-400 line-through">$950.00</td>
-                                    </tr>
+                                <tbody id="orderItemsBody" class="divide-y divide-[#e7f3eb] dark:divide-gray-800 bg-white dark:bg-[#152e1e]">
+                                    <!-- Order items will be loaded here by JavaScript -->
                                 </tbody>
                                 <tfoot class="bg-gray-50 dark:bg-gray-800/50">
                                     <tr>
                                         <td class="py-3 px-3 text-right font-bold text-gray-600 dark:text-gray-300" colspan="2">Grand Total</td>
-                                        <td class="py-3 px-3 text-right font-black text-lg text-[#0d1b12] dark:text-white">$4,250.00</td>
+                                        <td id="orderGrandTotal" class="py-3 px-3 text-right font-black text-lg text-[#0d1b12] dark:text-white">$0.00</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -380,37 +365,84 @@ require_once '../../../config/admin_session.php';
                     </div>
                     <!-- Logistics Assignment -->
                     <div>
-                        <h3 class="text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Logistics Assignment</h3>
-                        <div class="relative">
-                            <select class="block w-full pl-3 pr-10 py-2.5 text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-[#102216] focus:outline-none focus:ring-primary focus:border-primary rounded-lg appearance-none text-[#0d1b12] dark:text-white border shadow-sm">
-                                <option>Select Delivery Partner...</option>
-                                <option selected="">Internal Fleet (Van 04)</option>
-                                <option>3PL - FastLogistics</option>
-                                <option>Customer Pickup</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                                <span class="material-symbols-outlined">expand_more</span>
+                        <h3 class="text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Driver Assignment</h3>
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <select id="driverSelect" class="block w-full pl-3 pr-10 py-2.5 text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-[#102216] focus:outline-none focus:ring-primary focus:border-primary rounded-lg appearance-none text-[#0d1b12] dark:text-white border shadow-sm">
+                                    <option value="">Select Delivery Partner...</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                                    <span class="material-symbols-outlined">expand_more</span>
+                                </div>
                             </div>
+                            <button onclick="saveDriverAssignment()" class="px-4 py-2.5 bg-primary hover:bg-[#0ebf49] text-white rounded-lg font-medium text-sm transition-colors flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[18px]">save</span> Save
+                            </button>
                         </div>
                     </div>
                     <!-- Delivery Notes -->
                     <div>
-                        <h3 class="text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Delivery Notes</h3>
-                        <textarea class="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-[#102216] text-sm text-[#0d1b12] dark:text-white p-3 focus:ring-primary focus:border-primary shadow-sm border" placeholder="Add special instructions for the driver..." rows="3">Gate code 1234. Please call 10 mins before arrival.</textarea>
+                        <h3 class="text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Delivery Notes (Admin)</h3>
+                        <div class="flex gap-2">
+                            <textarea id="deliveryNotes" class="flex-1 rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-[#102216] text-sm text-[#0d1b12] dark:text-white p-3 focus:ring-primary focus:border-primary shadow-sm border" placeholder="Add special instructions for the driver..." rows="3"></textarea>
+                            <button id="saveNotesBtn" onclick="saveDeliveryNotes()" class="px-4 py-2.5 bg-primary hover:bg-[#0ebf49] text-white rounded-lg font-medium text-sm transition-colors flex items-center gap-1 h-fit">
+                                <span class="material-symbols-outlined text-[18px]">save</span> Save
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <!-- Sticky Bottom Actions -->
-                <div class="p-6 border-t border-[#e7f3eb] dark:border-gray-800 bg-white dark:bg-[#152e1e]">
-                    <div class="flex gap-3">
-                        <button class="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 font-bold text-sm transition-colors">
-                            <span class="material-symbols-outlined text-[18px]">close</span> Reject
+                <div id="orderActions" class="p-6 border-t border-[#e7f3eb] dark:border-gray-800 bg-white dark:bg-[#152e1e]">
+                    <!-- Action buttons will be dynamically loaded based on order status -->
+                </div>
+            </aside>
+
+            <!-- Delivery Confirmation Modal -->
+            <div id="deliveryConfirmModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                <div class="bg-white dark:bg-[#152e1e] rounded-xl shadow-2xl max-w-md w-full p-6 space-y-4">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-green-600 dark:text-green-400 text-2xl">check_circle</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold text-[#0d1b12] dark:text-white mb-2">Confirm Delivery</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Are you sure this order has been successfully delivered to the customer?</p>
+
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2 text-sm">
+                                    <span class="material-symbols-outlined text-gray-500 text-[18px]">tag</span>
+                                    <span class="text-gray-600 dark:text-gray-400">Order: <span id="modalOrderNumber" class="font-bold text-[#0d1b12] dark:text-white"></span></span>
+                                </div>
+                                <div class="flex items-center gap-2 text-sm">
+                                    <span class="material-symbols-outlined text-gray-500 text-[18px]">storefront</span>
+                                    <span class="text-gray-600 dark:text-gray-400">Customer: <span id="modalCustomerName" class="font-bold text-[#0d1b12] dark:text-white"></span></span>
+                                </div>
+                                <div class="flex items-center gap-2 text-sm">
+                                    <span class="material-symbols-outlined text-gray-500 text-[18px]">local_shipping</span>
+                                    <span class="text-gray-600 dark:text-gray-400">Driver: <span id="modalDriverName" class="font-bold text-[#0d1b12] dark:text-white"></span></span>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                                <p class="text-xs text-green-800 dark:text-green-300 flex items-start gap-2">
+                                    <span class="material-symbols-outlined text-[16px] mt-0.5">info</span>
+                                    <span>This action will mark the order as completed and cannot be undone.</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button onclick="closeDeliveryConfirmModal()" class="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 font-medium text-sm transition-colors">
+                            Cancel
                         </button>
-                        <button class="flex-[2] flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-[#0ebf49] text-white rounded-lg font-bold text-sm shadow-md shadow-primary/20 transition-all active:scale-[0.98]">
-                            <span class="material-symbols-outlined text-[18px]">check</span> Accept &amp; Process
+                        <button onclick="confirmDelivery()" class="flex-1 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold text-sm shadow-md shadow-green-600/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                            Confirm Delivery
                         </button>
                     </div>
                 </div>
-            </aside>
+            </div>
         </main>
     </div>
 
