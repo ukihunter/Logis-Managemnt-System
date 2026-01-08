@@ -1,5 +1,85 @@
 <?php
 require_once '../../../config/session_Detils.php';
+require_once '../../../config/database.php';
+
+// Get order_id from URL
+$order_id = isset($_GET['order_id']) ? (int)$_GET['order_id'] : 0;
+$user_id = $_SESSION['user_id'];
+
+if ($order_id === 0) {
+    header('Location: order.php');
+    exit;
+}
+
+$conn = getDBConnection();
+
+// Fetch order details with driver info
+$order_query = "SELECT o.*, d.full_name as driver_name, d.phone_number as driver_phone, d.vehicle_model
+                FROM orders o
+                LEFT JOIN drivers d ON o.driver_id = d.id
+                WHERE o.id = ? AND o.user_id = ?";
+$stmt = $conn->prepare($order_query);
+$stmt->bind_param("ii", $order_id, $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    $_SESSION['error'] = 'Order not found';
+    header('Location: order.php');
+    exit;
+}
+
+$order = $result->fetch_assoc();
+
+// Get order status history
+$history_query = "SELECT * FROM order_status_history 
+                  WHERE order_id = ? 
+                  ORDER BY created_at ASC";
+$stmt = $conn->prepare($history_query);
+$stmt->bind_param("i", $order_id);
+$stmt->execute();
+$history_result = $stmt->get_result();
+$status_history = [];
+while ($row = $history_result->fetch_assoc()) {
+    $status_history[] = $row;
+}
+
+// Fetch order items
+$items_query = "SELECT oi.*, p.name as product_name, p.sku as SKU 
+                FROM order_items oi 
+                JOIN products p ON oi.product_id = p.id 
+                WHERE oi.order_id = ?";
+$items_stmt = $conn->prepare($items_query);
+$items_stmt->bind_param("i", $order_id);
+$items_stmt->execute();
+$items_result = $items_stmt->get_result();
+$order_items = [];
+while ($item = $items_result->fetch_assoc()) {
+    $order_items[] = $item;
+}
+$items_stmt->close();
+
+// Close database connection
+$conn->close();
+
+// Determine progress percentage
+$progress_map = [
+    'pending' => 20,
+    'processing' => 40,
+    'packed' => 60,
+    'shipped' => 80,
+    'delivered' => 100
+];
+$progress = $progress_map[$order['order_status']] ?? 20;
+
+// Status labels
+$status_labels = [
+    'pending' => 'Order Placed',
+    'processing' => 'Processing',
+    'packed' => 'Packed',
+    'shipped' => 'In Transit',
+    'delivered' => 'Delivered'
+];
 ?>
 <!DOCTYPE html>
 
@@ -106,18 +186,20 @@ require_once '../../../config/session_Detils.php';
                         <button class="text-white">Go back</button>
                     </div>
                     <div class="flex items-center gap-3 mb-2">
-                        <h1 class="text-3xl md:text-4xl font-black tracking-tight text-text-main dark:text-white">Order #402-99B</h1>
+                        <h1 class="text-3xl md:text-4xl font-black tracking-tight text-text-main dark:text-white">Order <?php echo htmlspecialchars($order['order_number']); ?></h1>
                         <span class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary ring-1 ring-inset ring-primary/20">
-                            Confirmed
+                            <?php echo ucfirst($order['payment_status']); ?>
                         </span>
                     </div>
-                    <p class="text-text-secondary dark:text-gray-400">Placed on Oct 24, 2023 at 09:00 AM • Wholesale Account:<?php echo htmlspecialchars($business_name); ?></p>
+                    <p class="text-text-secondary dark:text-gray-400">Placed on <?php echo date('M d, Y', strtotime($order['created_at'])); ?> at <?php echo date('h:i A', strtotime($order['created_at'])); ?> • Wholesale Account: <?php echo htmlspecialchars($business_name); ?></p>
                 </div>
                 <div class="flex gap-3">
-                    <button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-card-dark border border-[#e7f3eb] dark:border-[#253f30] text-sm font-bold text-text-main dark:text-white hover:bg-gray-50 dark:hover:bg-[#253f30] transition-colors shadow-sm">
-                        <span class="material-symbols-outlined text-lg">download</span>
-                        <span>Invoice</span>
-                    </button>
+                    <?php if ($order['payment_status'] === 'paid' && $order['order_status'] !== 'cancelled'): ?>
+                        <button onclick="window.open('download_invoice.php?order_id=<?php echo $order['id']; ?>', '_blank')" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-card-dark border border-[#e7f3eb] dark:border-[#253f30] text-sm font-bold text-text-main dark:text-white hover:bg-gray-50 dark:hover:bg-[#253f30] transition-colors shadow-sm">
+                            <span class="material-symbols-outlined text-lg">download</span>
+                            <span>Invoice</span>
+                        </button>
+                    <?php endif; ?>
                     <button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-card-dark border border-[#e7f3eb] dark:border-[#253f30] text-sm font-bold text-text-main dark:text-white hover:bg-gray-50 dark:hover:bg-[#253f30] transition-colors shadow-sm">
                         <span class="material-symbols-outlined text-lg">support_agent</span>
                         <span>Support</span>
@@ -132,8 +214,20 @@ require_once '../../../config/session_Detils.php';
                     <div class="rounded-xl bg-white dark:bg-card-dark p-6 shadow-sm border border-[#e7f3eb] dark:border-[#1e3a29]">
                         <div class="flex items-start justify-between">
                             <div>
-                                <p class="text-sm font-medium text-text-secondary uppercase tracking-wider">Estimated Delivery</p>
-                                <p class="mt-1 text-2xl font-bold text-text-main dark:text-white">Today, 2:30 PM - 4:30 PM</p>
+                                <p class="text-sm font-medium text-text-secondary uppercase tracking-wider">
+                                    <?php echo $order['order_status'] === 'delivered' ? 'Delivered' : 'Estimated Delivery'; ?>
+                                </p>
+                                <p class="mt-1 text-2xl font-bold text-text-main dark:text-white">
+                                    <?php
+                                    if ($order['order_status'] === 'delivered') {
+                                        echo date('M d, Y', strtotime($order['updated_at']));
+                                    } elseif ($order['order_status'] === 'shipped') {
+                                        echo 'Today';
+                                    } else {
+                                        echo 'Pending';
+                                    }
+                                    ?>
+                                </p>
                             </div>
                             <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
                                 <span class="material-symbols-outlined text-2xl">local_shipping</span>
@@ -148,98 +242,68 @@ require_once '../../../config/session_Detils.php';
                     <div class="rounded-xl bg-white dark:bg-card-dark p-6 shadow-sm border border-[#e7f3eb] dark:border-[#1e3a29] flex-1">
                         <h3 class="text-lg font-bold text-text-main dark:text-white mb-6">Tracking History</h3>
                         <div class="relative pl-2">
-                            <!-- Step 1: Completed -->
-                            <div class="flex gap-4 pb-8 relative group">
-                                <div class="absolute left-[11px] top-8 bottom-0 w-[2px] bg-primary"></div>
-                                <div class="relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-white">
-                                    <span class="material-symbols-outlined text-sm font-bold">check</span>
+                            <?php
+                            $status_icons = [
+                                'pending' => 'schedule',
+                                'processing' => 'sync',
+                                'packed' => 'inventory_2',
+                                'shipped' => 'local_shipping',
+                                'delivered' => 'check_circle',
+                                'cancelled' => 'cancel'
+                            ];
+
+                            $total_steps = count($status_history);
+                            foreach ($status_history as $index => $history):
+                                $is_last = ($index === $total_steps - 1);
+                                $is_current = ($history['status'] === $order['order_status']);
+                                $date_time = date('M d, h:i A', strtotime($history['created_at']));
+                                $status_label = $status_labels[$history['status']] ?? ucfirst($history['status']);
+                                $icon = $status_icons[$history['status']] ?? 'circle';
+                            ?>
+                                <div class="flex gap-4 <?php echo !$is_last ? 'pb-8' : ''; ?> relative group">
+                                    <?php if (!$is_last): ?>
+                                        <div class="absolute left-[11px] top-8 bottom-0 w-[2px] bg-primary"></div>
+                                    <?php endif; ?>
+                                    <div class="relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full <?php echo $is_current ? 'ring-4 ring-primary/20 bg-primary text-white animate-pulse' : 'bg-primary text-white'; ?>">
+                                        <span class="material-symbols-outlined text-sm <?php echo $is_current ? '' : 'font-bold'; ?>"><?php echo $icon; ?></span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold <?php echo $is_current ? 'text-primary' : 'text-text-main dark:text-white'; ?>"><?php echo htmlspecialchars($status_label); ?></p>
+                                        <p class="text-xs text-text-secondary"><?php echo $date_time; ?>
+                                            <?php if (!empty($history['notes'])): ?>
+                                                • <span class="font-medium"><?php echo htmlspecialchars($history['notes']); ?></span>
+                                            <?php endif; ?>
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p class="text-sm font-bold text-text-main dark:text-white">Order Placed</p>
-                                    <p class="text-xs text-text-secondary">Oct 24, 09:00 AM</p>
-                                </div>
-                            </div>
-                            <!-- Step 2: Completed -->
-                            <div class="flex gap-4 pb-8 relative group">
-                                <div class="absolute left-[11px] top-8 bottom-0 w-[2px] bg-primary"></div>
-                                <div class="relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-white">
-                                    <span class="material-symbols-outlined text-sm font-bold">check</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-bold text-text-main dark:text-white">Packed &amp; Ready</p>
-                                    <p class="text-xs text-text-secondary">Oct 24, 11:30 AM</p>
-                                </div>
-                            </div>
-                            <!-- Step 3: Active/Current -->
-                            <div class="flex gap-4 pb-8 relative group">
-                                <div class="absolute left-[11px] top-8 bottom-0 w-[2px] bg-[#e7f3eb] dark:bg-[#253f30]"></div>
-                                <div class="relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ring-4 ring-primary/20 bg-primary text-white animate-pulse">
-                                    <span class="material-symbols-outlined text-sm">local_shipping</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-bold text-primary">Out for Delivery</p>
-                                    <p class="text-xs text-text-secondary">Oct 24, 02:15 PM • <span class="font-medium">14 miles away</span></p>
-                                </div>
-                            </div>
-                            <!-- Step 4: Pending -->
-                            <div class="flex gap-4 relative group">
-                                <div class="relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#e7f3eb] dark:bg-[#253f30] text-text-secondary border-2 border-transparent">
-                                    <span class="material-symbols-outlined text-sm">home</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium text-text-secondary">Delivered</p>
-                                    <p class="text-xs text-text-secondary opacity-60">Pending</p>
-                                </div>
-                            </div>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                     <!-- Order Summary -->
                     <div class="rounded-xl bg-white dark:bg-card-dark overflow-hidden shadow-sm border border-[#e7f3eb] dark:border-[#1e3a29]">
                         <div class="px-6 py-4 border-b border-[#e7f3eb] dark:border-[#1e3a29] flex justify-between items-center">
                             <h3 class="text-lg font-bold text-text-main dark:text-white">Order Items</h3>
-                            <span class="text-xs font-bold bg-[#e7f3eb] dark:bg-[#253f30] text-text-main dark:text-white px-2 py-1 rounded">3 Items</span>
+                            <span class="text-xs font-bold bg-[#e7f3eb] dark:bg-[#253f30] text-text-main dark:text-white px-2 py-1 rounded"><?php echo count($order_items); ?> Items</span>
                         </div>
                         <div class="divide-y divide-[#e7f3eb] dark:divide-[#1e3a29]">
-                            <div class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-[#253f30]/50 transition-colors">
-                                <div class="flex items-center gap-3">
-                                    <div class="h-10 w-10 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                                        <span class="material-symbols-outlined text-text-secondary">inventory_2</span>
+                            <?php foreach ($order_items as $item): ?>
+                                <div class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-[#253f30]/50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="h-10 w-10 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-text-secondary">inventory_2</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-text-main dark:text-white"><?php echo htmlspecialchars($item['product_name']); ?></p>
+                                            <p class="text-xs text-text-secondary">SKU: <?php echo htmlspecialchars($item['SKU']); ?> • <?php echo (int)$item['quantity']; ?> Units</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-text-main dark:text-white">Island Spring Water (500ml)</p>
-                                        <p class="text-xs text-text-secondary">SKU: WTR-500 • 50 Cases</p>
-                                    </div>
+                                    <p class="text-sm font-bold text-text-main dark:text-white">Rs <?php echo number_format($item['subtotal'], 2); ?></p>
                                 </div>
-                                <p class="text-sm font-bold text-text-main dark:text-white">Rs 450.00</p>
-                            </div>
-                            <div class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-[#253f30]/50 transition-colors">
-                                <div class="flex items-center gap-3">
-                                    <div class="h-10 w-10 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                                        <span class="material-symbols-outlined text-text-secondary">inventory_2</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-text-main dark:text-white">Coconut Cream Bulk Pack</p>
-                                        <p class="text-xs text-text-secondary">SKU: COCO-BLK • 20 Units</p>
-                                    </div>
-                                </div>
-                                <p class="text-sm font-bold text-text-main dark:text-white">Rs 680.00</p>
-                            </div>
-                            <div class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-[#253f30]/50 transition-colors">
-                                <div class="flex items-center gap-3">
-                                    <div class="h-10 w-10 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                                        <span class="material-symbols-outlined text-text-secondary">inventory_2</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-text-main dark:text-white">Spiced Rum (750ml)</p>
-                                        <p class="text-xs text-text-secondary">SKU: RUM-750 • 5 Cases</p>
-                                    </div>
-                                </div>
-                                <p class="text-sm font-bold text-text-main dark:text-white">Rs 110.00</p>
-                            </div>
+                            <?php endforeach; ?>
                         </div>
                         <div class="bg-gray-50 dark:bg-[#15261c] px-6 py-4 flex justify-between items-center">
                             <span class="text-sm font-medium text-text-secondary">Total Amount</span>
-                            <span class="text-xl font-black text-text-main dark:text-white">Rs 1,240.00</span>
+                            <span class="text-xl font-black text-text-main dark:text-white">Rs <?php echo number_format($order['total_amount'], 2); ?></span>
                         </div>
                     </div>
                 </div>
@@ -278,45 +342,51 @@ require_once '../../../config/session_Detils.php';
                         <span class="text-xs font-bold text-text-main dark:text-white uppercase tracking-wide">Live Tracking</span>
                     </div>
                     <!-- Driver Card Overlay -->
-                    <div class="absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-80 bg-white dark:bg-card-dark p-4 rounded-xl shadow-xl border border-[#e7f3eb] dark:border-[#1e3a29] backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95 z-30">
-                        <div class="flex items-center gap-4 mb-4">
-                            <div class="relative">
-                                <div class="h-12 w-12 rounded-full bg-gray-200 bg-cover bg-center" data-alt="Portrait of the delivery driver" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCV9qk5tQlmldk1K0X3RIDCdFSBgQWwRQapwhrBSsL3fPSJIpG8stXovxhE7op5lR7ezznpf03rI6HxeOWLK_fCVZyLHUI3LlWBdc9wXgGi9jo45htfDmmKI2l851dzeK7o_xT9GbgJgtf4EBCeNTqUFXjke9AY92XPgkntUMZRIDr-jzzCfK0PbSxkyfahMqe7dW5H2WibepRz2QQhiqxTuNEY_T7qOLz-neNNaR8tufJI-sC1TRNF9MuGTojm72Ro7lKfLH40neA');"></div>
-                                <div class="absolute -bottom-1 -right-1 h-5 w-5 bg-primary rounded-full border-2 border-white dark:border-card-dark flex items-center justify-center">
-                                    <span class="material-symbols-outlined text-[10px] text-white font-bold">star</span>
+                    <?php if (!empty($order['driver_name'])): ?>
+                        <div class="absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-80 bg-white dark:bg-card-dark p-4 rounded-xl shadow-xl border border-[#e7f3eb] dark:border-[#1e3a29] backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95 z-30">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="relative">
+                                    <div class="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-gray-600">person</span>
+                                    </div>
+                                    <div class="absolute -bottom-1 -right-1 h-5 w-5 bg-primary rounded-full border-2 border-white dark:border-card-dark flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-[10px] text-white font-bold">local_shipping</span>
+                                    </div>
                                 </div>
+                                <div>
+                                    <h4 class="text-base font-bold text-text-main dark:text-white"><?php echo htmlspecialchars($order['driver_name']); ?></h4>
+                                    <p class="text-xs text-text-secondary">Your delivery driver</p>
+                                </div>
+                                <?php if (!empty($order['driver_phone'])): ?>
+                                    <div class="ml-auto">
+                                        <a href="tel:<?php echo htmlspecialchars($order['driver_phone']); ?>" class="h-10 w-10 flex items-center justify-center rounded-full bg-[#e7f3eb] dark:bg-[#253f30] text-primary hover:bg-primary hover:text-white transition-all">
+                                            <span class="material-symbols-outlined">call</span>
+                                        </a>
+                                    </div>
+                                <?php endif; ?>
                             </div>
-                            <div>
-                                <h4 class="text-base font-bold text-text-main dark:text-white">Mahinda.</h4>
-                                <p class="text-xs text-text-secondary">4.9 Rating • 1,000 deliveries</p>
-                            </div>
-                            <div class="ml-auto">
-                                <button class="h-10 w-10 flex items-center justify-center rounded-full bg-[#e7f3eb] dark:bg-[#253f30] text-primary hover:bg-primary hover:text-white transition-all">
-                                    <span class="material-symbols-outlined">call</span>
-                                </button>
+                            <div class="space-y-3">
+                                <?php if (!empty($order['vehicle_model'])): ?>
+                                    <div class="flex items-center justify-between text-sm p-3 bg-background-light dark:bg-[#15261c] rounded-lg">
+                                        <div class="flex items-center gap-2 text-text-secondary">
+                                            <span class="material-symbols-outlined text-lg">directions_car</span>
+                                            <span>Vehicle</span>
+                                        </div>
+                                        <span class="font-bold text-text-main dark:text-white"><?php echo htmlspecialchars($order['vehicle_model']); ?></span>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if (!empty($order['driver_phone'])): ?>
+                                    <div class="flex items-center justify-between text-sm p-3 bg-background-light dark:bg-[#15261c] rounded-lg">
+                                        <div class="flex items-center gap-2 text-text-secondary">
+                                            <span class="material-symbols-outlined text-lg">phone</span>
+                                            <span>Contact</span>
+                                        </div>
+                                        <span class="font-bold text-text-main dark:text-white"><?php echo htmlspecialchars($order['driver_phone']); ?></span>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between text-sm p-3 bg-background-light dark:bg-[#15261c] rounded-lg">
-                                <div class="flex items-center gap-2 text-text-secondary">
-                                    <span class="material-symbols-outlined text-lg">directions_car</span>
-                                    <span>Vehicle</span>
-                                </div>
-                                <span class="font-bold text-text-main dark:text-white">White Isuzu Truck</span>
-                            </div>
-                            <div class="flex items-center justify-between text-sm p-3 bg-background-light dark:bg-[#15261c] rounded-lg">
-                                <div class="flex items-center gap-2 text-text-secondary">
-                                    <span class="material-symbols-outlined text-lg">pin</span>
-                                    <span>License Plate</span>
-                                </div>
-                                <span class="font-bold text-text-main dark:text-white">994-XYZ</span>
-                            </div>
-                        </div>
-                        <button class="w-full mt-4 bg-primary hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-                            <span>Message Driver</span>
-                            <span class="material-symbols-outlined text-sm">send</span>
-                        </button>
-                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </main>
