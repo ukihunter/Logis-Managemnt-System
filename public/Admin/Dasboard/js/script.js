@@ -163,7 +163,7 @@ async function loadLowStockItems() {
       div.className = `flex items-start gap-3 p-3 rounded-lg bg-${severity}-50 dark:bg-${severity}-900/10 border border-${severity}-100 dark:border-${severity}-900/30`;
       div.innerHTML = `
                 <div class="bg-white dark:bg-surface-dark p-2 rounded-md shadow-sm shrink-0">
-                    <div class="size-8 bg-cover bg-center rounded" style="background-image: url('${item.image}');"></div>
+                    <div class="size-8 bg-cover bg-center rounded" style="background-image: url('../../../${item.image}')"></div>
                 </div>
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-bold text-text-main-light dark:text-text-main-dark truncate">${item.name}</p>
