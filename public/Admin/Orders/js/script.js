@@ -657,3 +657,33 @@ function confirmDelivery() {
   closeDeliveryConfirmModal();
   updateOrderStatus("delivered", "Order successfully delivered to customer");
 }
+
+// Print Order Invoice function
+function printOrderInvoice() {
+  if (!currentOrderId) {
+    alert("Please select an order first");
+    return;
+  }
+
+  // Open invoice in new window for printing
+  window.open(`order_invoice.php?order_id=${currentOrderId}`, "_blank");
+}
+
+// Download Order Invoice function
+function downloadOrderInvoice() {
+  if (!currentOrderId) {
+    alert("Please select an order first");
+    return;
+  }
+
+  // Create a hidden iframe to load and trigger download
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = `order_invoice.php?order_id=${currentOrderId}&download=1`;
+  document.body.appendChild(iframe);
+
+  // Remove iframe after download starts (5 seconds)
+  setTimeout(() => {
+    document.body.removeChild(iframe);
+  }, 5000);
+}

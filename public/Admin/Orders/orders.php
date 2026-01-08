@@ -158,12 +158,24 @@ $ordersResult = $conn->query($ordersQuery);
                     </div>
                     <!-- Search & Filters -->
                     <div class="flex flex-col gap-4">
-                        <!-- Search Bar -->
-                        <div class="relative w-full">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <span class="material-symbols-outlined text-[#4c9a66]">search</span>
+                        <!-- Search Bar and Export Buttons -->
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <div class="relative flex-1">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="material-symbols-outlined text-[#4c9a66]">search</span>
+                                </div>
+                                <input id="searchInput" class="block w-full pl-10 pr-3 py-3 border border-transparent rounded-lg leading-5 bg-[#e7f3eb] dark:bg-[#1e3b29] text-[#0d1b12] dark:text-white placeholder-[#4c9a66] focus:outline-none focus:bg-white dark:focus:bg-[#152e1e] focus:ring-2 focus:ring-primary focus:border-transparent sm:text-sm transition-all shadow-sm" placeholder="Search by Order ID, Customer Name, or Zone..." type="text" />
                             </div>
-                            <input id="searchInput" class="block w-full pl-10 pr-3 py-3 border border-transparent rounded-lg leading-5 bg-[#e7f3eb] dark:bg-[#1e3b29] text-[#0d1b12] dark:text-white placeholder-[#4c9a66] focus:outline-none focus:bg-white dark:focus:bg-[#152e1e] focus:ring-2 focus:ring-primary focus:border-transparent sm:text-sm transition-all shadow-sm" placeholder="Search by Order ID, Customer Name, or Zone..." type="text" />
+                            <div class="flex gap-2">
+                                <button onclick="exportToCSV()" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#152e1e] border border-[#e7f3eb] dark:border-gray-700 rounded-lg hover:border-primary transition-colors shadow-sm text-[#0d1b12] dark:text-gray-300">
+                                    <span class="material-symbols-outlined text-[20px]">download</span>
+                                    <span class="text-sm font-semibold hidden sm:inline">Export CSV</span>
+                                </button>
+                                <button onclick="exportToExcel()" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#152e1e] border border-[#e7f3eb] dark:border-gray-700 rounded-lg hover:border-primary transition-colors shadow-sm text-[#0d1b12] dark:text-gray-300">
+                                    <span class="material-symbols-outlined text-[20px]">table_chart</span>
+                                    <span class="text-sm font-semibold hidden sm:inline">Export Excel</span>
+                                </button>
+                            </div>
                         </div>
                         <!-- Chips -->
                         <div class="flex gap-2 flex-wrap pb-2">
@@ -264,19 +276,32 @@ $ordersResult = $conn->query($ordersQuery);
             <!-- Right Panel: Order Details (Detail View) -->
             <aside id="detailPanel" class="detail-panel hidden flex-col bg-white dark:bg-[#152e1e] h-full shadow-xl z-20 overflow-hidden fixed right-0 top-0 w-5/12 xl:w-4/12">
                 <!-- Detail Header -->
-                <div class="px-6 py-5 border-b border-[#e7f3eb] dark:border-gray-800 flex justify-between items-start bg-white dark:bg-[#152e1e]">
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <h2 id="orderNumber" class="text-xl font-black text-[#0d1b12] dark:text-white">Loading...</h2>
-                            <span id="orderStatus" class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-gray-100 text-gray-800 border border-gray-200">
-                                ...
-                            </span>
+                <div class="px-6 py-5 border-b border-[#e7f3eb] dark:border-gray-800 bg-white dark:bg-[#152e1e]">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <h2 id="orderNumber" class="text-xl font-black text-[#0d1b12] dark:text-white">Loading...</h2>
+                                <span id="orderStatus" class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-gray-100 text-gray-800 border border-gray-200">
+                                    ...
+                                </span>
+                            </div>
+                            <p id="orderDate" class="text-xs text-gray-500 dark:text-gray-400">Loading...</p>
                         </div>
-                        <p id="orderDate" class="text-xs text-gray-500 dark:text-gray-400">Loading...</p>
+                        <button onclick="closeOrderDetail()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
                     </div>
-                    <button onclick="closeOrderDetail()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
-                        <span class="material-symbols-outlined">close</span>
-                    </button>
+                    <!-- Invoice Action Buttons -->
+                    <div class="flex gap-2">
+                        <button onclick="printOrderInvoice()" class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-white dark:bg-[#102216] border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-primary hover:text-primary dark:hover:border-primary dark:hover:text-primary rounded-lg font-medium text-xs transition-all">
+                            <span class="material-symbols-outlined text-[16px]">print</span>
+                            <span>Print</span>
+                        </button>
+                        <button onclick="downloadOrderInvoice()" class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-primary text-white hover:bg-[#0ebf49] rounded-lg font-medium text-xs transition-all">
+                            <span class="material-symbols-outlined text-[16px]">download</span>
+                            <span>Download</span>
+                        </button>
+                    </div>
                 </div>
                 <!-- Scrollable Content -->
                 <div class="flex-1 overflow-y-auto p-6 space-y-6">
@@ -392,7 +417,18 @@ $ordersResult = $conn->query($ordersQuery);
                     </div>
                 </div>
                 <!-- Sticky Bottom Actions -->
-                <div id="orderActions" class="p-6 border-t border-[#e7f3eb] dark:border-gray-800 bg-white dark:bg-[#152e1e]">
+                <div id="orderActions" class="p-6 border-t border-[#e7f3eb] dark:border-gray-800 bg-white dark:bg-[#152e1e] space-y-3">
+                    <!-- Invoice Buttons -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="printOrderInvoice()" class="flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-[#102216] border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-lg font-bold text-sm transition-all shadow-sm">
+                            <span class="material-symbols-outlined text-[20px]">print</span>
+                            <span>Print</span>
+                        </button>
+                        <button onclick="downloadOrderInvoice()" class="flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white hover:bg-[#0ebf49] rounded-lg font-bold text-sm transition-all shadow-sm">
+                            <span class="material-symbols-outlined text-[20px]">download</span>
+                            <span>Download</span>
+                        </button>
+                    </div>
                     <!-- Action buttons will be dynamically loaded based on order status -->
                 </div>
             </aside>
@@ -443,11 +479,176 @@ $ordersResult = $conn->query($ordersQuery);
                     </div>
                 </div>
             </div>
+
+            <!-- Mobile Bottom Nav Spacer -->
+            <div class="h-16 lg:hidden"></div>
         </main>
+
+        <!-- Mobile Bottom Nav -->
+        <div class="fixed bottom-0 left-0 w-full bg-surface-light dark:bg-surface-dark border-t border-[#e7f3eb] dark:border-[#2a4034] flex lg:hidden justify-around py-3 px-2 z-50">
+            <a href="../Dasboard/dasboard.php" class="flex flex-col items-center gap-1 text-text-secondary-light dark:text-text-secondary-dark">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-[10px] font-medium">Dashboard</span>
+            </a>
+            <a href="orders.php" class="flex flex-col items-center gap-1 text-primary">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span class="text-[10px] font-bold">Orders</span>
+            </a>
+            <a href="../Inventory/inventory.php" class="flex flex-col items-center gap-1 text-text-secondary-light dark:text-text-secondary-dark">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <span class="text-[10px] font-medium">Inventory</span>
+            </a>
+            <button id="mobileMoreBtn" class="flex flex-col items-center gap-1 text-text-secondary-light dark:text-text-secondary-dark">
+                <span class="material-symbols-outlined">more_horiz</span>
+                <span class="text-[10px] font-medium">More</span>
+            </button>
+        </div>
+
+        <!-- Mobile More Menu -->
+        <div id="mobileMoreMenu" class="hidden fixed bottom-16 right-2 bg-surface-light dark:bg-surface-dark border border-[#e7f3eb] dark:border-[#2a4034] rounded-lg shadow-xl z-50 min-w-[200px]">
+            <a href="../Logistics/logistics.php" class="flex items-center gap-3 px-4 py-3 hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors border-b border-[#e7f3eb] dark:border-[#2a4034]">
+                <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark">local_shipping</span>
+                <span class="text-sm font-medium">Logistics</span>
+            </a>
+            <a href="../User_Management/user_managment.php" class="flex items-center gap-3 px-4 py-3 hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors <?php echo ($user_type === 'admin') ? 'border-b border-[#e7f3eb] dark:border-[#2a4034]' : ''; ?>">
+                <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark">account_child_invert</span>
+                <span class="text-sm font-medium">Users</span>
+            </a>
+            <?php if ($user_type === 'admin'): ?>
+                <a href="../Reports/reports.php" class="flex items-center gap-3 px-4 py-3 hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors">
+                    <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark">description</span>
+                    <span class="text-sm font-medium">Reports</span>
+                </a>
+            <?php endif; ?>
+        </div>
     </div>
 
     <?php include '../components/scripts.php'; ?>
     <script src="../Orders/js/script.js"></script>
+    <script>
+        // Mobile more menu toggle
+        document.getElementById('mobileMoreBtn')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('mobileMoreMenu')?.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('mobileMoreMenu');
+            const btn = document.getElementById('mobileMoreBtn');
+            if (menu && !menu.contains(e.target) && !btn?.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        // Export to CSV function
+        function exportToCSV() {
+            const rows = document.querySelectorAll('#ordersTableBody tr:not(.hidden)');
+            if (rows.length === 0) {
+                alert('No orders to export');
+                return;
+            }
+
+            let csvContent = "Order ID,Customer,Business Name,Zone,Items,Total,Status,Payment,Date\n";
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const orderId = cells[0]?.textContent.trim();
+                const customer = cells[1]?.querySelector('.font-bold')?.textContent.trim();
+                const businessName = cells[1]?.querySelector('.text-xs')?.textContent.trim();
+                const zone = cells[2]?.textContent.trim();
+                const items = cells[3]?.textContent.trim();
+                const total = cells[4]?.textContent.trim();
+                const status = cells[5]?.textContent.trim();
+                const payment = cells[6]?.textContent.trim();
+                const date = cells[7]?.textContent.trim();
+
+                csvContent += `"${orderId}","${customer}","${businessName}","${zone}","${items}","${total}","${status}","${payment}","${date}"\n`;
+            });
+
+            const blob = new Blob([csvContent], {
+                type: 'text/csv;charset=utf-8;'
+            });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `orders_export_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Export to Excel function (HTML table format)
+        function exportToExcel() {
+            const rows = document.querySelectorAll('#ordersTableBody tr:not(.hidden)');
+            if (rows.length === 0) {
+                alert('No orders to export');
+                return;
+            }
+
+            let htmlContent = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
+                <head><meta charset="UTF-8"></head>
+                <body>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Business Name</th>
+                            <th>Zone</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Payment</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const orderId = cells[0]?.textContent.trim();
+                const customer = cells[1]?.querySelector('.font-bold')?.textContent.trim();
+                const businessName = cells[1]?.querySelector('.text-xs')?.textContent.trim();
+                const zone = cells[2]?.textContent.trim();
+                const items = cells[3]?.textContent.trim();
+                const total = cells[4]?.textContent.trim();
+                const status = cells[5]?.textContent.trim();
+                const payment = cells[6]?.textContent.trim();
+                const date = cells[7]?.textContent.trim();
+
+                htmlContent += `
+                    <tr>
+                        <td>${orderId}</td>
+                        <td>${customer}</td>
+                        <td>${businessName}</td>
+                        <td>${zone}</td>
+                        <td>${items}</td>
+                        <td>${total}</td>
+                        <td>${status}</td>
+                        <td>${payment}</td>
+                        <td>${date}</td>
+                    </tr>
+                `;
+            });
+
+            htmlContent += '</tbody></table></body></html>';
+
+            const blob = new Blob([htmlContent], {
+                type: 'application/vnd.ms-excel'
+            });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `orders_export_${new Date().toISOString().split('T')[0]}.xls`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
 </body>
 
 </html>

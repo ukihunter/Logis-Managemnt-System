@@ -49,16 +49,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $redirect_url = '';
             switch ($user['user_type']) {
                 case 'customer':
-                    $redirect_url = '../customer/dashboard/dashboard.php';
+                    $redirect_url = '../Customer/Dashboard/dashboard.php';
                     break;
                 case 'admin':
-                    $redirect_url = '../admin/dashboard/dashboard.php';
-                    break;
                 case 'staff':
-                    $redirect_url = '../../public/Admin/Dasboard/dasboard.php';
+                    $redirect_url = '../Admin/Dasboard/dasboard.php';
                     break;
                 default:
-                    $redirect_url = '../customer/dashboard/dashboard.php';
+                    $redirect_url = '../Customer/Dashboard/dashboard.php';
             }
 
             echo json_encode(['success' => true, 'message' => 'Login successful!', 'redirect' => $redirect_url]);

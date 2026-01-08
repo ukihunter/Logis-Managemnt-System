@@ -389,7 +389,30 @@ $status_labels = [
                     <?php endif; ?>
                 </div>
             </div>
+
+            <!-- Mobile Bottom Nav Spacer -->
+            <div class="h-16 lg:hidden"></div>
         </main>
+
+        <!-- Mobile Bottom Nav -->
+        <div class="fixed bottom-0 left-0 w-full bg-surface-light dark:bg-surface-dark border-t border-slate-200 dark:border-slate-800 flex lg:hidden justify-around py-3 px-2 z-40">
+            <a href="../Dashboard/dashboard.php" class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-[10px] font-medium">Home</span>
+            </a>
+            <a href="../Catalog/catalog.php" class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
+                <span class="material-symbols-outlined">manage_search</span>
+                <span class="text-[10px] font-medium">Catalog</span>
+            </a>
+            <a href="order.php" class="flex flex-col items-center gap-1 text-primary">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span class="text-[10px] font-bold">Orders</span>
+            </a>
+            <button id="mobileProfileBtn" class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
+                <span class="material-symbols-outlined">person</span>
+                <span class="text-[10px] font-medium">Account</span>
+            </button>
+        </div>
     </div>
 </body>
 <script src="../Orders/js/script.js"></script>

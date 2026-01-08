@@ -312,6 +312,9 @@ $ordersResult = $conn->query($ordersQuery);
                 </div>
             </div>
         </div>
+
+        <!-- Mobile Bottom Nav Spacer -->
+        <div class="h-16 lg:hidden"></div>
     </main>
 
     <?php include '../components/scripts.php'; ?>
@@ -465,6 +468,60 @@ $ordersResult = $conn->query($ordersQuery);
 
             // Filter to in_progress tab by default
             filterByTab('in_progress');
+        });
+    </script>
+
+    <!-- Mobile Bottom Nav -->
+    <div class="fixed bottom-0 left-0 w-full bg-surface-light dark:bg-surface-dark border-t border-[#e7f3eb] dark:border-[#2a4034] flex lg:hidden justify-around py-3 px-2 z-50">
+        <a href="../Dasboard/dasboard.php" class="flex flex-col items-center gap-1 text-text-secondary-light dark:text-text-secondary-dark">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="text-[10px] font-medium">Dashboard</span>
+        </a>
+        <a href="../Orders/orders.php" class="flex flex-col items-center gap-1 text-text-secondary-light dark:text-text-secondary-dark">
+            <span class="material-symbols-outlined">shopping_cart</span>
+            <span class="text-[10px] font-medium">Orders</span>
+        </a>
+        <a href="../Inventory/inventory.php" class="flex flex-col items-center gap-1 text-text-secondary-light dark:text-text-secondary-dark">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <span class="text-[10px] font-medium">Inventory</span>
+        </a>
+        <button id="mobileMoreBtn" class="flex flex-col items-center gap-1 text-text-secondary-light dark:text-text-secondary-dark">
+            <span class="material-symbols-outlined">more_horiz</span>
+            <span class="text-[10px] font-medium">More</span>
+        </button>
+    </div>
+
+    <!-- Mobile More Menu -->
+    <div id="mobileMoreMenu" class="hidden fixed bottom-16 right-2 bg-surface-light dark:bg-surface-dark border border-[#e7f3eb] dark:border-[#2a4034] rounded-lg shadow-xl z-50 min-w-[200px]">
+        <a href="logistics.php" class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary transition-colors border-b border-[#e7f3eb] dark:border-[#2a4034]">
+            <span class="material-symbols-outlined">local_shipping</span>
+            <span class="text-sm font-medium">Logistics</span>
+        </a>
+        <a href="../User_Management/user_managment.php" class="flex items-center gap-3 px-4 py-3 hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors <?php echo ($user_type === 'admin') ? 'border-b border-[#e7f3eb] dark:border-[#2a4034]' : ''; ?>">
+            <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark">account_child_invert</span>
+            <span class="text-sm font-medium">Users</span>
+        </a>
+        <?php if ($user_type === 'admin'): ?>
+            <a href="../Reports/reports.php" class="flex items-center gap-3 px-4 py-3 hover:bg-background-light dark:hover:bg-[#2a4034] transition-colors">
+                <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark">description</span>
+                <span class="text-sm font-medium">Reports</span>
+            </a>
+        <?php endif; ?>
+    </div>
+
+    <script>
+        // Mobile more menu toggle
+        document.getElementById('mobileMoreBtn')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('mobileMoreMenu')?.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('mobileMoreMenu');
+            const btn = document.getElementById('mobileMoreBtn');
+            if (menu && !menu.contains(e.target) && !btn?.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
         });
     </script>
 </body>

@@ -69,11 +69,11 @@ require_once 'dashboard_handler.php';
                 <!-- Right Actions -->
                 <div class="flex items-center gap-4">
                     <!-- Nav Links (Desktop) -->
-                    <nav class="hidden lg:flex items-center gap-6 mr-4">
+                    <nav class="hidden lg:flex items-center gap-6 mr-4 font-medium">
                         <a class="text-sm font-bold text-primary" href="#">Dashboard</a>
-                        <a class="text-sm font-medium hover:text-primary transition-colors" href="../Catalog/catalog.php">Catalog</a>
-                        <a class="text-sm font-medium hover:text-primary transition-colors" href="../Orders/order.php">Orders</a>
-                        <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Invoices</a>
+                        <a class="text-sm font-bold hover:text-primary transition-colors" href="../Catalog/catalog.php">Catalog</a>
+                        <a class="text-sm font-bold hover:text-primary transition-colors" href="../Orders/order.php">Orders</a>
+                        <!--    <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Invoices</a>-->
                     </nav>
                     <!-- Action Icons -->
                     <div class="flex gap-2">
@@ -374,19 +374,19 @@ require_once 'dashboard_handler.php';
         </main>
         <!-- Mobile Bottom Nav -->
         <div class="fixed bottom-0 left-0 w-full bg-surface-light dark:bg-surface-dark border-t border-slate-200 dark:border-slate-800 flex lg:hidden justify-around py-3 px-2 z-40">
-            <button class="flex flex-col items-center gap-1 text-primary">
+            <a href="dashboard.php" class="flex flex-col items-center gap-1 text-primary">
                 <span class="material-symbols-outlined">dashboard</span>
                 <span class="text-[10px] font-bold">Home</span>
-            </button>
-            <button class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
+            </a>
+            <a href="../Catalog/catalog.php" class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
                 <span class="material-symbols-outlined">manage_search</span>
                 <span class="text-[10px] font-medium">Catalog</span>
-            </button>
-            <button class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
+            </a>
+            <a href="../Orders/order.php" class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
                 <span class="material-symbols-outlined">receipt_long</span>
                 <span class="text-[10px] font-medium">Orders</span>
-            </button>
-            <button class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
+            </a>
+            <button id="mobileProfileBtn" class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
                 <span class="material-symbols-outlined">person</span>
                 <span class="text-[10px] font-medium">Account</span>
             </button>

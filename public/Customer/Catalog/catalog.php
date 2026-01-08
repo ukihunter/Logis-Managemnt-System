@@ -125,10 +125,10 @@ $total_products = $total_result->fetch_assoc()['total'];
             <!-- Right Actions -->
             <div class="flex items-center gap-6 shrink-0">
                 <nav class="hidden lg:flex items-center gap-6">
-                    <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="../Dashboard/dashboard.php">Dashboard</a>
+                    <a class="text-text-main dark:text-gray-200 text-sm  font-bold hover:text-primary transition-colors" href="../Dashboard/dashboard.php">Dashboard</a>
                     <a class="text-primary text-sm font-bold" href="#">Catalog</a>
-                    <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="../Orders/order.php">Orders</a>
-                    <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Invoices</a>
+                    <a class="text-text-main dark:text-gray-200 text-sm font-bold hover:text-primary transition-colors" href="../Orders/order.php">Orders</a>
+                    <!--    <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Invoices</a> -->
                 </nav>
                 <div class="flex items-center gap-4">
                     <button onclick="location.href='../../Customer/Cart/cart.php'" class="relative flex items-center justify-center h-10 px-4 bg-primary hover:bg-green-500 transition-colors text-text-main rounded-lg font-bold text-sm gap-2">
@@ -301,7 +301,30 @@ $total_products = $total_result->fetch_assoc()['total'];
             <div id="paginationContainer" class="mt-12 flex items-center justify-center gap-3">
                 <!-- Pagination will be loaded here -->
             </div>
+
+            <!-- Mobile Bottom Nav Spacer -->
+            <div class="h-16 lg:hidden"></div>
         </main>
+
+        <!-- Mobile Bottom Nav -->
+        <div class="fixed bottom-0 left-0 w-full bg-surface-light dark:bg-surface-dark border-t border-slate-200 dark:border-slate-800 flex lg:hidden justify-around py-3 px-2 z-40">
+            <a href="../Dashboard/dashboard.php" class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-[10px] font-medium">Home</span>
+            </a>
+            <a href="catalog.php" class="flex flex-col items-center gap-1 text-primary">
+                <span class="material-symbols-outlined">manage_search</span>
+                <span class="text-[10px] font-bold">Catalog</span>
+            </a>
+            <a href="../Orders/order.php" class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span class="text-[10px] font-medium">Orders</span>
+            </a>
+            <button id="mobileProfileBtn" class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
+                <span class="material-symbols-outlined">person</span>
+                <span class="text-[10px] font-medium">Account</span>
+            </button>
+        </div>
     </div>
 </body>
 

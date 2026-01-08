@@ -147,7 +147,7 @@ $conn->close();
                     <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="../Dashboard/dashboard.php">Dashboard</a>
                     <a class="text-text-main dark:text-gray-200 text-sm font-bold" href="#">Catalog</a>
                     <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Orders</a>
-                    <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Invoices</a>
+                    <!--  <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Invoices</a>-->
                 </nav>
                 <div class="relative flex gap-2 border-l border-[#e7f3eb] dark:border-white/10 pl-6">
 
@@ -437,7 +437,31 @@ $conn->close();
                 </div>
             </div>
         </div>
+
+        <!-- Mobile Bottom Nav Spacer -->
+        <div class="h-16 lg:hidden"></div>
     </main>
+
+    <!-- Mobile Bottom Nav -->
+    <div class="fixed bottom-0 left-0 w-full bg-surface-light dark:bg-surface-dark border-t border-slate-200 dark:border-slate-800 flex lg:hidden justify-around py-3 px-2 z-40">
+        <a href="../Dashboard/dashboard.php" class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="text-[10px] font-medium">Home</span>
+        </a>
+        <a href="../Catalog/catalog.php" class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
+            <span class="material-symbols-outlined">manage_search</span>
+            <span class="text-[10px] font-medium">Catalog</span>
+        </a>
+        <a href="../Orders/order.php" class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
+            <span class="material-symbols-outlined">receipt_long</span>
+            <span class="text-[10px] font-medium">Orders</span>
+        </a>
+        <button id="mobileProfileBtn" class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
+            <span class="material-symbols-outlined">person</span>
+            <span class="text-[10px] font-medium">Account</span>
+        </button>
+    </div>
+
     <footer class="mt-auto border-t border-[#e7f3eb] dark:border-white/5 bg-surface-light dark:bg-surface-dark py-12">
         <div class="max-w-[1440px] mx-auto px-6 text-center">
             <p class="text-text-secondary dark:text-gray-500 text-sm">© <?php echo date("Y"); ?> DistriMgt Distribution Systems. All rights reserved.</p>

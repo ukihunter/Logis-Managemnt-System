@@ -92,7 +92,7 @@ require_once 'order_data_handler.php';
                             <a class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition" href="../Dashboard/dashboard.php">Dashboard</a>
                             <a class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition" href="../Catalog/catalog.php">Catalog</a>
                             <a class="text-primary font-semibold" href="#">Orders</a>
-                            <a class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition" href="#">Invoices</a>
+                            <!--          <a class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition" href="#">Invoices</a> -->
                         </div>
                         <div class="relative ml-2">
                             <button id="profileMenuBtn" class="size-9 rounded-full bg-slate-300 dark:bg-slate-700 bg-cover bg-center border-2 border-slate-100 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-colors" data-alt="User profile avatar showing a store logo or generic user icon" style='background-image: url("https://avatar.iran.liara.run/username?username=<?php echo urlencode($business_name); ?>");'></button>
@@ -315,6 +315,29 @@ require_once 'order_data_handler.php';
         <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm text-gray-400 dark:text-gray-600">
             © 2026 IslandDistro Inc. All rights reserved.
         </footer>
+
+        <!-- Mobile Bottom Nav Spacer -->
+        <div class="h-16 lg:hidden"></div>
+
+        <!-- Mobile Bottom Nav -->
+        <div class="fixed bottom-0 left-0 w-full bg-surface-light dark:bg-surface-dark border-t border-slate-200 dark:border-slate-800 flex lg:hidden justify-around py-3 px-2 z-40">
+            <a href="../Dashboard/dashboard.php" class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-[10px] font-medium">Home</span>
+            </a>
+            <a href="../Catalog/catalog.php" class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
+                <span class="material-symbols-outlined">manage_search</span>
+                <span class="text-[10px] font-medium">Catalog</span>
+            </a>
+            <a href="order.php" class="flex flex-col items-center gap-1 text-primary">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span class="text-[10px] font-bold">Orders</span>
+            </a>
+            <button id="mobileProfileBtn" class="flex flex-col items-center gap-1 text-text-secondary dark:text-emerald-400">
+                <span class="material-symbols-outlined">person</span>
+                <span class="text-[10px] font-medium">Account</span>
+            </button>
+        </div>
     </div>
 
     <!-- Order Details Sidebar -->
@@ -336,20 +359,28 @@ require_once 'order_data_handler.php';
         // Profile dropdown toggle
         const profileMenuBtn = document.getElementById('profileMenuBtn');
         const profileDropdown = document.getElementById('profileDropdown');
+        const mobileProfileBtn = document.getElementById('mobileProfileBtn');
 
         if (profileMenuBtn && profileDropdown) {
             profileMenuBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 profileDropdown.classList.toggle('hidden');
             });
+        }
 
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!profileMenuBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
-                    profileDropdown.classList.add('hidden');
-                }
+        if (mobileProfileBtn && profileDropdown) {
+            mobileProfileBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
             });
         }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (profileDropdown && !profileMenuBtn?.contains(e.target) && !mobileProfileBtn?.contains(e.target) && !profileDropdown.contains(e.target)) {
+                profileDropdown.classList.add('hidden');
+            }
+        });
 
         // Order Details Sidebar Functions
         function viewOrderDetails(orderNumber, orderId) {

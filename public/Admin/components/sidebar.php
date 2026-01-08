@@ -75,10 +75,12 @@
             <span class="material-symbols-outlined <?php echo (basename($_SERVER['PHP_SELF']) == 'user_managment.php') ? 'group-hover:scale-110' : 'text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary'; ?> transition-colors">account_child_invert</span>
             <span class="sidebar-text">User Management</span>
         </a>
-        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg <?php echo (basename($_SERVER['PHP_SELF']) == 'reports.php') ? 'bg-primary/10 text-primary' : 'text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-[#2a4034]'; ?> transition-colors font-medium group" href="<?php echo getRelativePath('Admin/Reports/reports.php'); ?>">
-            <span class="material-symbols-outlined <?php echo (basename($_SERVER['PHP_SELF']) == 'reports.php') ? 'group-hover:scale-110' : 'text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary'; ?> transition-colors">description</span>
-            <span class="sidebar-text">Reports</span>
-        </a>
+        <?php if ($user_type === 'admin'): ?>
+            <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg <?php echo (basename($_SERVER['PHP_SELF']) == 'reports.php') ? 'bg-primary/10 text-primary' : 'text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-[#2a4034]'; ?> transition-colors font-medium group" href="<?php echo getRelativePath('Admin/Reports/reports.php'); ?>">
+                <span class="material-symbols-outlined <?php echo (basename($_SERVER['PHP_SELF']) == 'reports.php') ? 'group-hover:scale-110' : 'text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary'; ?> transition-colors">description</span>
+                <span class="sidebar-text">Reports</span>
+            </a>
+        <?php endif; ?>
     </nav>
     <div class="p-4 border-t border-[#e7f3eb] dark:border-[#2a4034] relative">
         <div class="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-background-light dark:hover:bg-[#2a4034]">
