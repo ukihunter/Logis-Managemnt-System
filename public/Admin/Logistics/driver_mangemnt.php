@@ -156,108 +156,108 @@ if ($drivers_result) {
                         </thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
                             <?php if (empty($drivers)): ?>
-                            <tr>
-                                <td colspan="6" class="py-8 px-6 text-center text-gray-500 dark:text-gray-400">
-                                    No drivers found. Click "Add New Driver" to get started.
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td colspan="6" class="py-8 px-6 text-center text-gray-500 dark:text-gray-400">
+                                        No drivers found. Click "Add New Driver" to get started.
+                                    </td>
+                                </tr>
                             <?php else: ?>
-                            <?php foreach ($drivers as $driver): 
-                                // Determine status badge
-                                $status_class = '';
-                                $status_text = '';
-                                $status_dot = '';
-                                
-                                switch($driver['status']) {
-                                    case 'active':
-                                        $status_class = 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400';
-                                        $status_text = 'Active';
-                                        $status_dot = 'bg-green-500 animate-pulse';
-                                        break;
-                                    case 'inactive':
-                                        $status_class = 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400';
-                                        $status_text = 'Inactive';
-                                        $status_dot = 'bg-gray-400';
-                                        break;
-                                    case 'on_leave':
-                                        $status_class = 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400';
-                                        $status_text = 'On Leave';
-                                        $status_dot = 'bg-yellow-500';
-                                        break;
-                                }
-                                
-                                // Determine vehicle icon
-                                $vehicle_icon = 'local_shipping';
-                                $vehicle_color = 'blue';
-                                switch($driver['vehicle_type']) {
-                                    case 'truck':
-                                        $vehicle_icon = 'local_shipping';
-                                        $vehicle_color = 'blue';
-                                        break;
-                                    case 'van':
-                                        $vehicle_icon = 'airport_shuttle';
-                                        $vehicle_color = 'orange';
-                                        break;
-                                    case 'motorcycle':
-                                        $vehicle_icon = 'two_wheeler';
-                                        $vehicle_color = 'purple';
-                                        break;
-                                }
-                            ?>
-                            <tr class="group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                <td class="py-4 px-6 whitespace-nowrap">
-                                    <div class="flex items-center gap-3">
-                                        <div class="h-10 w-10 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-                                            <?php if ($driver['profile_image']): ?>
-                                            <img alt="Driver Avatar" class="h-full w-full object-cover" src="<?php echo htmlspecialchars($driver['profile_image']); ?>" />
-                                            <?php else: ?>
-                                            <span class="material-symbols-outlined text-gray-400">person</span>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="flex flex-col">
-                                            <span class="text-sm font-bold text-gray-900 dark:text-white"><?php echo htmlspecialchars($driver['full_name']); ?></span>
-                                            <span class="text-xs text-gray-500"><?php echo htmlspecialchars($driver['phone_number']); ?></span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-4 px-6 whitespace-nowrap">
-                                    <span class="text-sm font-mono text-gray-600 dark:text-gray-400"><?php echo htmlspecialchars($driver['employee_id']); ?></span>
-                                </td>
-                                <td class="py-4 px-6 whitespace-nowrap">
-                                    <div class="flex items-center gap-2">
-                                        <div class="p-1.5 rounded bg-<?php echo $vehicle_color; ?>-50 dark:bg-<?php echo $vehicle_color; ?>-900/20 text-<?php echo $vehicle_color; ?>-600 dark:text-<?php echo $vehicle_color; ?>-400">
-                                            <span class="material-symbols-outlined text-[18px]"><?php echo $vehicle_icon; ?></span>
-                                        </div>
-                                        <div class="flex flex-col">
-                                            <span class="text-sm font-medium text-gray-900 dark:text-white"><?php echo htmlspecialchars($driver['vehicle_model'] ?: ucfirst($driver['vehicle_type'])); ?></span>
-                                            <span class="text-xs text-gray-500"><?php echo htmlspecialchars($driver['license_plate']); ?></span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-4 px-6 whitespace-nowrap">
-                                    <span class="text-sm text-gray-700 dark:text-gray-300"><?php echo htmlspecialchars($driver['distribution_centre']); ?></span>
-                                </td>
-                                <td class="py-4 px-6 whitespace-nowrap">
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold <?php echo $status_class; ?>">
-                                        <span class="w-1.5 h-1.5 rounded-full <?php echo $status_dot; ?>"></span>
-                                        <?php echo $status_text; ?>
-                                    </span>
-                                </td>
-                                <td class="py-4 px-6 whitespace-nowrap text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <button onclick="viewDriver(<?php echo $driver['id']; ?>)" class="p-1.5 rounded-lg text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="View Details">
-                                            <span class="material-symbols-outlined">visibility</span>
-                                        </button>
-                                        <button onclick="editDriver(<?php echo $driver['id']; ?>)" class="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="Edit">
-                                            <span class="material-symbols-outlined">edit</span>
-                                        </button>
-                                        <button onclick="deleteDriver(<?php echo $driver['id']; ?>, '<?php echo htmlspecialchars($driver['full_name']); ?>')" class="p-1.5 rounded-lg text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="Delete">
-                                            <span class="material-symbols-outlined">delete</span>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
+                                <?php foreach ($drivers as $driver):
+                                    // Determine status badge
+                                    $status_class = '';
+                                    $status_text = '';
+                                    $status_dot = '';
+
+                                    switch ($driver['status']) {
+                                        case 'active':
+                                            $status_class = 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400';
+                                            $status_text = 'Active';
+                                            $status_dot = 'bg-green-500 animate-pulse';
+                                            break;
+                                        case 'inactive':
+                                            $status_class = 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400';
+                                            $status_text = 'Inactive';
+                                            $status_dot = 'bg-gray-400';
+                                            break;
+                                        case 'on_leave':
+                                            $status_class = 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400';
+                                            $status_text = 'On Leave';
+                                            $status_dot = 'bg-yellow-500';
+                                            break;
+                                    }
+
+                                    // Determine vehicle icon
+                                    $vehicle_icon = 'local_shipping';
+                                    $vehicle_color = 'blue';
+                                    switch ($driver['vehicle_type']) {
+                                        case 'truck':
+                                            $vehicle_icon = 'local_shipping';
+                                            $vehicle_color = 'blue';
+                                            break;
+                                        case 'van':
+                                            $vehicle_icon = 'airport_shuttle';
+                                            $vehicle_color = 'orange';
+                                            break;
+                                        case 'motorcycle':
+                                            $vehicle_icon = 'two_wheeler';
+                                            $vehicle_color = 'purple';
+                                            break;
+                                    }
+                                ?>
+                                    <tr class="group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                        <td class="py-4 px-6 whitespace-nowrap">
+                                            <div class="flex items-center gap-3">
+                                                <div class="h-10 w-10 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                                                    <?php if ($driver['profile_image']): ?>
+                                                        <img alt="Driver Avatar" class="h-full w-full object-cover" src="<?php echo htmlspecialchars($driver['profile_image']); ?>" />
+                                                    <?php else: ?>
+                                                        <span class="material-symbols-outlined text-gray-400">person</span>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <div class="flex flex-col">
+                                                    <span class="text-sm font-bold text-gray-900 dark:text-white"><?php echo htmlspecialchars($driver['full_name']); ?></span>
+                                                    <span class="text-xs text-gray-500"><?php echo htmlspecialchars($driver['phone_number']); ?></span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-6 whitespace-nowrap">
+                                            <span class="text-sm font-mono text-gray-600 dark:text-gray-400"><?php echo htmlspecialchars($driver['employee_id']); ?></span>
+                                        </td>
+                                        <td class="py-4 px-6 whitespace-nowrap">
+                                            <div class="flex items-center gap-2">
+                                                <div class="p-1.5 rounded bg-<?php echo $vehicle_color; ?>-50 dark:bg-<?php echo $vehicle_color; ?>-900/20 text-<?php echo $vehicle_color; ?>-600 dark:text-<?php echo $vehicle_color; ?>-400">
+                                                    <span class="material-symbols-outlined text-[18px]"><?php echo $vehicle_icon; ?></span>
+                                                </div>
+                                                <div class="flex flex-col">
+                                                    <span class="text-sm font-medium text-gray-900 dark:text-white"><?php echo htmlspecialchars($driver['vehicle_model'] ?: ucfirst($driver['vehicle_type'])); ?></span>
+                                                    <span class="text-xs text-gray-500"><?php echo htmlspecialchars($driver['license_plate']); ?></span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-6 whitespace-nowrap">
+                                            <span class="text-sm text-gray-700 dark:text-gray-300"><?php echo htmlspecialchars($driver['distribution_centre']); ?></span>
+                                        </td>
+                                        <td class="py-4 px-6 whitespace-nowrap">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold <?php echo $status_class; ?>">
+                                                <span class="w-1.5 h-1.5 rounded-full <?php echo $status_dot; ?>"></span>
+                                                <?php echo $status_text; ?>
+                                            </span>
+                                        </td>
+                                        <td class="py-4 px-6 whitespace-nowrap text-right">
+                                            <div class="flex items-center justify-end gap-2">
+                                                <button onclick="viewDriver(<?php echo $driver['id']; ?>)" class="p-1.5 rounded-lg text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="View Details">
+                                                    <span class="material-symbols-outlined">visibility</span>
+                                                </button>
+                                                <button onclick="editDriver(<?php echo $driver['id']; ?>)" class="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="Edit">
+                                                    <span class="material-symbols-outlined">edit</span>
+                                                </button>
+                                                <button onclick="deleteDriver(<?php echo $driver['id']; ?>, '<?php echo htmlspecialchars($driver['full_name']); ?>')" class="p-1.5 rounded-lg text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="Delete">
+                                                    <span class="material-symbols-outlined">delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -299,11 +299,11 @@ if ($drivers_result) {
                 <form id="driverForm" class="space-y-6">
                     <input type="hidden" id="driver_id" name="id" value="">
                     <input type="hidden" id="form_action" name="action" value="add">
-                    
+
                     <!-- Personal Information -->
                     <div class="space-y-4">
                         <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Personal Information</h3>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Full Name *</label>
                             <input type="text" name="full_name" id="full_name" required class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary" placeholder="Enter driver's full name" />
@@ -328,7 +328,7 @@ if ($drivers_result) {
                     <!-- Vehicle Assignment -->
                     <div class="space-y-4">
                         <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Vehicle Assignment</h3>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Vehicle Type *</label>
                             <select name="vehicle_type" id="vehicle_type" required class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary appearance-none cursor-pointer">
@@ -363,7 +363,7 @@ if ($drivers_result) {
                     <!-- Employment Details -->
                     <div class="space-y-4">
                         <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Employment Details</h3>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Start Date *</label>
                             <input type="date" name="start_date" id="start_date" required class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary" />
@@ -412,7 +412,7 @@ if ($drivers_result) {
                         </div>
                     </div>
                     <p class="text-gray-700 dark:text-gray-300 mb-6">
-                        Are you sure you want to delete <strong id="deleteDriverName" class="text-gray-900 dark:text-white"></strong>? 
+                        Are you sure you want to delete <strong id="deleteDriverName" class="text-gray-900 dark:text-white"></strong>?
                         All data associated with this driver will be permanently removed.
                     </p>
                     <div class="flex gap-3">
@@ -443,7 +443,7 @@ if ($drivers_result) {
                 document.getElementById('driverForm').classList.remove('hidden');
                 document.getElementById('driverViewContainer').classList.add('hidden');
                 document.getElementById('panelActions').classList.remove('hidden');
-                
+
                 document.getElementById('driverForm').reset();
                 document.getElementById('panelTitle').textContent = 'Add New Driver';
                 document.getElementById('submitBtnText').textContent = 'Add Driver';
@@ -474,14 +474,14 @@ if ($drivers_result) {
 
             // Hide driver panel with animation
             driverPanel.classList.remove("active");
-            
+
             // Reset main content to center
             mainContent.style.marginRight = "";
-            
+
             // Expand sidebar back to full width
             sidebar.classList.remove("sidebar-collapsed");
             sidebar.classList.add("sidebar-expanded");
-            
+
             // Remove panel from DOM after animation completes
             setTimeout(() => {
                 driverPanel.classList.add("hidden");
@@ -492,28 +492,28 @@ if ($drivers_result) {
         // Handle form submission
         document.getElementById('driverForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
             const formData = new FormData(this);
             const submitBtn = document.getElementById('submitBtn');
             const submitBtnText = document.getElementById('submitBtnText');
             const originalBtnText = submitBtnText.textContent;
-            
+
             // Disable button and show loading state
             submitBtn.disabled = true;
             submitBtnText.textContent = 'Saving...';
-            
+
             try {
                 const response = await fetch('driver_handler.php', {
                     method: 'POST',
                     body: formData
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (result.success) {
                     // Show success message
                     showNotification('success', result.message);
-                    
+
                     // Close panel and reload page
                     closeDriverPanel();
                     setTimeout(() => {
@@ -535,22 +535,22 @@ if ($drivers_result) {
             try {
                 const response = await fetch(`driver_handler.php?action=get_single&id=${id}`);
                 const result = await response.json();
-                
+
                 if (result.success) {
                     const driver = result.driver;
-                    
+
                     // Hide form, show view container
                     document.getElementById('driverForm').classList.add('hidden');
                     document.getElementById('driverViewContainer').classList.remove('hidden');
                     document.getElementById('panelActions').classList.add('hidden');
-                    
+
                     // Update panel title
                     document.getElementById('panelTitle').textContent = 'Driver Details';
-                    
+
                     // Get vehicle icon
                     let vehicleIcon = 'local_shipping';
                     let vehicleColor = 'blue';
-                    switch(driver.vehicle_type) {
+                    switch (driver.vehicle_type) {
                         case 'truck':
                             vehicleIcon = 'local_shipping';
                             vehicleColor = 'blue';
@@ -564,11 +564,11 @@ if ($drivers_result) {
                             vehicleColor = 'purple';
                             break;
                     }
-                    
+
                     // Get status badge
                     let statusClass = '';
                     let statusText = '';
-                    switch(driver.status) {
+                    switch (driver.status) {
                         case 'active':
                             statusClass = 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400';
                             statusText = 'Active';
@@ -582,7 +582,7 @@ if ($drivers_result) {
                             statusText = 'On Leave';
                             break;
                     }
-                    
+
                     // Build view HTML
                     const viewHTML = `
                         <!-- Driver Profile -->
@@ -689,9 +689,9 @@ if ($drivers_result) {
                             </button>
                         </div>
                     `;
-                    
+
                     document.getElementById('driverViewContainer').innerHTML = viewHTML;
-                    
+
                     // Open panel in view mode
                     openDriverPanel(true);
                 } else {
@@ -707,15 +707,15 @@ if ($drivers_result) {
             try {
                 const response = await fetch(`driver_handler.php?action=get_single&id=${id}`);
                 const result = await response.json();
-                
+
                 if (result.success) {
                     const driver = result.driver;
-                    
+
                     // Show form, hide view
                     document.getElementById('driverForm').classList.remove('hidden');
                     document.getElementById('driverViewContainer').classList.add('hidden');
                     document.getElementById('panelActions').classList.remove('hidden');
-                    
+
                     // Populate form fields
                     document.getElementById('driver_id').value = driver.id;
                     document.getElementById('full_name').value = driver.full_name;
@@ -728,13 +728,13 @@ if ($drivers_result) {
                     document.getElementById('distribution_centre').value = driver.distribution_centre;
                     document.getElementById('start_date').value = driver.start_date;
                     document.getElementById('status').value = driver.status;
-                    
+
                     // Update panel title and button
                     document.getElementById('panelTitle').textContent = 'Edit Driver';
                     document.getElementById('submitBtnText').textContent = 'Update Driver';
                     document.getElementById('form_action').value = 'edit';
                     currentDriverId = id;
-                    
+
                     // Open panel in edit mode
                     openDriverPanel(true);
                 } else {
@@ -767,21 +767,21 @@ if ($drivers_result) {
         // Confirm delete
         async function confirmDelete() {
             if (!deleteDriverId) return;
-            
+
             try {
                 const formData = new FormData();
                 formData.append('action', 'delete');
                 formData.append('id', deleteDriverId);
-                
+
                 const response = await fetch('driver_handler.php', {
                     method: 'POST',
                     body: formData
                 });
-                
+
                 const result = await response.json();
-                
+
                 closeDeleteModal();
-                
+
                 if (result.success) {
                     showNotification('success', result.message);
                     setTimeout(() => {
@@ -818,7 +818,7 @@ if ($drivers_result) {
             currentStatusFilter = status;
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             filterTable(searchTerm, currentCentreFilter, currentStatusFilter);
-            
+
             // Update button styles
             document.querySelectorAll('.status-filter').forEach(btn => {
                 if (btn.dataset.status === status) {
@@ -833,28 +833,28 @@ if ($drivers_result) {
         function filterTable(searchTerm, centre, status) {
             const rows = document.querySelectorAll('tbody tr');
             let visibleCount = 0;
-            
+
             rows.forEach(row => {
                 // Skip the "no drivers" row
                 if (row.querySelector('td[colspan]')) {
                     return;
                 }
-                
+
                 const driverName = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
                 const empId = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
                 const vehicle = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
                 const assignedCentre = row.querySelector('td:nth-child(4)').textContent.trim();
                 const statusBadge = row.querySelector('td:nth-child(5)').textContent.trim().toLowerCase();
-                
+
                 // Check search term
-                const matchesSearch = !searchTerm || 
-                    driverName.includes(searchTerm) || 
-                    empId.includes(searchTerm) || 
+                const matchesSearch = !searchTerm ||
+                    driverName.includes(searchTerm) ||
+                    empId.includes(searchTerm) ||
                     vehicle.includes(searchTerm);
-                
+
                 // Check centre filter
                 const matchesCentre = !centre || assignedCentre === centre;
-                
+
                 // Check status filter
                 let matchesStatus = true;
                 if (status) {
@@ -866,7 +866,7 @@ if ($drivers_result) {
                         return false;
                     });
                 }
-                
+
                 // Show/hide row
                 if (matchesSearch && matchesCentre && matchesStatus) {
                     row.style.display = '';
@@ -875,7 +875,7 @@ if ($drivers_result) {
                     row.style.display = 'none';
                 }
             });
-            
+
             // Update pagination text if needed
             // You can add pagination update logic here
         }
@@ -890,7 +890,7 @@ if ($drivers_result) {
                 <span>${message}</span>
             `;
             document.body.appendChild(notification);
-            
+
             setTimeout(() => {
                 notification.remove();
             }, 3000);

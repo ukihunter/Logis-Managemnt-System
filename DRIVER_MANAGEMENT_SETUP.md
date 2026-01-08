@@ -42,17 +42,21 @@ INSERT INTO drivers (employee_id, full_name, phone_number, email, license_number
 ## Features Implemented
 
 ### ✅ Database-Driven Data
+
 - All driver data now comes from the `drivers` table in the database
 - No more hardcoded data in the page
 - Real-time statistics from database
 
 ### ✅ Statistics Cards
+
 The three cards at the top now show real data:
+
 - **Total Drivers**: Count of all drivers in the database
 - **Active Now**: Count of drivers with 'active' status
 - **Inactive/Leave**: Count of drivers with 'inactive' or 'on_leave' status
 
 ### ✅ Right Side Panel
+
 - Opens when clicking "Add New Driver" button
 - Form includes all necessary fields:
   - Personal Information (Name, Phone, Email, License Number)
@@ -61,15 +65,18 @@ The three cards at the top now show real data:
 - Employee ID is auto-generated in format: EMP-YYYY-XXX
 
 ### ✅ CRUD Operations
+
 - **Create**: Add new drivers via the form
 - **Read**: View all drivers in the table
 - **Update**: Click edit icon to modify driver details
 - **Delete**: Click delete icon to remove a driver (with confirmation)
 
 ### ✅ Driver Handler API
+
 Location: `public/Admin/Logistics/driver_handler.php`
 
 Available actions:
+
 - `add` - Add a new driver
 - `edit` - Update existing driver
 - `delete` - Remove a driver
@@ -80,12 +87,14 @@ Available actions:
 ## Usage
 
 1. **Add a Driver**:
+
    - Click "Add New Driver" button
    - Fill in the form
    - Click "Add Driver" button
    - Page will reload with the new driver
 
 2. **Edit a Driver**:
+
    - Click the edit (pencil) icon on any driver row
    - Modify the details in the form
    - Click "Update Driver" button
