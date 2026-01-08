@@ -1,5 +1,6 @@
 <?php
 require_once '../../../config/session_Detils.php';
+require_once 'dashboard_handler.php';
 ?>
 
 <!DOCTYPE html>
@@ -143,22 +144,22 @@ require_once '../../../config/session_Detils.php';
                 <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col gap-1">
                     <p class="text-sm font-medium text-text-secondary dark:text-emerald-400">Active Orders</p>
                     <div class="flex items-baseline justify-between">
-                        <p class="text-3xl font-bold">0</p>
-                        <span class="bg-primary/20 text-emerald-800 dark:text-primary text-xs font-bold px-2 py-1 rounded-full">0 Arriving</span>
+                        <p class="text-3xl font-bold"><?php echo $stats['active_orders']; ?></p>
+                        <span class="bg-primary/20 text-emerald-800 dark:text-primary text-xs font-bold px-2 py-1 rounded-full"><?php echo $stats['arriving_today']; ?> Arriving</span>
                     </div>
                 </div>
                 <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col gap-1">
-                    <p class="text-sm font-medium text-text-secondary dark:text-emerald-400">Pending Payment</p>
-                    <p class="text-3xl font-bold">Rs.0</p>
+                    <p class="text-sm font-medium text-text-secondary dark:text-emerald-400">Completed Orders</p>
+                    <p class="text-3xl font-bold"><?php echo $stats['completed_orders']; ?></p>
                 </div>
                 <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col gap-1">
                     <p class="text-sm font-medium text-text-secondary dark:text-emerald-400">Total Spend YTD</p>
-                    <p class="text-3xl font-bold">Rs.0</p>
+                    <p class="text-3xl font-bold">Rs.<?php echo number_format($stats['total_spend_ytd'], 2); ?></p>
                 </div>
                 <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col gap-1">
                     <p class="text-sm font-medium text-text-secondary dark:text-emerald-400">Loyalty Points</p>
                     <div class="flex items-baseline justify-between">
-                        <p class="text-3xl font-bold">0</p>
+                        <p class="text-3xl font-bold"><?php echo $stats['loyalty_points']; ?></p>
                         <span class="text-xs font-bold text-primary cursor-pointer hover:underline">Redeem</span>
                     </div>
                 </div>
@@ -170,149 +171,156 @@ require_once '../../../config/session_Detils.php';
                     <div class="flex flex-col gap-4">
                         <div class="flex items-center justify-between">
                             <h2 class="text-xl font-bold">Track my Delivery</h2>
-                            <a class="text-primary text-sm font-bold hover:underline" href="#">View All</a>
+                            <a class="text-primary text-sm font-bold hover:underline" href="../Orders/order.php">View All</a>
                         </div>
-                        <div class="bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
-                            <div class="flex flex-col md:flex-row">
-                                <!-- Map Image -->
-                                <div class="w-full md:w-1/3 h-48 md:h-auto bg-slate-200 dark:bg-slate-800 relative">
-                                    <div class="absolute inset-0 bg-cover bg-center opacity-80" data-alt="Map showing delivery route in Kingston" data-location="Kingston" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAciHolyBMnId5Pk6xtowzRZhgUEfPI_8azy3xn2Bxx8nMhLWsa9tDtNlIZg6khtZwF-N7NB-Vyuzl-oFMKnd_yA5hkkOYkFQrohTgE3XsRo5wxwXJg50WZcDQ9GDPpLqiYd_H7yckTX8Dn8AdyDwmWah5yBGeDcgx7iHFojQgKcps1B9fbOcrggSoZQXYROEWElqQcLgUsU8jTyaupBImmq2rJxT1942sq1tm3y154Vq8WplpiV5DP2vLdhezJVx62jim4N9V5MrQ");'></div>
-                                    <div class="absolute inset-0 flex items-center justify-center">
-                                        <div class="bg-primary text-white p-2 rounded-full shadow-lg">
-                                            <span class="material-symbols-outlined block">local_shipping</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Delivery Details -->
-                                <div class="p-6 flex flex-col justify-center flex-1">
-                                    <div class="flex justify-between items-start mb-4">
-                                        <div>
-                                            <h3 class="text-lg font-bold mb-1">Order #0001 - Out for Delivery</h3>
-                                            <p class="text-text-secondary dark:text-emerald-400 text-sm">Processed at Distribution Center A</p>
-                                        </div>
-                                        <span class="px-3 py-1 bg-primary text-black text-xs font-bold rounded-full animate-pulse">Live</span>
-                                    </div>
-                                    <!-- Progress Bar -->
-                                    <div class="relative w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full mb-4">
-                                        <div class="absolute left-0 top-0 h-full w-3/4 bg-primary rounded-full"></div>
-                                    </div>
-                                    <div class="flex flex-wrap items-end justify-between gap-4">
-                                        <div class="flex flex-col gap-1">
-                                            <div class="flex items-center gap-2 text-sm font-medium">
-                                                <span class="material-symbols-outlined text-[18px] text-primary">schedule</span>
-                                                <span>Est. arrival: 2:00 PM today</span>
-                                            </div>
-                                            <div class="flex items-center gap-2 text-sm text-text-secondary dark:text-emerald-400">
-                                                <span class="material-symbols-outlined text-[18px]">person</span>
-                                                <span>Driver: Mahinda</span>
+                        <?php if ($tracking_order): ?>
+                            <div class="bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+                                <div class="flex flex-col md:flex-row">
+                                    <!-- Map Image -->
+                                    <div class="w-full md:w-1/3 h-48 md:h-auto bg-slate-200 dark:bg-slate-800 relative">
+                                        <div class="absolute inset-0 bg-cover bg-center opacity-80" data-alt="Map showing delivery route" data-location="<?php echo htmlspecialchars($tracking_order['shipping_city'] ?? 'Kingston'); ?>" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAciHolyBMnId5Pk6xtowzRZhgUEfPI_8azy3xn2Bxx8nMhLWsa9tDtNlIZg6khtZwF-N7NB-Vyuzl-oFMKnd_yA5hkkOYkFQrohTgE3XsRo5wxwXJg50WZcDQ9GDPpLqiYd_H7yckTX8Dn8AdyDwmWah5yBGeDcgx7iHFojQgKcps1B9fbOcrggSoZQXYROEWElqQcLgUsU8jTyaupBImmq2rJxT1942sq1tm3y154Vq8WplpiV5DP2vLdhezJVx62jim4N9V5MrQ");'></div>
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <div class="bg-primary text-white p-2 rounded-full shadow-lg">
+                                                <span class="material-symbols-outlined block">local_shipping</span>
                                             </div>
                                         </div>
-                                        <button class="px-4 py-2 bg-slate-200 dark:bg-white/10 text-sm font-bold rounded-lg hover:bg-green-500 hover:text-white dark:hover:bg-white/20 transition-colors">
-                                            Contact Driver
-                                        </button>
+                                    </div>
+                                    <!-- Delivery Details -->
+                                    <div class="p-6 flex flex-col justify-center flex-1">
+                                        <div class="flex justify-between items-start mb-4">
+                                            <div>
+                                                <h3 class="text-lg font-bold mb-1">Order <?php echo htmlspecialchars($tracking_order['order_number']); ?> - <?php
+                                                                                                                                                            $status_text = ucfirst($tracking_order['order_status']);
+                                                                                                                                                            if ($tracking_order['order_status'] === 'shipped') {
+                                                                                                                                                                echo 'Out for Delivery';
+                                                                                                                                                            } elseif ($tracking_order['order_status'] === 'packed') {
+                                                                                                                                                                echo 'Ready to Ship';
+                                                                                                                                                            } else {
+                                                                                                                                                                echo $status_text;
+                                                                                                                                                            }
+                                                                                                                                                            ?></h3>
+                                                <p class="text-text-secondary dark:text-emerald-400 text-sm">
+                                                    <?php
+                                                    if ($tracking_order['order_status'] === 'shipped') {
+                                                        echo 'En route to your location';
+                                                    } elseif ($tracking_order['order_status'] === 'packed') {
+                                                        echo 'Package is packed and ready';
+                                                    } else {
+                                                        echo 'Being processed at distribution center';
+                                                    }
+                                                    ?>
+                                                </p>
+                                            </div>
+                                            <?php if ($tracking_order['order_status'] === 'shipped'): ?>
+                                                <span class="px-3 py-1 bg-primary text-black text-xs font-bold rounded-full animate-pulse">Live</span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <!-- Progress Bar -->
+                                        <div class="relative w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full mb-4">
+                                            <div class="absolute left-0 top-0 h-full <?php
+                                                                                        if ($tracking_order['order_status'] === 'shipped') echo 'w-3/4';
+                                                                                        elseif ($tracking_order['order_status'] === 'packed') echo 'w-1/2';
+                                                                                        else echo 'w-1/4';
+                                                                                        ?> bg-primary rounded-full"></div>
+                                        </div>
+                                        <div class="flex flex-wrap items-end justify-between gap-4">
+                                            <div class="flex flex-col gap-1">
+                                                <?php if ($tracking_order['order_status'] === 'shipped'): ?>
+                                                    <div class="flex items-center gap-2 text-sm font-medium">
+                                                        <span class="material-symbols-outlined text-[18px] text-primary">schedule</span>
+                                                        <span>Est. arrival: Today</span>
+                                                    </div>
+                                                <?php endif; ?>
+                                                <?php if ($tracking_order['driver_name']): ?>
+                                                    <div class="flex items-center gap-2 text-sm text-text-secondary dark:text-emerald-400">
+                                                        <span class="material-symbols-outlined text-[18px]">person</span>
+                                                        <span>Driver: <?php echo htmlspecialchars($tracking_order['driver_name']); ?></span>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                            <?php if ($tracking_order['driver_phone'] && $tracking_order['order_status'] === 'shipped'): ?>
+                                                <a href="tel:<?php echo htmlspecialchars($tracking_order['driver_phone']); ?>" class="px-4 py-2 bg-slate-200 dark:bg-white/10 text-sm font-bold rounded-lg hover:bg-green-500 hover:text-white dark:hover:bg-white/20 transition-colors">
+                                                    Contact Driver
+                                                </a>
+                                            <?php else: ?>
+                                                <button class="px-4 py-2 bg-slate-200 dark:bg-white/10 text-sm font-bold rounded-lg hover:bg-green-500 hover:text-white dark:hover:bg-white/20 transition-colors" onclick="location.href='../Orders/order.php'">
+                                                    View Details
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        <?php else: ?>
+                            <div class="bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm p-8 text-center">
+                                <span class="material-symbols-outlined text-5xl text-text-secondary dark:text-emerald-400 mb-3 block">local_shipping</span>
+                                <p class="text-text-secondary dark:text-emerald-400 mb-4">No active deliveries at the moment</p>
+                                <button class="px-4 py-2 bg-primary text-black font-bold text-sm rounded-lg hover:brightness-110 transition-all" onclick="location.href='../Catalog/catalog.php'">
+                                    Browse Catalog
+                                </button>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     <!-- Recent Orders Table -->
                     <div class="flex flex-col gap-4">
                         <div class="flex items-center justify-between">
                             <h2 class="text-xl font-bold">Recent Orders</h2>
-                            <a class="text-primary text-sm font-bold hover:underline" href="#">View All</a>
+                            <a class="text-primary text-sm font-bold hover:underline" href="../Orders/order.php">View All</a>
                         </div>
                         <div class="bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm overflow-x-auto">
-                            <table class="w-full text-left text-sm whitespace-nowrap">
-                                <thead class="bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-800">
-                                    <tr>
-                                        <th class="px-6 py-4 font-bold text-text-secondary dark:text-emerald-400">Order ID</th>
-                                        <th class="px-6 py-4 font-bold text-text-secondary dark:text-emerald-400">Date</th>
-                                        <th class="px-6 py-4 font-bold text-text-secondary dark:text-emerald-400">Status</th>
-                                        <th class="px-6 py-4 font-bold text-text-secondary dark:text-emerald-400">Total</th>
-                                        <th class="px-6 py-4 font-bold text-text-secondary dark:text-emerald-400 text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                                    <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="px-6 py-4 font-medium">#0000</td>
-                                        <td class="px-6 py-4 text-text-secondary dark:text-emerald-400">jan , 2026</td>
-                                        <td class="px-6 py-4">
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                                                <span class="size-1.5 rounded-full bg-green-600 dark:bg-green-400"></span> Delivered
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 font-bold">Rs.0</td>
-                                        <td class="px-6 py-4 text-right">
-                                            <button class="text-primary hover:text-green-400 font-bold text-sm">Reorder</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="px-6 py-4 font-medium">#0001</td>
-                                        <td class="px-6 py-4 text-text-secondary dark:text-emerald-400">jan , 2026</td>
-                                        <td class="px-6 py-4">
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                                                <span class="size-1.5 rounded-full bg-green-600 dark:bg-green-400"></span> Delivered
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 font-bold">Rs.0</td>
-                                        <td class="px-6 py-4 text-right">
-                                            <button class="text-primary hover:text-green-400 font-bold text-sm">Reorder</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="px-6 py-4 font-medium">#0002</td>
-                                        <td class="px-6 py-4 text-text-secondary dark:text-emerald-400">jan , 2026</td>
-                                        <td class="px-6 py-4">
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                                                <span class="size-1.5 rounded-full bg-yellow-600 dark:bg-yellow-400"></span> Processing
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 font-bold">Rs.0</td>
-                                        <td class="px-6 py-4 text-right">
-                                            <button class="text-primary hover:text-green-400 font-bold text-sm">View</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="px-6 py-4 font-medium">#0002</td>
-                                        <td class="px-6 py-4 text-text-secondary dark:text-emerald-400">jan , 2026</td>
-                                        <td class="px-6 py-4">
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                                                <span class="size-1.5 rounded-full bg-yellow-600 dark:bg-yellow-400"></span> Processing
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 font-bold">Rs.0</td>
-                                        <td class="px-6 py-4 text-right">
-                                            <button class="text-primary hover:text-green-400 font-bold text-sm">View</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="px-6 py-4 font-medium">#0003</td>
-                                        <td class="px-6 py-4 text-text-secondary dark:text-emerald-400">jan , 2026</td>
-                                        <td class="px-6 py-4">
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                                                <span class="size-1.5 rounded-full bg-yellow-600 dark:bg-yellow-400"></span> Processing
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 font-bold">Rs.0</td>
-                                        <td class="px-6 py-4 text-right">
-                                            <button class="text-primary hover:text-green-400 font-bold text-sm">View</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="px-6 py-4 font-medium">#0004</td>
-                                        <td class="px-6 py-4 text-text-secondary dark:text-emerald-400">jan , 2026</td>
-                                        <td class="px-6 py-4">
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                                                <span class="size-1.5 rounded-full bg-yellow-600 dark:bg-yellow-400"></span> Processing
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 font-bold">Rs.0</td>
-                                        <td class="px-6 py-4 text-right">
-                                            <button class="text-primary hover:text-green-400 font-bold text-sm">View</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <?php if (count($recent_orders) > 0): ?>
+                                <table class="w-full text-left text-sm whitespace-nowrap">
+                                    <thead class="bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-800">
+                                        <tr>
+                                            <th class="px-6 py-4 font-bold text-text-secondary dark:text-emerald-400">Order ID</th>
+                                            <th class="px-6 py-4 font-bold text-text-secondary dark:text-emerald-400">Date</th>
+                                            <th class="px-6 py-4 font-bold text-text-secondary dark:text-emerald-400">Status</th>
+                                            <th class="px-6 py-4 font-bold text-text-secondary dark:text-emerald-400">Total</th>
+                                            <th class="px-6 py-4 font-bold text-text-secondary dark:text-emerald-400 text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                                        <?php foreach ($recent_orders as $order):
+                                            // Status badge configuration
+                                            $status_config = [
+                                                'delivered' => ['bg' => 'bg-green-100 dark:bg-green-900/30', 'text' => 'text-green-800 dark:text-green-400', 'dot' => 'bg-green-600 dark:bg-green-400', 'label' => 'Delivered'],
+                                                'shipped' => ['bg' => 'bg-blue-100 dark:bg-blue-900/30', 'text' => 'text-blue-800 dark:text-blue-400', 'dot' => 'bg-blue-600 dark:bg-blue-400', 'label' => 'Shipped'],
+                                                'packed' => ['bg' => 'bg-purple-100 dark:bg-purple-900/30', 'text' => 'text-purple-800 dark:text-purple-400', 'dot' => 'bg-purple-600 dark:bg-purple-400', 'label' => 'Packed'],
+                                                'processing' => ['bg' => 'bg-yellow-100 dark:bg-yellow-900/30', 'text' => 'text-yellow-800 dark:text-yellow-400', 'dot' => 'bg-yellow-600 dark:bg-yellow-400', 'label' => 'Processing'],
+                                                'pending' => ['bg' => 'bg-gray-100 dark:bg-gray-900/30', 'text' => 'text-gray-800 dark:text-gray-400', 'dot' => 'bg-gray-600 dark:bg-gray-400', 'label' => 'Pending'],
+                                                'cancelled' => ['bg' => 'bg-red-100 dark:bg-red-900/30', 'text' => 'text-red-800 dark:text-red-400', 'dot' => 'bg-red-600 dark:bg-red-400', 'label' => 'Cancelled']
+                                            ];
+                                            $status = $status_config[$order['order_status']] ?? $status_config['pending'];
+                                        ?>
+                                            <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                                <td class="px-6 py-4 font-medium"><?php echo htmlspecialchars($order['order_number']); ?></td>
+                                                <td class="px-6 py-4 text-text-secondary dark:text-emerald-400"><?php echo date('M j, Y', strtotime($order['created_at'])); ?></td>
+                                                <td class="px-6 py-4">
+                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold <?php echo $status['bg'] . ' ' . $status['text']; ?>">
+                                                        <span class="size-1.5 rounded-full <?php echo $status['dot']; ?>"></span> <?php echo $status['label']; ?>
+                                                    </span>
+                                                </td>
+                                                <td class="px-6 py-4 font-bold">Rs.<?php echo number_format($order['total_amount'], 2); ?></td>
+                                                <td class="px-6 py-4 text-right">
+                                                    <?php if ($order['order_status'] === 'delivered'): ?>
+                                                        <button class="text-primary hover:text-green-400 font-bold text-sm" onclick="location.href='../Orders/order.php'">Reorder</button>
+                                                    <?php else: ?>
+                                                        <button class="text-primary hover:text-green-400 font-bold text-sm" onclick="location.href='../Orders/order.php'">View</button>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            <?php else: ?>
+                                <div class="p-8 text-center">
+                                    <span class="material-symbols-outlined text-5xl text-text-secondary dark:text-emerald-400 mb-3 block">receipt_long</span>
+                                    <p class="text-text-secondary dark:text-emerald-400 mb-4">No orders yet</p>
+                                    <button class="px-4 py-2 bg-primary text-black font-bold text-sm rounded-lg hover:brightness-110 transition-all" onclick="location.href='../Catalog/catalog.php'">
+                                        Place Your First Order
+                                    </button>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
