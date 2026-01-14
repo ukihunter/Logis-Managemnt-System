@@ -1,15 +1,20 @@
 <?php
+// Start session and include necessary configuration files
+// Start session
+// grabing the db 
 require_once '../../../config/admin_session.php';
 require_once '../../../config/database.php';
 
 header('Content-Type: application/json');
-
+// Establish database connection
 $conn = getDBConnection();
 $response = ['success' => false, 'message' => ''];
 
 // Handle different actions
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
+
+// Switch case to handle different actions
 switch ($action) {
     case 'add':
         addDriver($conn);
@@ -34,8 +39,10 @@ switch ($action) {
         break;
 }
 
+// Close database connection
 $conn->close();
 
+// Function to add a new driver
 function addDriver($conn)
 {
     global $response;

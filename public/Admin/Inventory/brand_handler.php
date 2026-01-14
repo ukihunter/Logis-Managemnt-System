@@ -1,4 +1,6 @@
 <?php
+// Brand management handler for Admin Inventory Panel 
+// Start session and include database configuration
 session_start();
 require_once '../../../config/database.php';
 
@@ -6,16 +8,20 @@ if (ob_get_level()) {
     ob_clean();
 }
 
+// Set response header to JSON
 header('Content-Type: application/json');
 
+// Check if user is logged in and has admin or staff privileges
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_type'], ['admin', 'staff'])) {
     echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
     exit();
 }
 
+// Establish database connection
 $conn = getDBConnection();
 $action = $_POST['action'] ?? '';
 
+// Handle add and delete brand actions
 if ($action === 'add_brand') {
     $name = trim($_POST['name'] ?? '');
 
@@ -46,6 +52,7 @@ if ($action === 'add_brand') {
     } else {
         echo json_encode(['success' => false, 'message' => 'Failed to add brand']);
     }
+    // Close the statement
 } elseif ($action === 'delete_brand') {
     $brand_id = $_POST['brand_id'] ?? 0;
 
@@ -67,4 +74,5 @@ if ($action === 'add_brand') {
     echo json_encode(['success' => false, 'message' => 'Invalid action']);
 }
 
+// Close the database connection
 $conn->close();

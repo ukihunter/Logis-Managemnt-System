@@ -1,12 +1,16 @@
 <?php
+// Dashboard Data Handler for Admin Panel
 require_once '../../../config/database.php';
 require_once '../../../config/admin_session.php';
 
+// Set response header to JSON
 header('Content-Type: application/json');
 
+// Establish database connection
 $conn = getDBConnection();
 $action = $_GET['action'] ?? '';
 
+// Handle different actions based on the 'action' parameter
 try {
     switch ($action) {
         case 'get_kpi_stats':
@@ -25,6 +29,7 @@ try {
             echo json_encode(['error' => 'Invalid action']);
     }
 } catch (Exception $e) {
+    // Handle exceptions and return error message
     echo json_encode(['error' => $e->getMessage()]);
 }
 
@@ -89,7 +94,7 @@ function getKPIStats($conn)
     $revenueChange = $yesterdayRevenue > 0
         ? round((($todayRevenue - $yesterdayRevenue) / $yesterdayRevenue) * 100)
         : 0;
-
+    // Compile and return KPI stats as JSON
     echo json_encode([
         'pending_orders' => [
             'count' => intval($pendingCount),
@@ -111,6 +116,8 @@ function getKPIStats($conn)
     ]);
 }
 
+
+// Fetch recent pending orders
 function getPendingOrders($conn)
 {
     $query = "SELECT 
@@ -143,6 +150,8 @@ function getPendingOrders($conn)
     echo json_encode($orders);
 }
 
+
+// Fetch low stock items
 function getLowStockItems($conn)
 {
     $query = "SELECT 
@@ -173,6 +182,7 @@ function getLowStockItems($conn)
     echo json_encode($items);
 }
 
+// Fetch logistics schedule for active drivers
 function getLogisticsSchedule($conn)
 {
     $today = date('Y-m-d');

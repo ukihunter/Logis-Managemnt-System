@@ -1,4 +1,6 @@
 <?php
+// Start session and include database configuration
+
 session_start();
 require_once '../../../config/database.php';
 
@@ -249,4 +251,5 @@ if ($action === 'add') {
     echo json_encode(['success' => false, 'message' => 'Invalid action']);
 }
 
+// Close database connection
 $conn->close();

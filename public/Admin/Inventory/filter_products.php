@@ -1,6 +1,9 @@
 <?php
+// Set up environment
 require_once '../../../config/database.php';
 
+
+// Clean output buffer if needed
 $conn = getDBConnection();
 
 // Get filter parameters
@@ -16,6 +19,8 @@ $where_conditions = [];
 $params = [];
 $types = '';
 
+
+// Add search condition
 if (!empty($search)) {
     $where_conditions[] = "(name LIKE ? OR sku LIKE ? OR description LIKE ?)";
     $search_param = "%{$search}%";
@@ -25,18 +30,21 @@ if (!empty($search)) {
     $types .= 'sss';
 }
 
+// Add category filter
 if (!empty($category)) {
     $where_conditions[] = "category = ?";
     $params[] = &$category;
     $types .= 's';
 }
 
+// Add brand filter
 if (!empty($brand)) {
     $where_conditions[] = "brand = ?";
     $params[] = &$brand;
     $types .= 's';
 }
 
+// Combine where conditions
 $where_clause = !empty($where_conditions) ? 'WHERE ' . implode(' AND ', $where_conditions) : '';
 
 // Count total
@@ -50,6 +58,7 @@ if (!empty($params)) {
     $total_products = $conn->query($count_query)->fetch_assoc()['total'];
 }
 
+// Calculate total pages
 $total_pages = ceil($total_products / $items_per_page);
 
 // Fetch products
@@ -63,6 +72,7 @@ if (!empty($params)) {
     $result = $conn->query($query);
 }
 
+// Fetch products into array
 $products = [];
 if ($result) {
     while ($row = $result->fetch_assoc()) {
@@ -73,6 +83,7 @@ if ($result) {
 // Generate HTML
 ob_start();
 
+// Output table rows
 if (empty($products)) {
     echo '<tr><td colspan="7" class="py-8 px-6 text-center text-sm text-gray-500 dark:text-gray-400">No products found</td></tr>';
 } else {
@@ -98,7 +109,7 @@ if (empty($products)) {
         } else {
             $image_html = '<div class="size-8 sm:size-10 shrink-0 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center"><span class="material-symbols-outlined text-gray-400 text-[16px] sm:text-[20px]">inventory_2</span></div>';
         }
-
+        // Output table row
         echo '<tr class="group hover:bg-[#f6f8f6] dark:hover:bg-white/5 transition-colors cursor-pointer">
             <td class="py-3 px-4 sm:py-4 sm:px-6">
                 <div class="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -200,4 +211,5 @@ echo json_encode([
     'total' => $total_products
 ]);
 
+// Close database connection
 $conn->close();

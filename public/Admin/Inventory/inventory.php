@@ -17,7 +17,7 @@ $category_filter = isset($_GET['category']) ? trim($_GET['category']) : '';
 $where_conditions = [];
 $params = [];
 $types = '';
-
+// Add search condition
 if (!empty($search)) {
     $where_conditions[] = "(name LIKE ? OR sku LIKE ? OR description LIKE ?)";
     $search_param = "%{$search}%";
@@ -26,7 +26,7 @@ if (!empty($search)) {
     $params[] = &$search_param;
     $types .= 'sss';
 }
-
+// catogory filter
 if (!empty($category_filter)) {
     $where_conditions[] = "category = ?";
     $params[] = &$category_filter;

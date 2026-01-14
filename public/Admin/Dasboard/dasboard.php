@@ -1,4 +1,5 @@
 <?php
+// Start admin session and verify authentication
 require_once '../../../config/admin_session.php';
 ?>
 <!DOCTYPE html>
