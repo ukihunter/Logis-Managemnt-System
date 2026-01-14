@@ -244,7 +244,7 @@ function displayOrderItems(items, subtotal, total) {
                 <td class="py-3 px-3 text-center font-medium">${
                   item.quantity
                 }</td>
-                <td class="py-3 px-3 text-right font-medium">$${parseFloat(
+                <td class="py-3 px-3 text-right font-medium">Rs ${parseFloat(
                   item.subtotal
                 ).toFixed(2)}</td>
             </tr>
@@ -254,7 +254,7 @@ function displayOrderItems(items, subtotal, total) {
 
   // Update totals
   document.getElementById("orderItemCount").textContent = items.length;
-  document.getElementById("orderGrandTotal").textContent = `$${parseFloat(
+  document.getElementById("orderGrandTotal").textContent = `Rs ${parseFloat(
     total
   ).toFixed(2)}`;
 }

@@ -140,11 +140,11 @@ function addDriver($conn)
 
     echo json_encode($response);
 }
-
+// Function to edit an existing driver
 function editDriver($conn)
 {
     global $response;
-
+    // Update driver details
     try {
         $stmt = $conn->prepare("UPDATE drivers SET full_name = ?, phone_number = ?, email = ?, license_number = ?, vehicle_type = ?, vehicle_model = ?, license_plate = ?, distribution_centre = ?, status = ?, start_date = ? WHERE id = ?");
 
@@ -159,7 +159,7 @@ function editDriver($conn)
         $status = $_POST['status'];
         $start_date = $_POST['start_date'];
         $id = $_POST['id'];
-
+        // Bind parameters
         $stmt->bind_param(
             "ssssssssssi",
             $full_name,
@@ -174,14 +174,14 @@ function editDriver($conn)
             $start_date,
             $id
         );
-
+        // Execute and check for success
         if ($stmt->execute()) {
             $response['success'] = true;
             $response['message'] = 'Driver updated successfully';
         } else {
             $response['message'] = 'Error updating driver: ' . $stmt->error;
         }
-
+        // Close statement
         $stmt->close();
     } catch (Exception $e) {
         $response['message'] = 'Error: ' . $e->getMessage();
@@ -190,10 +190,11 @@ function editDriver($conn)
     echo json_encode($response);
 }
 
+// Function to delete a driver
 function deleteDriver($conn)
 {
     global $response;
-
+    // Delete driver by ID
     try {
         $id = $_POST['id'];
         $stmt = $conn->prepare("DELETE FROM drivers WHERE id = ?");
@@ -207,15 +208,17 @@ function deleteDriver($conn)
         }
 
         $stmt->close();
+        // Close statement
     } catch (Exception $e) {
         $response['message'] = 'Error: ' . $e->getMessage();
     }
 
     echo json_encode($response);
 }
-
+// Function to get all drivers with optional filters
 function getAllDrivers($conn)
 {
+    // Fetch all drivers with optional filters
     try {
         $query = "SELECT * FROM drivers ORDER BY created_at DESC";
 
@@ -241,18 +244,20 @@ function getAllDrivers($conn)
         } else {
             $result = $conn->query($query);
         }
-
+        // Fetch all drivers
         $drivers = [];
         while ($row = $result->fetch_assoc()) {
             $drivers[] = $row;
         }
-
+        // Return drivers as JSON
+        // scuess response
         echo json_encode(['success' => true, 'drivers' => $drivers]);
     } catch (Exception $e) {
+        // Error response
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
 }
-
+// Function to get driver statistics
 function getDriverStats($conn)
 {
     try {
@@ -267,7 +272,7 @@ function getDriverStats($conn)
         // Get inactive/on leave drivers
         $result = $conn->query("SELECT COUNT(*) as inactive FROM drivers WHERE status IN ('inactive', 'on_leave')");
         $inactive = $result->fetch_assoc()['inactive'];
-
+        // Return stats as JSON
         echo json_encode([
             'success' => true,
             'stats' => [
@@ -276,11 +281,12 @@ function getDriverStats($conn)
                 'inactive' => $inactive
             ]
         ]);
+        // Close statement
     } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
 }
-
+// Function to get a single driver's details
 function getSingleDriver($conn)
 {
     try {
@@ -289,7 +295,7 @@ function getSingleDriver($conn)
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
-
+        // Fetch driver details
         if ($row = $result->fetch_assoc()) {
             echo json_encode(['success' => true, 'driver' => $row]);
         } else {
@@ -297,6 +303,7 @@ function getSingleDriver($conn)
         }
 
         $stmt->close();
+        // Close statement
     } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }

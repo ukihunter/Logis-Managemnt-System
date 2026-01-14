@@ -1,4 +1,5 @@
 <?php
+// Database and session includes
 require_once '../../../config/database.php';
 require_once '../../../config/api_session.php';
 
@@ -134,6 +135,7 @@ function getMonthlyStats($conn)
     ]);
 }
 
+// Sales Performance Report
 function getSalesPerformance($conn)
 {
     $month = $_GET['month'] ?? date('Y-m');
@@ -187,7 +189,7 @@ function getSalesPerformance($conn)
         'top_products' => $topProducts
     ]);
 }
-
+// Stock Turnover Report
 function getStockTurnover($conn)
 {
     $month = $_GET['month'] ?? date('Y-m');
@@ -228,7 +230,7 @@ function getStockTurnover($conn)
         'stock_turnover' => $stockData
     ]);
 }
-
+// Delivery Efficiency Report
 function getDeliveryEfficiency($conn)
 {
     $month = $_GET['month'] ?? date('Y-m');
@@ -314,7 +316,7 @@ function getDeliveryEfficiency($conn)
         'by_location' => $locationData
     ]);
 }
-
+// Download Report as CSV
 function downloadReport($conn)
 {
     $month = $_GET['month'] ?? date('Y-m');

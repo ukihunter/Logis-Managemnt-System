@@ -1,14 +1,15 @@
 <?php
+// db and session includes
 require_once '../../../config/admin_session.php';
 require_once '../../../config/database.php';
-
+// Get order ID and download flag from query parameters
 $order_id = isset($_GET['order_id']) ? (int)$_GET['order_id'] : 0;
 $download = isset($_GET['download']) ? (int)$_GET['download'] : 0;
-
+// Validate order ID
 if ($order_id === 0) {
     die('Invalid order ID');
 }
-
+// Connect to database
 $conn = getDBConnection();
 
 // Get order details
@@ -21,6 +22,7 @@ $stmt->bind_param("i", $order_id);
 $stmt->execute();
 $order = $stmt->get_result()->fetch_assoc();
 
+// Determine province for RDC info
 if (!$order) {
     die('Order not found');
 }
@@ -48,6 +50,7 @@ $conn->close();
 <html>
 
 <head>
+    <!-- template  -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice - <?php echo htmlspecialchars($order['order_number']); ?></title>
@@ -385,10 +388,6 @@ $conn->close();
         </div>
     </div>
 
-    <script>
-        // Auto print on load (optional)
-        // window.onload = function() { window.print(); }
-    </script>
 </body>
 
 </html>

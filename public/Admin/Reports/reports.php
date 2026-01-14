@@ -1,4 +1,5 @@
 <?php
+// db and session includes
 require_once '../../../config/admin_session.php';
 ?>
 

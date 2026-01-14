@@ -1,11 +1,12 @@
 <?php
+// db and session includes
 require_once '../../../config/database.php';
 require_once '../../../config/admin_session.php';
 
 header('Content-Type: application/json');
 
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
-
+// Route actions
 switch ($action) {
     case 'get_all_orders':
         getAllOrders();
@@ -32,7 +33,7 @@ switch ($action) {
         echo json_encode(['success' => false, 'message' => 'Invalid action']);
         break;
 }
-
+// Function definitions
 function getAllOrders()
 {
     $conn = getDBConnection();
@@ -72,7 +73,7 @@ function getAllOrders()
         $conn->close();
     }
 }
-
+// Fetch detailed information for a specific order
 function getOrderDetails()
 {
     $conn = getDBConnection();
@@ -139,7 +140,7 @@ function getOrderDetails()
         $conn->close();
     }
 }
-
+// Update order status and log history
 function updateOrderStatus()
 {
     $conn = getDBConnection();
@@ -173,7 +174,7 @@ function updateOrderStatus()
         $conn->close();
     }
 }
-
+// Assign or unassign driver to/from order
 function assignDriver()
 {
     $conn = getDBConnection();
@@ -202,7 +203,7 @@ function assignDriver()
         $conn->close();
     }
 }
-
+// Get order statistics
 function getOrderStats()
 {
     $conn = getDBConnection();
@@ -229,7 +230,7 @@ function getOrderStats()
         $conn->close();
     }
 }
-
+// Get list of available drivers
 function getAvailableDrivers()
 {
     $conn = getDBConnection();
@@ -254,7 +255,7 @@ function getAvailableDrivers()
         $conn->close();
     }
 }
-
+// Save delivery notes for an order
 function saveDeliveryNotes()
 {
     $conn = getDBConnection();

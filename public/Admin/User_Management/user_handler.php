@@ -1,4 +1,5 @@
-<?php
+<?
+// user_handler.php - Handle user management actions (add, update, delete, fetch)
 session_start();
 require_once '../../../config/database.php';
 
@@ -189,4 +190,5 @@ if ($action === 'add') {
     echo json_encode(['success' => false, 'message' => 'Invalid action']);
 }
 
+// Close the database connection
 $conn->close();

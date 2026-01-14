@@ -1,4 +1,6 @@
 <?php
+// Logistics Management Page - Delivery Tracking & Route Optimization
+// db and session includes
 require_once '../../../config/admin_session.php';
 require_once '../../../config/database.php';
 
@@ -121,6 +123,7 @@ $ordersResult = $conn->query($ordersQuery);
     </style>
 </head>
 
+
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display overflow-hidden h-screen w-screen flex">
     <?php include '../components/sidebar.php'; ?>
 
@@ -135,10 +138,7 @@ $ordersResult = $conn->query($ordersQuery);
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <!-- <div class="flex items-center gap-2 px-3 py-1.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-full border border-red-100 dark:border-red-800/50">
-                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                    <span class="text-xs font-bold">High Traffic Alert: Highway 4</span>
-                </div>-->
+
                 <button class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 relative">
                     <span class="material-symbols-outlined">notifications</span>
                     <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
@@ -170,6 +170,7 @@ $ordersResult = $conn->query($ordersQuery);
                 <div id="deliveryList" class="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#122218] p-4 space-y-3">
                     <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Active Deliveries</h3>
                     <?php
+                    // Get status badge HTML
                     function getStatusBadge($status)
                     {
                         $badges = [
@@ -181,7 +182,7 @@ $ordersResult = $conn->query($ordersQuery);
                         ];
                         return $badges[$status] ?? $badges['pending'];
                     }
-
+                    // Get driver initials
                     function getDriverInitials($name)
                     {
                         if (empty($name)) return '?';
@@ -191,7 +192,7 @@ $ordersResult = $conn->query($ordersQuery);
                         }
                         return strtoupper(substr($name, 0, 2));
                     }
-
+                    // Get tab group based on status
                     function getTabGroup($status)
                     {
                         if ($status === 'pending') return 'pending';
@@ -200,7 +201,7 @@ $ordersResult = $conn->query($ordersQuery);
                         if ($status === 'delivered') return 'completed';
                         return 'pending';
                     }
-
+                    // Display each order card
                     $hasOrders = false;
                     while ($order = $ordersResult->fetch_assoc()):
                         $hasOrders = true;
@@ -209,6 +210,7 @@ $ordersResult = $conn->query($ordersQuery);
                         $borderClass = $isHighlighted ? 'border-2 border-primary shadow-lg shadow-primary/5' : 'border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm';
                         $tabGroup = getTabGroup($order['order_status']);
                     ?>
+
                         <div onclick='showDeliveryMap(<?php echo json_encode([
                                                             "id" => $order["id"],
                                                             "orderNumber" => $order["order_number"],
@@ -257,6 +259,7 @@ $ordersResult = $conn->query($ordersQuery);
                         </div>
                     <?php endwhile; ?>
                     <?php if (!$hasOrders): ?>
+                        <!-- no delivery -->
                         <div class="text-center py-12">
                             <span class="material-symbols-outlined text-slate-300 dark:text-slate-700 text-5xl">package_2</span>
                             <p class="text-slate-400 mt-2">No deliveries found</p>

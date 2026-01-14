@@ -1,4 +1,5 @@
 ﻿<?php
+// db and session includes
 require_once '../../../config/admin_session.php';
 require_once '../../../config/database.php';
 
@@ -258,7 +259,7 @@ $ordersResult = $conn->query($ordersQuery);
                                     </td>
                                     <td class="py-4 px-2 text-[#0d1b12] dark:text-gray-300"><?php echo htmlspecialchars(($order['shipping_city'] ?? '') . ($order['shipping_province'] ? ', ' . $order['shipping_province'] : '') ?: 'N/A'); ?></td>
                                     <td class="py-4 px-2 text-right text-[#0d1b12] dark:text-gray-300"><?php echo $order['total_items']; ?></td>
-                                    <td class="py-4 px-2 text-right font-bold text-[#0d1b12] dark:text-white">$<?php echo number_format($order['total_amount'], 2); ?></td>
+                                    <td class="py-4 px-2 text-right font-bold text-[#0d1b12] dark:text-white">Rs <?php echo number_format($order['total_amount'], 2); ?></td>
                                     <td class="py-4 px-2 text-center">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo getStatusBadge($order['order_status']); ?>">
                                             <?php echo ucfirst($order['order_status']); ?>
@@ -382,7 +383,7 @@ $ordersResult = $conn->query($ordersQuery);
                                 <tfoot class="bg-gray-50 dark:bg-gray-800/50">
                                     <tr>
                                         <td class="py-3 px-3 text-right font-bold text-gray-600 dark:text-gray-300" colspan="2">Grand Total</td>
-                                        <td id="orderGrandTotal" class="py-3 px-3 text-right font-black text-lg text-[#0d1b12] dark:text-white">$0.00</td>
+                                        <td id="orderGrandTotal" class="py-3 px-3 text-right font-black text-lg text-[#0d1b12] dark:text-white">Rs 0.00</td>
                                     </tr>
                                 </tfoot>
                             </table>

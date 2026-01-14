@@ -553,7 +553,7 @@ function formatNumber(num) {
     maximumFractionDigits: 2,
   }).format(num);
 }
-
+// Get initials from name
 function getInitials(name) {
   return name
     .split(" ")
@@ -562,7 +562,7 @@ function getInitials(name) {
     .toUpperCase()
     .slice(0, 2);
 }
-
+// Escape HTML to prevent XSS
 function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text;

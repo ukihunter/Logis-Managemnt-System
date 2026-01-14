@@ -1,4 +1,6 @@
 <?php
+// user_managment.php - User & Role Management Page
+// session and database includes
 require_once '../../../config/admin_session.php';
 
 // Fetch users from database
@@ -477,19 +479,19 @@ while ($row = $province_result->fetch_assoc()) {
                         <!-- Full Name -->
                         <div>
                             <label class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Full Name *</label>
-                            <input type="text" name="full_name" required placeholder="John Doe" class="w-full px-4 py-2.5 rounded-lg border border-[#e7f3eb] dark:border-gray-600 bg-white dark:bg-gray-800 text-[#0d1b12] dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent" />
+                            <input type="text" name="full_name" required placeholder="saman" class="w-full px-4 py-2.5 rounded-lg border border-[#e7f3eb] dark:border-gray-600 bg-white dark:bg-gray-800 text-[#0d1b12] dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent" />
                         </div>
 
                         <!-- Email -->
                         <div>
                             <label class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Email Address *</label>
-                            <input type="email" name="email" required placeholder="john@example.com" class="w-full px-4 py-2.5 rounded-lg border border-[#e7f3eb] dark:border-gray-600 bg-white dark:bg-gray-800 text-[#0d1b12] dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent" />
+                            <input type="email" name="email" required placeholder="saman@example.com" class="w-full px-4 py-2.5 rounded-lg border border-[#e7f3eb] dark:border-gray-600 bg-white dark:bg-gray-800 text-[#0d1b12] dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent" />
                         </div>
 
                         <!-- Username -->
                         <div>
                             <label class="block text-sm font-bold text-[#0d1b12] dark:text-white mb-2">Username *</label>
-                            <input type="text" name="username" required placeholder="johndoe" class="w-full px-4 py-2.5 rounded-lg border border-[#e7f3eb] dark:border-gray-600 bg-white dark:bg-gray-800 text-[#0d1b12] dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent" />
+                            <input type="text" name="username" required placeholder="saman123" class="w-full px-4 py-2.5 rounded-lg border border-[#e7f3eb] dark:border-gray-600 bg-white dark:bg-gray-800 text-[#0d1b12] dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent" />
                         </div>
 
                         <!-- Password -->
@@ -552,181 +554,7 @@ while ($row = $province_result->fetch_assoc()) {
         </div>
     </div>
     <?php include '../components/scripts.php'; ?>
-    <script>
-        function toggleFieldsByUserType() {
-            const userType = document.getElementById('userTypeSelect').value;
-            const businessNameField = document.getElementById('businessNameField');
-            const addressField = document.getElementById('addressField');
-            const provinceField = document.getElementById('provinceField');
-
-            // Hide business name and address for staff and admin
-            if (userType === 'staff' || userType === 'admin') {
-                businessNameField.style.display = 'none';
-                addressField.style.display = 'none';
-                // Clear values when hidden
-                businessNameField.querySelector('input').value = '';
-                addressField.querySelector('textarea').value = '';
-            } else {
-                businessNameField.style.display = 'block';
-                addressField.style.display = 'block';
-            }
-
-            // Hide province for admin only
-            if (userType === 'admin') {
-                provinceField.style.display = 'none';
-                provinceField.querySelector('select').value = '';
-            } else {
-                provinceField.style.display = 'block';
-            }
-        }
-
-        function openUserPanel() {
-            // Collapse sidebar
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.add('sidebar-collapsed');
-            sidebar.classList.remove('sidebar-expanded');
-
-            // Shrink main content
-            const mainContent = document.getElementById('mainContent');
-            mainContent.style.width = 'calc(100% - 450px)';
-
-            // Show panel
-            const panel = document.getElementById('userPanel');
-            panel.classList.remove('translate-x-full');
-            panel.classList.add('translate-x-0');
-        }
-
-        function closeUserPanel() {
-            // Reset main content
-            const mainContent = document.getElementById('mainContent');
-            mainContent.style.width = '100%';
-
-            // Hide panel
-            const panel = document.getElementById('userPanel');
-            panel.classList.remove('translate-x-0');
-            panel.classList.add('translate-x-full');
-
-            // Reset form
-            document.getElementById('userForm').reset();
-            document.getElementById('userId').value = '';
-            document.getElementById('formAction').value = 'add';
-            document.querySelector('#userPanel h2').textContent = 'Add New User';
-        }
-
-        // Show notification
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            const content = document.getElementById('notificationContent');
-            const icon = document.getElementById('notificationIcon');
-            const msg = document.getElementById('notificationMessage');
-
-            // Set message
-            msg.textContent = message;
-
-            // Set style based on type
-            if (type === 'success') {
-                content.className = 'flex items-center gap-3 min-w-[320px] px-4 py-3 rounded-lg shadow-lg bg-primary text-white';
-                icon.textContent = 'check_circle';
-            } else if (type === 'error') {
-                content.className = 'flex items-center gap-3 min-w-[320px] px-4 py-3 rounded-lg shadow-lg bg-red-500 text-white';
-                icon.textContent = 'error';
-            } else if (type === 'warning') {
-                content.className = 'flex items-center gap-3 min-w-[320px] px-4 py-3 rounded-lg shadow-lg bg-orange-500 text-white';
-                icon.textContent = 'warning';
-            }
-
-            // Show notification
-            notification.classList.remove('translate-x-[500px]');
-            notification.classList.add('translate-x-0');
-
-            // Hide after 3 seconds
-            setTimeout(() => {
-                notification.classList.remove('translate-x-0');
-                notification.classList.add('translate-x-[500px]');
-            }, 3000);
-        }
-
-        // Edit user
-        function editUser(userId) {
-            // Fetch user data
-            const formData = new FormData();
-            formData.append('action', 'get');
-            formData.append('user_id', userId);
-
-            fetch('user_handler.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const user = data.user;
-
-                        // Populate form
-                        document.getElementById('userId').value = user.id;
-                        document.getElementById('formAction').value = 'update';
-                        document.querySelector('#userPanel h2').textContent = 'Edit User';
-
-                        document.querySelector('[name="user_type"]').value = user.user_type;
-                        document.querySelector('[name="business_name"]').value = user.business_name || '';
-                        document.querySelector('[name="full_name"]').value = user.full_name;
-                        document.querySelector('[name="email"]').value = user.email;
-                        document.querySelector('[name="username"]').value = user.username;
-                        document.querySelector('[name="phone_number"]').value = user.phone_number || '';
-                        document.querySelector('[name="address"]').value = user.address || '';
-                        document.querySelector('[name="province"]').value = user.province || '';
-                        document.querySelector('[name="status"]').value = user.status;
-
-                        // Password is optional for edit
-                        document.querySelector('[name="password"]').removeAttribute('required');
-                        document.querySelector('[name="password"]').placeholder = 'Leave blank to keep current password';
-
-                        // Toggle fields based on user type
-                        toggleFieldsByUserType();
-
-                        // Open panel
-                        openUserPanel();
-                    } else {
-                        showNotification(data.message, 'error');
-                    }
-                })
-                .catch(error => {
-                    showNotification('Error loading user data', 'error');
-                    console.error('Error:', error);
-                });
-        }
-
-        // Handle form submission
-        document.getElementById('userForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-            const action = formData.get('action');
-
-            fetch('user_handler.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showNotification(data.message, 'success');
-                        closeUserPanel();
-                        // Reload page after short delay to show updated data
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1000);
-                    } else {
-                        showNotification(data.message, 'error');
-                    }
-                })
-                .catch(error => {
-                    showNotification('An error occurred. Please try again.', 'error');
-                    console.error('Error:', error);
-                });
-        });
-    </script>
-
+    <script src="./js/script.js"></script>
     <!-- Mobile Bottom Nav -->
     <div class="fixed bottom-0 left-0 w-full bg-surface-light dark:bg-surface-dark border-t border-[#e7f3eb] dark:border-[#2a4034] flex lg:hidden justify-around py-3 px-2 z-50">
         <a href="../Dasboard/dasboard.php" class="flex flex-col items-center gap-1 text-text-secondary-light dark:text-text-secondary-dark">
