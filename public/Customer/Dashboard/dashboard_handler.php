@@ -1,8 +1,11 @@
+
 <?php
+//connections string links
 require_once '../../../config/database.php';
 require_once '../../../config/session_Detils.php';
 
 $conn = getDBConnection();
+// acording to session user id
 $user_id = $_SESSION['user_id'];
 
 // Get stats for the customer
@@ -15,6 +18,7 @@ $stats = [
 ];
 
 // Active Orders (orders that are not delivered or cancelled)
+// this will get the count of active orders
 $active_query = "SELECT COUNT(*) as count FROM orders 
                  WHERE user_id = ? 
                  AND order_status NOT IN ('delivered', 'cancelled')";
@@ -25,6 +29,7 @@ $result = $stmt->get_result();
 $stats['active_orders'] = $result->fetch_assoc()['count'];
 
 // Orders arriving today (shipped status)
+//count of orders that are shipped today
 $arriving_query = "SELECT COUNT(*) as count FROM orders 
                    WHERE user_id = ? 
                    AND order_status = 'shipped'
@@ -36,6 +41,7 @@ $result = $stmt->get_result();
 $stats['arriving_today'] = $result->fetch_assoc()['count'];
 
 // Completed Orders (delivered orders)
+//count of orders that are delivered
 $completed_query = "SELECT COUNT(*) as count FROM orders 
                     WHERE user_id = ? 
                     AND order_status = 'delivered'";
@@ -46,6 +52,7 @@ $result = $stmt->get_result();
 $stats['completed_orders'] = $result->fetch_assoc()['count'];
 
 // Total Spend Year-to-Date
+//sum of total amount of paid orders in the current year
 $ytd_query = "SELECT COALESCE(SUM(total_amount), 0) as total FROM orders 
               WHERE user_id = ? 
               AND payment_status = 'paid'
@@ -57,6 +64,7 @@ $result = $stmt->get_result();
 $stats['total_spend_ytd'] = $result->fetch_assoc()['total'];
 
 // Get most recent delivery tracking (shipped order)
+//latest shipped, processing, or packed order
 $tracking_query = "SELECT o.id, o.order_number, o.order_status, o.updated_at, 
                    o.shipping_city, d.full_name as driver_name, d.phone_number as driver_phone
                    FROM orders o
@@ -72,6 +80,7 @@ $tracking_result = $stmt->get_result();
 $tracking_order = $tracking_result->fetch_assoc();
 
 // Get recent orders (latest 6)
+//fetch the latest 6 orders
 $orders_query = "SELECT o.order_number, o.created_at, o.order_status, o.total_amount
                  FROM orders o
                  WHERE o.user_id = ?
@@ -86,4 +95,5 @@ while ($row = $orders_result->fetch_assoc()) {
     $recent_orders[] = $row;
 }
 
+// Prepare the final response
 $conn->close();

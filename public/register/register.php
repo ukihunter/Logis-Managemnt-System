@@ -272,6 +272,7 @@
             </div>
         </div>
     </div>
+    <!-- Scripts -->
     <script src="js/script.js"></script>
 </body>
 

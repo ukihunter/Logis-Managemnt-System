@@ -38,7 +38,7 @@
         }
     }
 
-    // Watch for sidebar collapse and close dropdown
+    // Watch for sidebar collapse and close dropdown if needed
     const sidebarObserver = new MutationObserver(closeDropdownOnCollapse);
     const sidebar = document.getElementById('sidebar');
     if (sidebar) {

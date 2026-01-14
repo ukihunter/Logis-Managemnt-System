@@ -1,7 +1,8 @@
 <?php
+// Start session and include database configuration
 require_once '../../../config/session_Detils.php';
 require_once '../../../config/database.php';
-
+//get db cnnection 
 $conn = getDBConnection();
 
 // Fetch categories
@@ -177,7 +178,9 @@ $total_products = $total_result->fetch_assoc()['total'];
                     <span class="material-symbols-outlined filled text-[20px]">grid_view</span>
                     <span class="text-sm">All Products</span>
                 </button>
+                <!-- getting catogories names-->
                 <?php foreach ($categories as $cat): ?>
+
                     <button data-category="<?php echo htmlspecialchars($cat['name']); ?>" class="category-filter flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main dark:text-gray-300 hover:bg-border-light dark:hover:bg-border-dark transition-colors group">
                         <span class="material-symbols-outlined text-[20px] text-gray-400 group-hover:text-primary"><?php echo htmlspecialchars($cat['icon'] ?? 'category'); ?></span>
                         <span class="text-sm font-medium"><?php echo htmlspecialchars($cat['name']); ?></span>
@@ -194,6 +197,7 @@ $total_products = $total_result->fetch_assoc()['total'];
                         <span class="material-symbols-outlined text-text-main dark:text-white text-[20px] transition-transform group-open:rotate-180">expand_more</span>
                     </summary>
                     <div class="pt-3 pb-2 flex flex-col gap-2" id="brandFilterContainer">
+                        <!-- getting brand names-->
                         <?php foreach ($brands as $brand): ?>
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input class="brand-checkbox w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" type="checkbox" value="<?php echo htmlspecialchars($brand); ?>" />
@@ -327,7 +331,7 @@ $total_products = $total_result->fetch_assoc()['total'];
         </div>
     </div>
 </body>
-
+<!-- link the script -->
 <script src="js/script.js"></script>
 
 </html>

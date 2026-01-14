@@ -1,4 +1,5 @@
 <?php
+// Start session and include necessary files
 require_once '../../../config/session_Detils.php';
 require_once '../../../config/database.php';
 
@@ -415,6 +416,7 @@ $status_labels = [
         </div>
     </div>
 </body>
+<!-- Scripts -->
 <script src="../Orders/js/script.js"></script>
 
 </html>

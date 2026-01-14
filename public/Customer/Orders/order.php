@@ -1,4 +1,5 @@
 <?php
+// db connction and the order_data_handler
 require_once '../../../config/session_Detils.php';
 require_once 'order_data_handler.php';
 ?>
@@ -68,6 +69,8 @@ require_once 'order_data_handler.php';
     </style>
 </head>
 
+<!-- This will show the order detils acordigg to the  login session data  -->
+
 <body class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200 transition-colors duration-200 min-h-screen">
     <div id="mainWrapper" class="transition-all duration-300 ease-in-out">
         <nav class="sticky top-0 z-50 bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-gray-700 shadow-sm">
@@ -92,7 +95,7 @@ require_once 'order_data_handler.php';
                             <a class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition" href="../Dashboard/dashboard.php">Dashboard</a>
                             <a class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition" href="../Catalog/catalog.php">Catalog</a>
                             <a class="text-primary font-semibold" href="#">Orders</a>
-                            <!--          <a class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition" href="#">Invoices</a> -->
+                            <!--<a class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition" href="#">Invoices</a> -->
                         </div>
                         <div class="relative ml-2">
                             <button id="profileMenuBtn" class="size-9 rounded-full bg-slate-300 dark:bg-slate-700 bg-cover bg-center border-2 border-slate-100 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-colors" data-alt="User profile avatar showing a store logo or generic user icon" style='background-image: url("https://avatar.iran.liara.run/username?username=<?php echo urlencode($business_name); ?>");'></button>
@@ -116,6 +119,8 @@ require_once 'order_data_handler.php';
                 </div>
             </div>
         </nav>
+
+        <!-- this secion will load the data to the tabel and this is the main secion -->
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 transition hover:shadow-md">
@@ -127,6 +132,7 @@ require_once 'order_data_handler.php';
                         </span>
                     </div>
                 </div>
+                <!-- cards that is show in the top -->
                 <div class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 transition hover:shadow-md">
                     <p class="text-sm font-medium text-primary mb-1">Pending Payment</p>
                     <div class="flex items-end justify-between">
@@ -155,6 +161,7 @@ require_once 'order_data_handler.php';
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="material-symbols-outlined text-gray-400 text-[18px]">search</span>
                             </div>
+                            <!-- search input -->
                             <input name="search" value="<?php echo htmlspecialchars($search_query); ?>" class="w-full pl-9 pr-12 py-2 text-sm border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-surface-dark text-gray-900 dark:text-white focus:ring-primary focus:border-primary shadow-sm" placeholder="Search Order ID..." type="text" />
                             <input type="hidden" name="status" value="<?php echo htmlspecialchars($status_filter); ?>" />
                             <button type="submit" class="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -163,6 +170,7 @@ require_once 'order_data_handler.php';
                         </form>
                     </div>
                 </div>
+                <!-- table filters -->
                 <div class="bg-surface-light dark:bg-surface-dark rounded-t-xl border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex flex-wrap items-center gap-2">
                     <a href="?status=all<?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?>" class="px-4 py-2 rounded-lg text-sm font-medium <?php echo $status_filter === 'all' ? 'bg-primary text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'; ?> transition-colors">
                         All Orders
@@ -180,6 +188,7 @@ require_once 'order_data_handler.php';
                         Cancelled
                     </a>
                 </div>
+                <!-- table filters -->
                 <div class="bg-surface-light dark:bg-surface-dark rounded-b-xl shadow-sm border border-t-0 border-gray-100 dark:border-gray-700 overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -244,6 +253,7 @@ require_once 'order_data_handler.php';
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
+                                        <!-- no orders found message -->
                                         <td colspan="5" class="px-6 py-12 text-center">
                                             <div class="flex flex-col items-center justify-center">
                                                 <span class="material-symbols-outlined text-5xl text-gray-300 dark:text-gray-600 mb-3">receipt_long</span>
@@ -258,6 +268,7 @@ require_once 'order_data_handler.php';
                             </tbody>
                         </table>
                     </div>
+                    <!--page numbers -->
                     <div class="bg-white dark:bg-surface-dark px-4 py-3 border-t border-gray-200 dark:border-gray-700 sm:px-6">
                         <div class="flex items-center justify-between">
                             <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
@@ -311,7 +322,7 @@ require_once 'order_data_handler.php';
                 </div>
             </div>
         </main>
-
+        <!-- footer section  -->
         <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm text-gray-400 dark:text-gray-600">
             © 2026 IslandDistro Inc. All rights reserved.
         </footer>
@@ -450,7 +461,7 @@ require_once 'order_data_handler.php';
                 }
             }
         });
-
+        // display order details in sidebar
         function displayOrderDetails(order, items) {
             const content = document.getElementById('orderDetailsContent');
 
@@ -484,7 +495,7 @@ require_once 'order_data_handler.php';
             const status = statusBadges[order.order_status] || statusBadges['pending'];
             const paymentStatus = order.payment_status === 'paid' ? 'Paid' : 'Pending';
             const paymentClass = order.payment_status === 'paid' ? 'bg-green-600' : 'bg-yellow-600';
-
+            //  html for order items
             let itemsHtml = '';
             items.forEach(item => {
                 itemsHtml += `

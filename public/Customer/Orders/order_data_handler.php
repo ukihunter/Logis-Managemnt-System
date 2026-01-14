@@ -1,8 +1,11 @@
 <?php
+//  db connction and the sesion detils
 require_once '../../../config/database.php';
 require_once '../../../config/session_Detils.php';
 
+// opn the conction 
 $conn = getDBConnection();
+// get the data acording to the  login session data
 $user_id = $_SESSION['user_id'];
 
 // Get filter and search parameters
@@ -166,4 +169,6 @@ function getStatusBadge($status)
     return $badges[$status] ?? $badges['pending'];
 }
 
+
+// connction closed 
 $conn->close();

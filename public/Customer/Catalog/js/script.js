@@ -23,6 +23,7 @@ function setupProfileDropdown() {
   const profileDropdown = document.getElementById("profileDropdown");
   const mobileProfileBtn = document.getElementById("mobileProfileBtn");
 
+  //  cathing the action
   if (profileMenuBtn && profileDropdown) {
     profileMenuBtn.addEventListener("click", function (e) {
       e.stopPropagation();
@@ -30,6 +31,7 @@ function setupProfileDropdown() {
     });
   }
 
+  // mobiele preview settings
   if (mobileProfileBtn && profileDropdown) {
     mobileProfileBtn.addEventListener("click", function (e) {
       e.stopPropagation();
@@ -37,6 +39,7 @@ function setupProfileDropdown() {
     });
   }
 
+  // cathing the action
   document.addEventListener("click", function (e) {
     if (
       profileDropdown &&
@@ -239,6 +242,7 @@ function createProductCard(product) {
   const imagePath = product.image_path ? `../../../${product.image_path}` : "";
   const hasImage = imagePath && imagePath.includes("assest/");
 
+  //  color will define with the
   const stockColors = {
     green: {
       dot: "bg-primary",
@@ -253,11 +257,13 @@ function createProductCard(product) {
     gray: { dot: "bg-gray-400", text: "text-gray-500", pulse: "" },
   };
 
+  // defining the stock color
   const stockColor =
     stockColors[product.stock_status.color] || stockColors.gray;
   const isOutOfStock = product.stock_status.status === "out_of_stock";
   const hasDiscount = product.discount_percentage > 0;
 
+  // define the tags
   let labelHTML = "";
   if (product.is_featured && !hasDiscount) {
     labelHTML = `<div class="absolute top-3 left-3 z-10"><span class="bg-primary text-text-main text-xs font-bold px-2.5 py-1 rounded shadow-sm">${
@@ -266,9 +272,10 @@ function createProductCard(product) {
   } else if (hasDiscount) {
     labelHTML = `<div class="absolute top-3 left-3 z-10"><span class="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded shadow-sm">-${product.discount_percentage}% Off</span></div>`;
   }
-
+  // price html
   let priceHTML = hasDiscount
-    ? `<div class="flex items-center gap-2"><span class="text-2xl font-black text-text-main dark:text-white">Rs ${product.discounted_price.toFixed(
+    ? // this will show the prive acording to the discount that in the product
+      `<div class="flex items-center gap-2"><span class="text-2xl font-black text-text-main dark:text-white">Rs ${product.discounted_price.toFixed(
         2
       )}</span><span class="text-xs text-red-500 line-through font-medium">Rs ${product.unit_price.toFixed(
         2
@@ -276,11 +283,11 @@ function createProductCard(product) {
     : `<span class="text-2xl font-black text-text-main dark:text-white">Rs ${product.unit_price.toFixed(
         2
       )}</span>`;
-
+  // cart button html
   let cartButtonHTML = isOutOfStock
     ? `<div class="flex gap-2"><div class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg border border-border-light dark:border-border-dark h-10 w-24 shrink-0 opacity-50 cursor-not-allowed"><button class="w-8 h-full flex items-center justify-center text-gray-500" disabled>-</button><input class="w-full h-full bg-transparent text-center text-sm font-bold focus:ring-0 border-none p-0" disabled type="number" value="0" /><button class="w-8 h-full flex items-center justify-center text-gray-500" disabled>+</button></div><button class="flex-1 h-10 bg-gray-200 dark:bg-gray-700 text-gray-500 text-sm font-bold rounded-lg flex items-center justify-center gap-2 cursor-not-allowed" disabled>Notify Me</button></div>`
     : `<div class="flex gap-2"><div class="flex items-center bg-background-light dark:bg-background-dark rounded-lg border border-border-light dark:border-border-dark h-10 w-24 shrink-0"><button onclick="decrementQuantity(${product.id})" class="w-8 h-full flex items-center justify-center text-gray-500 hover:text-primary transition-colors hover:bg-gray-100 rounded-l-lg">-</button><input id="qty-${product.id}" class="w-full h-full bg-transparent text-center text-sm font-bold focus:ring-0 border-none p-0" type="number" value="${product.carton_quantity}" min="${product.min_order_quantity}" /><button onclick="incrementQuantity(${product.id})" class="w-8 h-full flex items-center justify-center text-gray-500 hover:text-primary transition-colors hover:bg-gray-100 rounded-r-lg">+</button></div><button onclick="addToCart(${product.id})" class="flex-1 h-10 bg-primary hover:bg-green-500 text-text-main text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm"><span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>Add</button></div>`;
-
+  // return the final html
   return `
         <div class="group flex flex-col bg-white dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden hover:shadow-lg transition-all duration-300 hover:border-primary/50 relative">
             ${labelHTML}
@@ -379,34 +386,44 @@ function renderPagination(pagination) {
   container.innerHTML = html;
 }
 
+// Update product count display
+
 function updateProductCount(pagination) {
   document.getElementById(
     "productCount"
   ).textContent = `Showing ${pagination.showing_from}-${pagination.showing_to} of ${pagination.total_products} products`;
 }
 
+// Change page
 function changePage(page) {
   currentPage = page;
   loadProducts();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+// show the error
 function showError(message) {
   document.getElementById(
     "productGrid"
   ).innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-20"><span class="material-symbols-outlined text-6xl text-red-300 mb-4">error</span><p class="text-red-500 text-lg">${message}</p></div>`;
 }
 
+// conntatty  incressing  funtion
+
 function incrementQuantity(id) {
   const input = document.getElementById(`qty-${id}`);
   input.value = parseInt(input.value) + 1;
 }
+
+//  countty decrese duntion
 
 function decrementQuantity(id) {
   const input = document.getElementById(`qty-${id}`);
   const min = parseInt(input.min) || 1;
   if (parseInt(input.value) > min) input.value = parseInt(input.value) - 1;
 }
+
+// add to cart funtion
 
 function addToCart(id) {
   const quantity = parseInt(document.getElementById(`qty-${id}`).value);
@@ -417,6 +434,8 @@ function addToCart(id) {
   formData.append("action", "add");
   formData.append("product_id", id);
   formData.append("quantity", quantity);
+
+  // cart handelr location
 
   fetch("../Cart/cart_handler.php", {
     method: "POST",
@@ -429,6 +448,7 @@ function addToCart(id) {
         // Update cart count in header if exists
         updateCartCount();
       } else {
+        // error massage
         showNotification(data.message || "Failed to add to cart", "error");
       }
     })
@@ -469,6 +489,7 @@ function showNotification(message, type = "info") {
 
   document.body.appendChild(notification);
 
+  // set the time out
   setTimeout(() => {
     notification.style.opacity = "1";
     notification.style.transform = "translateY(0)";

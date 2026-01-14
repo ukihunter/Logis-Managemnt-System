@@ -1,4 +1,5 @@
-<?php
+<?
+//  db connction and the sesion detils 
 require_once '../../../config/session_Detils.php';
 require_once '../../../config/database.php';
 
@@ -8,10 +9,13 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// opne the connction 
 $conn = getDBConnection();
+// acorrding to the user id and order number get the order details
 $user_id = $_SESSION['user_id'];
 $order_number = isset($_GET['order']) ? trim($_GET['order']) : '';
 
+// Redirect if order number is missing
 if (empty($order_number)) {
     header('Location: order.php');
     exit;
@@ -23,11 +27,14 @@ $order_query = "SELECT o.*,
                 FROM orders o
                 WHERE o.order_number = ? AND o.user_id = ?";
 
+// prepare and excute the statment
 $stmt = $conn->prepare($order_query);
+// bind the paramiters
 $stmt->bind_param('si', $order_number, $user_id);
 $stmt->execute();
 $order = $stmt->get_result()->fetch_assoc();
 
+// Redirect if order not found
 if (!$order) {
     $_SESSION['error'] = 'Order not found';
     header('Location: order.php');
@@ -41,10 +48,12 @@ $stmt->bind_param('i', $order['id']);
 $stmt->execute();
 $order_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
+// Close the connection
 $conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="en" class="light">
+
 
 <head>
     <meta charset="UTF-8">
@@ -71,6 +80,7 @@ $conn->close();
         }
     </script>
 </head>
+<!-- this will shwo the scuuss mmasge with the detils  -->
 
 <body class="bg-background-light dark:bg-background-dark font-display">
     <div class="min-h-screen flex items-center justify-center p-4">

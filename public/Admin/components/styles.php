@@ -1,3 +1,4 @@
+<!-- Tailwind CSS Configuration and Custom Styles for Admin Panel -->
 <script id="tailwind-config">
     tailwind.config = {
         darkMode: "class",

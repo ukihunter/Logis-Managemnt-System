@@ -3,14 +3,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const profileMenuBtn = document.getElementById("profileMenuBtn");
   const profileDropdown = document.getElementById("profileDropdown");
   const mobileProfileBtn = document.getElementById("mobileProfileBtn");
-
+  // Toggle dropdown on button click
   if (profileMenuBtn && profileDropdown) {
     profileMenuBtn.addEventListener("click", function (e) {
       e.stopPropagation();
       profileDropdown.classList.toggle("hidden");
     });
   }
-
+  // Mobile toggle
   if (mobileProfileBtn && profileDropdown) {
     mobileProfileBtn.addEventListener("click", function (e) {
       e.stopPropagation();
@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const notificationsDropdown = document.getElementById(
     "notificationsDropdown"
   );
+  // Toggle dropdown on button click
   if (notificationsBtn && notificationsDropdown) {
     notificationsBtn.addEventListener("click", function (e) {
       e.stopPropagation();
@@ -63,23 +64,23 @@ async function updateQuantity(cartId, change) {
     `.cart-quantity[data-cart-id="${cartId}"]`
   );
   if (!quantityInput) return;
-
+  // Get current quantity
   const currentQty = parseInt(quantityInput.value);
   const newQty = currentQty + change;
-
+  // If new quantity is less than 1, confirm removal
   if (newQty < 1) {
     if (confirm("Remove this item from cart?")) {
       await removeFromCart(cartId);
     }
     return;
   }
-
+  // Update quantity via AJAX
   try {
     const formData = new FormData();
     formData.append("action", "update");
     formData.append("cart_id", cartId);
     formData.append("quantity", newQty);
-
+    // Send request
     const response = await fetch("cart_handler.php", {
       method: "POST",
       body: formData,
@@ -107,7 +108,7 @@ async function removeFromCart(cartId) {
     const formData = new FormData();
     formData.append("action", "remove");
     formData.append("cart_id", cartId);
-
+    // Send request
     const response = await fetch("cart_handler.php", {
       method: "POST",
       body: formData,
@@ -135,7 +136,7 @@ async function removeFromCart(cartId) {
           }
         }, 300);
       }
-
+      //  item remove success massgae
       showNotification("Item removed from cart", "success");
     } else {
       showNotification(data.message || "Failed to remove item", "error");
@@ -161,7 +162,7 @@ function updateCartUI(cart) {
   const taxDisplay = document.getElementById("taxDisplay");
   const shippingDisplay = document.getElementById("shippingDisplay");
   const totalDisplay = document.getElementById("totalDisplay");
-
+  // Update amounts
   if (subtotalDisplay)
     subtotalDisplay.textContent = `Rs ${formatCurrency(cart.subtotal)}`;
   if (taxDisplay) taxDisplay.textContent = `Rs ${formatCurrency(cart.tax)}`;

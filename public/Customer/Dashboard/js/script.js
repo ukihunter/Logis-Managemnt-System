@@ -3,14 +3,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const profileMenuBtn = document.getElementById("profileMenuBtn");
   const profileDropdown = document.getElementById("profileDropdown");
   const mobileProfileBtn = document.getElementById("mobileProfileBtn");
-
+  // Desktop profile button
   if (profileMenuBtn && profileDropdown) {
     profileMenuBtn.addEventListener("click", function (e) {
       e.stopPropagation();
       profileDropdown.classList.toggle("hidden");
     });
   }
-
+  // Mobile profile button
   if (mobileProfileBtn && profileDropdown) {
     mobileProfileBtn.addEventListener("click", function (e) {
       e.stopPropagation();
@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const notificationsDropdown = document.getElementById(
     "notificationsDropdown"
   );
+  // Notifications button
   if (notificationsBtn && notificationsDropdown) {
     notificationsBtn.addEventListener("click", function (e) {
       e.stopPropagation();

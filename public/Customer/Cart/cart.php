@@ -1,8 +1,11 @@
 <?php
+// Start session and include necessary files
 require_once '../../../config/session_Detils.php';
 require_once '../../../config/database.php';
 
+// Create database connection
 $conn = getDBConnection();
+// Get user ID from session
 $user_id = $_SESSION['user_id'];
 
 // Fetch cart items
@@ -15,6 +18,7 @@ $cart_query = "SELECT c.id as cart_id, c.quantity,
                WHERE c.user_id = ? AND p.status = 'active'
                ORDER BY c.added_at DESC";
 
+//  Prepare and execute statement
 $stmt = $conn->prepare($cart_query);
 $stmt->bind_param('i', $user_id);
 $stmt->execute();
@@ -23,21 +27,22 @@ $result = $stmt->get_result();
 $cart_items = [];
 $subtotal = 0;
 
+// Process cart items
 while ($row = $result->fetch_assoc()) {
     $unit_price = floatval($row['unit_price']);
     $discount_percentage = floatval($row['discount_percentage']);
-
+    // disount  if there
     $discounted_price = $unit_price;
     if ($discount_percentage > 0) {
         $discounted_price = $unit_price * (1 - $discount_percentage / 100);
     }
-
+    // quntity count
     $item_total = $discounted_price * $row['quantity'];
     $subtotal += $item_total;
-
+    // stock level
     $is_low_stock = $row['stock_level'] < 50;
     $is_out_of_stock = $row['stock_level'] <= 0;
-
+    // Build cart item array
     $cart_items[] = [
         'cart_id' => $row['cart_id'],
         'product_id' => $row['product_id'],
@@ -57,11 +62,12 @@ while ($row = $result->fetch_assoc()) {
     ];
 }
 
+// if there is tax or other neccery 
 $tax_rate = 0.0;
 $shipping_fee = 0.0;
 $tax_amount = $subtotal * $tax_rate;
 $total = $subtotal + $tax_amount + $shipping_fee;
-
+//  connction close 
 $conn->close();
 ?>
 
@@ -141,6 +147,7 @@ $conn->close();
                     </div>
                     <input class="w-full bg-transparent border-none text-sm text-text-main dark:text-white placeholder:text-text-secondary dark:placeholder:text-gray-500 focus:ring-0 h-full" placeholder="Search products, SKUs..." />
                 </div>
+
             </div>
             <div class="flex items-center gap-6">
                 <nav class="hidden lg:flex items-center gap-6">
@@ -187,7 +194,7 @@ $conn->close();
                     </button>
 
                 </div>
-
+                <!-- bussiness and oter infornmation  -->
                 <button class="flex items-center gap-2">
                     <div class="relative ml-2">
                         <button id="profileMenuBtn" class="size-10 rounded-full bg-slate-300 dark:bg-slate-700 bg-cover bg-center border-2 border-slate-100 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-colors" data-alt="User profile avatar showing a store logo or generic user icon" style='background-image: url("https://avatar.iran.liara.run/username?username=<?php echo urlencode($business_name); ?>");'></button>
@@ -264,6 +271,7 @@ $conn->close();
                         <?php foreach ($cart_items as $item): ?>
                             <div class="cart-item group flex flex-col md:flex-row gap-6 bg-surface-light dark:bg-surface-dark p-5 rounded-xl shadow-sm border border-transparent hover:border-primary/20 transition-all" data-cart-id="<?php echo $item['cart_id']; ?>">
                                 <div class="relative shrink-0">
+                                    <!-- image path -->
                                     <?php if (!empty($item['image_path']) && file_exists('../../../' . $item['image_path'])): ?>
                                         <div class="bg-gray-100 dark:bg-white/5 rounded-lg w-full md:w-[120px] aspect-square bg-center bg-cover" style='background-image: url("../../../<?php echo htmlspecialchars($item['image_path']); ?>");'></div>
                                     <?php else: ?>
@@ -271,10 +279,12 @@ $conn->close();
                                             <span class="material-symbols-outlined text-gray-400 text-4xl">inventory_2</span>
                                         </div>
                                     <?php endif; ?>
+                                    <!-- offers label-->
                                     <?php if ($item['is_featured'] && !empty($item['offer_label'])): ?>
                                         <div class="absolute -top-2 -left-2 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm"><?php echo htmlspecialchars($item['offer_label']); ?></div>
                                     <?php endif; ?>
                                 </div>
+                                <!-- prodct inforamtion display -->
                                 <div class="flex flex-1 flex-col justify-between gap-4">
                                     <div>
                                         <div class="flex justify-between items-start">
@@ -320,6 +330,7 @@ $conn->close();
                     <?php endif; ?>
                 </div>
                 <!-- Cross Sell -->
+                <!-- TO DO --->
                 <div class="mt-12">
                     <h3 class="text-xl font-bold mb-6 text-text-main dark:text-white flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary">recommend</span>
@@ -461,7 +472,7 @@ $conn->close();
             <span class="text-[10px] font-medium">Account</span>
         </button>
     </div>
-
+    <!-- footer -->
     <footer class="mt-auto border-t border-[#e7f3eb] dark:border-white/5 bg-surface-light dark:bg-surface-dark py-12">
         <div class="max-w-[1440px] mx-auto px-6 text-center">
             <p class="text-text-secondary dark:text-gray-500 text-sm">© <?php echo date("Y"); ?> DistriMgt Distribution Systems. All rights reserved.</p>
@@ -469,7 +480,7 @@ $conn->close();
     </footer>
 </body>
 
-
+<!-- script link  -->
 <script src="../Cart/js/script.js"></script>
 
 </html>

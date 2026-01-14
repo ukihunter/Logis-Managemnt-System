@@ -1,4 +1,5 @@
 <?php
+// checkout.php - Handle checkout process using Stripe
 require_once '../../../config/session_Detils.php';
 require_once '../../../config/database.php';
 require_once '../../../config/stripe_config.php';
@@ -9,10 +10,10 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Install Stripe PHP library first: composer require stripe/stripe-php
-// Or download from: https://github.com/stripe/stripe-php/releases
+// stripe path 
 require_once '../../../vendor/autoload.php'; // Adjust path if needed
 
+// api key location 
 \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
 
 $conn = getDBConnection();
@@ -26,7 +27,7 @@ try {
     $stmt_user->execute();
     $user_result = $stmt_user->get_result();
     $user = $user_result->fetch_assoc();
-
+    //  if account is not found 
     if (!$user) {
         $_SESSION['error'] = 'User account not found';
         header('Location: cart.php');
@@ -46,7 +47,7 @@ try {
     $stmt->bind_param('i', $user_id);
     $stmt->execute();
     $result = $stmt->get_result();
-
+    // empty massge 
     if ($result->num_rows == 0) {
         $_SESSION['error'] = 'Your cart is empty';
         header('Location: cart.php');
@@ -56,7 +57,7 @@ try {
     $cart_items = [];
     $subtotal = 0;
     $line_items = [];
-
+    // loop through the cart items
     while ($row = $result->fetch_assoc()) {
         $unit_price = floatval($row['unit_price']);
         $discount_percentage = floatval($row['discount_percentage']);
@@ -69,7 +70,7 @@ try {
 
         $item_total = $discounted_price * $row['quantity'];
         $subtotal += $item_total;
-
+        // cart items
         $cart_items[] = [
             'cart_id' => $row['cart_id'],
             'product_id' => $row['product_id'],
@@ -84,7 +85,7 @@ try {
         ];
 
         // Prepare Stripe line items
-        // Stripe expects amounts in cents (smallest currency unit)
+
         $stripe_price = intval($discounted_price * 100);
 
         $line_items[] = [
@@ -151,4 +152,5 @@ try {
     exit;
 }
 
+// connction close
 $conn->close();

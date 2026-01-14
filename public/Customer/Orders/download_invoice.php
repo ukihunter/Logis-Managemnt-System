@@ -1,14 +1,18 @@
 <?php
+// connction to database and session details
 require_once '../../../config/database.php';
 require_once '../../../config/session_Detils.php';
 
+// Check if order_id is provided
 if (!isset($_GET['order_id'])) {
     die('Order ID not specified');
 }
 
+// Sanitize and validate order_id
 $order_id = (int)$_GET['order_id'];
 $user_id = $_SESSION['user_id'];
 
+//  coocntion start
 $conn = getDBConnection();
 
 // Get order details with security check
@@ -21,10 +25,13 @@ $stmt->bind_param("ii", $order_id, $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
+// order not found or does not belong to user
+
 if ($result->num_rows === 0) {
     die('Order not found');
 }
 
+// Fetch order data
 $order = $result->fetch_assoc();
 
 // Get order items
@@ -38,12 +45,15 @@ while ($row = $items_result->fetch_assoc()) {
     $items[] = $row;
 }
 
+// Close the database connection
 $conn->close();
 
 // Generate HTML invoice
 ?>
 <!DOCTYPE html>
 <html>
+
+<!-- template fot the invoice  -->
 
 <head>
     <meta charset="utf-8">

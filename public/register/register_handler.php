@@ -1,9 +1,11 @@
-<?php
+<?
+// Start session and include database configuration
 session_start();
 require_once '../../config/database.php';
-
+// Set response header to JSON
 header('Content-Type: application/json');
 
+// Handle POST request for user registration
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $business_name = trim($_POST['business_name'] ?? '');
     $full_name = trim($_POST['full_name'] ?? '');
@@ -81,9 +83,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['full_name'] = $full_name;
         $_SESSION['business_name'] = $business_name;
         $_SESSION['user_type'] = 'customer';
-
+        //        Respond with success message
         echo json_encode(['success' => true, 'message' => 'Account created successfully!', 'redirect' => '../customer/dashboard/dashboard.php']);
     } else {
+        //      Respond with error message
         echo json_encode(['success' => false, 'message' => 'Registration failed. Please try again.']);
     }
 

@@ -1,3 +1,5 @@
+<!-- in here i will create sidebar for admin panel and it will be import to other admin pages -->
+
 <!-- Sidebar Navigation Component -->
 <aside id="sidebar" class="sidebar-expanded flex-shrink-0 flex flex-col bg-surface-light dark:bg-surface-dark border-r border-[#e7f3eb] dark:border-[#2a4034] hidden lg:flex">
     <div class="p-6 border-b border-[#e7f3eb] dark:border-[#2a4034]">

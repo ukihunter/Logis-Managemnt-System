@@ -1,4 +1,5 @@
 <?php
+// db connction and the sesion detils
 require_once '../../../config/session_Detils.php';
 require_once '../../../config/database.php';
 require_once '../../../config/stripe_config.php';
@@ -13,16 +14,19 @@ if (!isset($_SESSION['user_id'])) {
 require_once '../../../vendor/autoload.php';
 \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
 
+// opne the connction
 $conn = getDBConnection();
+// acorrding to the user id and order number get the order details
 $user_id = $_SESSION['user_id'];
+// get the session id from the url
 $session_id = isset($_GET['session_id']) ? $_GET['session_id'] : '';
 
+// Validate session id and pending order
 if (empty($session_id) || !isset($_SESSION['pending_order'])) {
     $_SESSION['error'] = 'Invalid payment session';
     header('Location: ../Cart/cart.php');
     exit;
 }
-
 try {
     // Verify the Stripe session
     $checkout_session = \Stripe\Checkout\Session::retrieve($session_id);
@@ -45,6 +49,7 @@ try {
     $shipping_province = $pending_order['shipping_province'];
     $shipping_postal_code = '';
 
+    // Get shipping address details from Stripe if available
     if (isset($checkout_session->shipping_details) && $checkout_session->shipping_details) {
         $stripe_shipping = $checkout_session->shipping_details->address;
         $shipping_address = implode(', ', array_filter([
@@ -71,7 +76,7 @@ try {
         payment_method, payment_status, stripe_payment_intent_id, stripe_charge_id,
         paid_at, order_status
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'stripe', 'paid', ?, ?, NOW(), 'pending')";
-
+    // prepare and excute the statment
     $stmt = $conn->prepare($insert_order);
     $discount_amount = 0; // Must be a variable for bind_param
     $stmt->bind_param(
@@ -94,11 +99,11 @@ try {
         $checkout_session->payment_intent,
         $checkout_session->id
     );
-
+    // bind the paramiters
     if (!$stmt->execute()) {
         throw new Exception('Failed to create order');
     }
-
+    // get the order id
     $order_id = $conn->insert_id;
 
     // Insert order items
@@ -106,6 +111,7 @@ try {
         order_id, product_id, product_name, product_sku, product_image,
         unit_price, quantity, discount_percentage, subtotal
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
 
     $stmt = $conn->prepare($insert_item);
 
@@ -177,4 +183,5 @@ try {
     exit;
 }
 
+// connction closed
 $conn->close();

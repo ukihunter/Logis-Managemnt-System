@@ -1,4 +1,5 @@
 <?php
+//connction strings
 require_once '../../../config/database.php';
 header('Content-Type: application/json');
 
@@ -9,7 +10,7 @@ $items_per_page = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 12;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $items_per_page;
 
-// Filters
+// Filters 
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $category = isset($_GET['category']) ? trim($_GET['category']) : '';
 $brands = isset($_GET['brands']) ? $_GET['brands'] : [];
@@ -19,10 +20,12 @@ $max_price = isset($_GET['max_price']) ? floatval($_GET['max_price']) : 0;
 $sort_by = isset($_GET['sort_by']) ? trim($_GET['sort_by']) : 'popularity';
 
 // Build WHERE clause
-$where_conditions = ["status = 'active'"];
+//search conditions
+$where_conditions = ["status = 'active'"]; // prodct must be in the active state
 $params = [];
 $types = '';
 
+// Search filter
 if (!empty($search)) {
     $where_conditions[] = "(name LIKE ? OR sku LIKE ? OR description LIKE ?)";
     $search_param = "%{$search}%";
@@ -31,13 +34,13 @@ if (!empty($search)) {
     $params[] = $search_param;
     $types .= 'sss';
 }
-
+// Category filter
 if (!empty($category) && $category !== 'all') {
     $where_conditions[] = "category = ?";
     $params[] = $category;
     $types .= 's';
 }
-
+// Brand filter
 if (!empty($brands) && is_array($brands)) {
     $placeholders = str_repeat('?,', count($brands) - 1) . '?';
     $where_conditions[] = "brand IN ($placeholders)";
@@ -46,7 +49,7 @@ if (!empty($brands) && is_array($brands)) {
         $types .= 's';
     }
 }
-
+// Stock status filter
 if (!empty($stock_status)) {
     if ($stock_status === 'in_stock') {
         $where_conditions[] = "stock_level > 0";
@@ -54,19 +57,22 @@ if (!empty($stock_status)) {
         $where_conditions[] = "stock_level > 0 AND stock_level < (max_level * 0.2)";
     }
 }
-
+// Price range filter
 if ($min_price > 0) {
     $where_conditions[] = "unit_price >= ?";
     $params[] = $min_price;
     $types .= 'd';
 }
 
+
+// Max price filter
 if ($max_price > 0) {
     $where_conditions[] = "unit_price <= ?";
     $params[] = $max_price;
     $types .= 'd';
 }
 
+// Combine WHERE conditions
 $where_clause = !empty($where_conditions) ? 'WHERE ' . implode(' AND ', $where_conditions) : '';
 
 // Build ORDER BY clause
@@ -114,6 +120,7 @@ if (!empty($params)) {
 $stmt->execute();
 $result = $stmt->get_result();
 
+// Process products
 $products = [];
 while ($row = $result->fetch_assoc()) {
     // Calculate stock percentage
@@ -147,7 +154,7 @@ while ($row = $result->fetch_assoc()) {
     if ($row['discount_percentage'] > 0) {
         $discounted_price = $row['unit_price'] * (1 - $row['discount_percentage'] / 100);
     }
-
+    // Add product to the list
     $products[] = [
         'id' => $row['id'],
         'sku' => $row['sku'],
@@ -183,4 +190,5 @@ echo json_encode([
     ]
 ]);
 
+//connction closed
 $conn->close();

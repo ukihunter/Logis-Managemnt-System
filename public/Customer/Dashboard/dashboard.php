@@ -1,3 +1,4 @@
+<!-- db connection and the session handling -->
 <?php
 require_once '../../../config/session_Detils.php';
 require_once 'dashboard_handler.php';
@@ -10,6 +11,7 @@ require_once 'dashboard_handler.php';
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <!--title -->
     <title>IslandDistro Portal Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
@@ -84,7 +86,7 @@ require_once 'dashboard_handler.php';
 
                                 <span class="material-symbols-outlined text-[20px]">notifications</span>
                             </button>
-
+                            <!-- Notification drop down menu -->
                             <div
                                 id="notificationsDropdown"
                                 class="hidden absolute right-0 mt-5 w-48 bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg overflow-hidden z-50">
@@ -100,7 +102,7 @@ require_once 'dashboard_handler.php';
 
                             </div>
                         </div>
-
+                        <!-- Navigation buttons for the catalog and the cart -->
                         <button onclick="location.href='../../Customer/Cart/cart.php'" class="flex items-center justify-center size-10 rounded-lg bg-slate-200/50 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 transition-colors relative">
                             <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
                             <span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full"></span>
@@ -144,21 +146,25 @@ require_once 'dashboard_handler.php';
                 <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col gap-1">
                     <p class="text-sm font-medium text-text-secondary dark:text-emerald-400">Active Orders</p>
                     <div class="flex items-baseline justify-between">
+                        <!--fetch data from the db  -->
                         <p class="text-3xl font-bold"><?php echo $stats['active_orders']; ?></p>
                         <span class="bg-primary/20 text-emerald-800 dark:text-primary text-xs font-bold px-2 py-1 rounded-full"><?php echo $stats['arriving_today']; ?> Arriving</span>
                     </div>
                 </div>
                 <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col gap-1">
                     <p class="text-sm font-medium text-text-secondary dark:text-emerald-400">Completed Orders</p>
+                    <!--fetch data from the db  -->
                     <p class="text-3xl font-bold"><?php echo $stats['completed_orders']; ?></p>
                 </div>
                 <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col gap-1">
                     <p class="text-sm font-medium text-text-secondary dark:text-emerald-400">Total Spend YTD</p>
+                    <!--fetch data from the db  -->
                     <p class="text-3xl font-bold">Rs.<?php echo number_format($stats['total_spend_ytd'], 2); ?></p>
                 </div>
                 <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col gap-1">
                     <p class="text-sm font-medium text-text-secondary dark:text-emerald-400">Loyalty Points</p>
                     <div class="flex items-baseline justify-between">
+                        <!--fetch data from the db  -->
                         <p class="text-3xl font-bold"><?php echo $stats['loyalty_points']; ?></p>
                         <span class="text-xs font-bold text-primary cursor-pointer hover:underline">Redeem</span>
                     </div>
@@ -173,6 +179,7 @@ require_once 'dashboard_handler.php';
                             <h2 class="text-xl font-bold">Track my Delivery</h2>
                             <a class="text-primary text-sm font-bold hover:underline" href="../Orders/order.php">View All</a>
                         </div>
+                        <!--fetch data from the db  -->
                         <?php if ($tracking_order): ?>
                             <div class="bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
                                 <div class="flex flex-col md:flex-row">
@@ -189,16 +196,20 @@ require_once 'dashboard_handler.php';
                                     <div class="p-6 flex flex-col justify-center flex-1">
                                         <div class="flex justify-between items-start mb-4">
                                             <div>
-                                                <h3 class="text-lg font-bold mb-1">Order <?php echo htmlspecialchars($tracking_order['order_number']); ?> - <?php
-                                                                                                                                                            $status_text = ucfirst($tracking_order['order_status']);
-                                                                                                                                                            if ($tracking_order['order_status'] === 'shipped') {
-                                                                                                                                                                echo 'Out for Delivery';
-                                                                                                                                                            } elseif ($tracking_order['order_status'] === 'packed') {
-                                                                                                                                                                echo 'Ready to Ship';
-                                                                                                                                                            } else {
-                                                                                                                                                                echo $status_text;
-                                                                                                                                                            }
-                                                                                                                                                            ?></h3>
+                                                <!--fetch data from the db acording to the order number  -->
+                                                <h3 class="text-lg font-bold mb-1">Order <?php echo htmlspecialchars($tracking_order['order_number']); ?> -
+                                                    <?php
+                                                    //delivary status
+                                                    // color will define acording to the status 
+                                                    $status_text = ucfirst($tracking_order['order_status']);
+                                                    if ($tracking_order['order_status'] === 'shipped') {
+                                                        echo 'Out for Delivery';
+                                                    } elseif ($tracking_order['order_status'] === 'packed') {
+                                                        echo 'Ready to Ship';
+                                                    } else {
+                                                        echo $status_text;
+                                                    }
+                                                    ?></h3>
                                                 <p class="text-text-secondary dark:text-emerald-400 text-sm">
                                                     <?php
                                                     if ($tracking_order['order_status'] === 'shipped') {
@@ -216,6 +227,7 @@ require_once 'dashboard_handler.php';
                                             <?php endif; ?>
                                         </div>
                                         <!-- Progress Bar -->
+                                        <!-- This will indicate the progress of the delivery -->
                                         <div class="relative w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full mb-4">
                                             <div class="absolute left-0 top-0 h-full <?php
                                                                                         if ($tracking_order['order_status'] === 'shipped') echo 'w-3/4';
@@ -225,6 +237,8 @@ require_once 'dashboard_handler.php';
                                         </div>
                                         <div class="flex flex-wrap items-end justify-between gap-4">
                                             <div class="flex flex-col gap-1">
+                                                <!-- Estimated Arrival & Driver Info -->
+
                                                 <?php if ($tracking_order['order_status'] === 'shipped'): ?>
                                                     <div class="flex items-center gap-2 text-sm font-medium">
                                                         <span class="material-symbols-outlined text-[18px] text-primary">schedule</span>
@@ -251,6 +265,7 @@ require_once 'dashboard_handler.php';
                                     </div>
                                 </div>
                             </div>
+                            <!--if there is nothing in the database it will show this  -->
                         <?php else: ?>
                             <div class="bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm p-8 text-center">
                                 <span class="material-symbols-outlined text-5xl text-text-secondary dark:text-emerald-400 mb-3 block">local_shipping</span>
@@ -267,6 +282,7 @@ require_once 'dashboard_handler.php';
                             <h2 class="text-xl font-bold">Recent Orders</h2>
                             <a class="text-primary text-sm font-bold hover:underline" href="../Orders/order.php">View All</a>
                         </div>
+                        <!--fetch data from the db  -->
                         <div class="bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm overflow-x-auto">
                             <?php if (count($recent_orders) > 0): ?>
                                 <table class="w-full text-left text-sm whitespace-nowrap">
@@ -313,6 +329,7 @@ require_once 'dashboard_handler.php';
                                     </tbody>
                                 </table>
                             <?php else: ?>
+                                <!-- if not it will show this to place your first order -->
                                 <div class="p-8 text-center">
                                     <span class="material-symbols-outlined text-5xl text-text-secondary dark:text-emerald-400 mb-3 block">receipt_long</span>
                                     <p class="text-text-secondary dark:text-emerald-400 mb-4">No orders yet</p>
@@ -394,6 +411,7 @@ require_once 'dashboard_handler.php';
     </div>
 
 </body>
+<!-- script link -->
 <script src="../Dashboard/js/script.js"></script>
 
 </html>
