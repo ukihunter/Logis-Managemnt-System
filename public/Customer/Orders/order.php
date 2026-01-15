@@ -98,7 +98,7 @@ require_once 'order_data_handler.php';
                             <!--<a class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition" href="#">Invoices</a> -->
                         </div>
                         <div class="relative ml-2">
-                            <button id="profileMenuBtn" class="size-9 rounded-full bg-slate-300 dark:bg-slate-700 bg-cover bg-center border-2 border-slate-100 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-colors" data-alt="User profile avatar showing a store logo or generic user icon" style='background-image: url("https://avatar.iran.liara.run/username?username=<?php echo urlencode($business_name); ?>");'></button>
+                            <button id="profileMenuBtn" class="size-9 rounded-full bg-slate-300 dark:bg-slate-700 bg-cover bg-center border-2 border-slate-100 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-colors" data-alt="User profile avatar showing a store logo or generic user icon" style='background-image: url("https://ui-avatars.com/api/?&background=0D8ABC&color=fff&name=<?php echo urlencode($business_name); ?>");'></button>
                             <!-- Dropdown Menu -->
                             <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg overflow-hidden z-50">
                                 <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-800">

@@ -153,7 +153,7 @@ $conn->close();
                 <nav class="hidden lg:flex items-center gap-6">
                     <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="../Dashboard/dashboard.php">Dashboard</a>
                     <a class="text-text-main dark:text-gray-200 text-sm font-bold" href="#">Catalog</a>
-                    <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Orders</a>
+                    <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="../Orders/order.php">Orders</a>
                     <!--  <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Invoices</a>-->
                 </nav>
                 <div class="relative flex gap-2 border-l border-[#e7f3eb] dark:border-white/10 pl-6">
@@ -197,7 +197,7 @@ $conn->close();
                 <!-- bussiness and oter infornmation  -->
                 <button class="flex items-center gap-2">
                     <div class="relative ml-2">
-                        <button id="profileMenuBtn" class="size-10 rounded-full bg-slate-300 dark:bg-slate-700 bg-cover bg-center border-2 border-slate-100 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-colors" data-alt="User profile avatar showing a store logo or generic user icon" style='background-image: url("https://avatar.iran.liara.run/username?username=<?php echo urlencode($business_name); ?>");'></button>
+                        <button id="profileMenuBtn" class="size-10 rounded-full bg-slate-300 dark:bg-slate-700 bg-cover bg-center border-2 border-slate-100 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-colors" data-alt="User profile avatar showing a store logo or generic user icon" style='background-image: url("https://ui-avatars.com/api/?&background=0D8ABC&color=fff&name=<?php echo urlencode($business_name); ?>");'></button>
                         <!-- Dropdown Menu -->
                         <div id="profileDropdown" class="hidden absolute right-40 mt-60 w-48 bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg overflow-hidden z-50">
                             <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
