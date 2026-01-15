@@ -105,8 +105,22 @@ function editUser(userId) {
     method: "POST",
     body: formData,
   })
-    .then((response) => response.json())
-    .then((data) => {
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.text();
+    })
+    .then((text) => {
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error("Invalid JSON response:", text);
+        throw new Error(
+          "Server returned invalid JSON. Check console for details."
+        );
+      }
       if (data.success) {
         const user = data.user;
 
@@ -142,7 +156,7 @@ function editUser(userId) {
       }
     })
     .catch((error) => {
-      showNotification("Error loading user data", "error");
+      showNotification(error.message || "Error loading user data", "error");
       console.error("Error:", error);
     });
 }

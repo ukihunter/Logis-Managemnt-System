@@ -1,4 +1,4 @@
-<?
+<?php
 // user_handler.php - Handle user management actions (add, update, delete, fetch)
 session_start();
 require_once '../../../config/database.php';
