@@ -38,14 +38,15 @@ $ordersQuery = "SELECT
             FROM orders o
             LEFT JOIN drivers d ON o.driver_id = d.id
             LEFT JOIN order_items oi ON o.id = oi.order_id
-            WHERE o.order_status IN ('processing', 'packed', 'shipped', 'delivered')
+            WHERE o.order_status IN ('pending', 'processing', 'packed', 'shipped', 'delivered')
             GROUP BY o.id
             ORDER BY 
                 CASE o.order_status
                     WHEN 'shipped' THEN 1
                     WHEN 'packed' THEN 2
                     WHEN 'processing' THEN 3
-                    WHEN 'delivered' THEN 4
+                    WHEN 'pending' THEN 4
+                    WHEN 'delivered' THEN 5
                 END,
                 o.updated_at DESC";
 $ordersResult = $conn->query($ordersQuery);
@@ -273,27 +274,56 @@ $ordersResult = $conn->query($ordersQuery);
                     <span class="material-symbols-outlined">close</span>
                 </button>
 
+                <!-- Google Maps Container -->
+                <div id="map" class="absolute inset-0 w-full h-full"></div>
+
                 <!-- Static Map Background -->
-                <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900">
-                    <!-- Grid Pattern -->
-                    <div class="absolute inset-0" style="background-image: linear-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.1) 1px, transparent 1px); background-size: 50px 50px;"></div>
+                <div id="staticMapFallback" class="absolute inset-0 w-full h-full">
+                    <!-- Map Image Background -->
+                    <img src="../../../assest/map.png" alt="Map" class="absolute inset-0 w-full h-full object-cover" />
 
-                    <!-- Map Roads/Streets Illustration -->
-                    <svg class="absolute inset-0 w-full h-full opacity-20">
-                        <line x1="0" y1="30%" x2="100%" y2="30%" stroke="#94a3b8" stroke-width="3" />
-                        <line x1="0" y1="60%" x2="100%" y2="60%" stroke="#94a3b8" stroke-width="3" />
-                        <line x1="20%" y1="0" x2="20%" y2="100%" stroke="#94a3b8" stroke-width="2" />
-                        <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#94a3b8" stroke-width="4" />
-                        <line x1="80%" y1="0" x2="80%" y2="100%" stroke="#94a3b8" stroke-width="2" />
-                    </svg>
+                    <!-- Overlay for better marker visibility -->
+                    <div class="absolute inset-0 bg-black/5"></div>
 
-                    <!-- Delivery Zone Marker -->
-                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                        <div class="relative">
-                            <div class="w-16 h-16 bg-primary rounded-full shadow-2xl flex items-center justify-center animate-pulse">
+                    <!-- Location Markers - Colombo (Pending/Processing) -->
+                    <div id="marker-colombo" class="location-marker hidden absolute z-10" style="left: 25%; top: 65%;" data-city="Colombo" data-lat="6.9271" data-lng="79.8612">
+                        <div class="relative group">
+                            <div class="w-14 h-14 bg-amber-500 rounded-full shadow-xl flex items-center justify-center">
                                 <span class="material-symbols-outlined text-white text-3xl">location_on</span>
                             </div>
-                            <div class="absolute inset-0 bg-primary rounded-full animate-ping opacity-20"></div>
+                            <div class="absolute inset-0 bg-amber-500 rounded-full animate-ping opacity-30"></div>
+                            <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg shadow-lg text-xs font-bold text-slate-900 dark:text-white">
+                                Colombo
+                                <div class="text-[10px] text-slate-500">6.9271, 79.8612</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location Markers - Kurunegala (Processing/Packing) -->
+                    <div id="marker-kurunegala" class="location-marker hidden absolute z-10" style="left: 45%; top: 35%;" data-city="Kurunegala" data-lat="7.4863" data-lng="80.3647">
+                        <div class="relative group">
+                            <div class="w-14 h-14 bg-blue-500 rounded-full shadow-xl flex items-center justify-center">
+                                <span class="material-symbols-outlined text-white text-3xl">location_on</span>
+                            </div>
+                            <div class="absolute inset-0 bg-blue-500 rounded-full animate-ping opacity-30"></div>
+                            <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg shadow-lg text-xs font-bold text-slate-900 dark:text-white">
+                                Kurunegala
+                                <div class="text-[10px] text-slate-500">7.4863, 80.3647</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location Markers - Kandy (Shipped/In Transit) -->
+                    <div id="marker-kandy" class="location-marker hidden absolute z-10" style="left: 65%; top: 45%;" data-city="Kandy" data-lat="7.2906" data-lng="80.6337">
+                        <div class="relative group">
+                            <div class="w-14 h-14 bg-green-500 rounded-full shadow-xl flex items-center justify-center">
+                                <span class="material-symbols-outlined text-white text-3xl">location_on</span>
+                            </div>
+                            <div class="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-30"></div>
+                            <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg shadow-lg text-xs font-bold text-slate-900 dark:text-white">
+                                Kandy
+                                <div class="text-[10px] text-slate-500">7.2906, 80.6337</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -306,11 +336,14 @@ $ordersResult = $conn->query($ordersQuery);
                     <div id="mapStatus" class="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-bold px-2 py-0.5 rounded-full"></div>
                 </div>
 
-                <!-- Delivery Zone Label -->
-                <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 bg-white/90 dark:bg-surface-dark/90 backdrop-blur px-4 py-2 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700">
+                <!-- Location Info Label -->
+                <div id="locationInfo" class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 bg-white/90 dark:bg-surface-dark/90 backdrop-blur px-4 py-2 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700">
                     <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-primary text-sm">info</span>
-                        <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Delivery Zone View</span>
+                        <span class="material-symbols-outlined text-primary text-sm">location_on</span>
+                        <div class="flex flex-col">
+                            <span id="locationCity" class="text-xs font-bold text-slate-700 dark:text-slate-300">Select a delivery</span>
+                            <span id="locationCoords" class="text-[10px] text-slate-500">Click markers to view locations</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -327,42 +360,19 @@ $ordersResult = $conn->query($ordersQuery);
         let currentOrderData = null;
         let currentTab = 'in_progress';
 
-        // Initialize Google Map
-        function initMap() {
-            // Default center - general map view
-            const defaultCenter = {
-                lat: 40.7128,
-                lng: -74.0060
-            };
-
-            map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 12,
-                center: defaultCenter,
-                mapTypeControl: true,
-                streetViewControl: false,
-                fullscreenControl: false,
-                styles: [{
-                    featureType: "poi",
-                    elementType: "labels",
-                    stylers: [{
-                        visibility: "off"
-                    }]
-                }]
-            });
-
-            // Add a general marker for visual purposes
-            marker = new google.maps.Marker({
-                map: map,
-                position: defaultCenter,
-                title: "Delivery Zone"
-            });
-        }
-
         // Show delivery on map with order data
         function showDeliveryMap(orderData) {
             currentOrderData = orderData;
             const mapSection = document.getElementById('mapSection');
             const deliveryListSection = document.getElementById('deliveryListSection');
+
+            const status = orderData.status.toLowerCase();
+
+            // Hide map for completed/delivered orders
+            if (status === 'delivered') {
+
+                return;
+            }
 
             // Show map
             mapSection.classList.remove('hidden');
@@ -377,13 +387,54 @@ $ordersResult = $conn->query($ordersQuery);
             document.getElementById('mapAddress').textContent = orderData.address;
             document.getElementById('mapStatus').textContent = orderData.status.charAt(0).toUpperCase() + orderData.status.slice(1);
 
-            // Just show general map view without actual location
-            // Update marker title with customer name
-            if (marker) {
-                marker.setTitle(orderData.customer + ' - Delivery Zone');
+            // Determine location based on order status
+            let targetCity = null;
+            let coords = null;
+            let markerId = null;
+            let lat = null;
+            let lng = null;
+
+            // Hide all markers first
+            document.querySelectorAll('.location-marker').forEach(m => {
+                m.classList.add('hidden');
+            });
+
+            // Map status to location:
+            // Pending -> Colombo
+            // Processing/Packed -> Kurunegala
+            // Shipped -> Kandy
+            if (status === 'pending') {
+                targetCity = 'Colombo';
+                coords = '6.9271, 79.8612';
+                markerId = 'marker-colombo';
+                lat = 6.9271;
+                lng = 79.8612;
+            } else if (status === 'processing' || status === 'packed') {
+                targetCity = 'Kurunegala';
+                coords = '7.4863, 80.3647';
+                markerId = 'marker-kurunegala';
+                lat = 7.4863;
+                lng = 80.3647;
+            } else if (status === 'shipped') {
+                targetCity = 'Kandy';
+                coords = '7.2906, 80.6337';
+                markerId = 'marker-kandy';
+                lat = 7.2906;
+                lng = 80.6337;
             }
 
-            console.log('Showing delivery map for:', orderData);
+            // Show and highlight the relevant marker
+            if (markerId) {
+                const marker = document.getElementById(markerId);
+                if (marker) {
+                    marker.classList.remove('hidden');
+                }
+
+                document.getElementById('locationCity').textContent = targetCity;
+                document.getElementById('locationCoords').textContent = coords;
+            }
+
+            console.log('Showing delivery map for:', orderData, 'Status:', status, 'Location:', targetCity);
         }
 
         // Close map
@@ -397,6 +448,19 @@ $ordersResult = $conn->query($ordersQuery);
             // Expand delivery list to full width
             deliveryListSection.classList.remove('w-[420px]');
             deliveryListSection.classList.add('w-full');
+
+            // Reset map info to default
+            document.getElementById('mapOrderNumber').textContent = 'Select an order';
+            document.getElementById('mapCustomer').textContent = '';
+            document.getElementById('mapAddress').textContent = '';
+            document.getElementById('mapStatus').textContent = '';
+            document.getElementById('locationCity').textContent = 'Select a delivery';
+            document.getElementById('locationCoords').textContent = 'Click an order to view location';
+
+            // Hide all markers
+            document.querySelectorAll('.location-marker').forEach(m => {
+                m.classList.add('hidden');
+            });
 
             currentOrderData = null;
         }
@@ -461,14 +525,9 @@ $ordersResult = $conn->query($ordersQuery);
             });
         }
 
-        // Initialize map when page loads
+        // Initialize page when loaded
         window.addEventListener('load', function() {
-            if (typeof google !== 'undefined') {
-                initMap();
-            } else {
-                console.warn('Google Maps API not loaded. Please add your API key.');
-            }
-
+            console.log('Using static visual map (no API key required)');
             // Filter to in_progress tab by default
             filterByTab('in_progress');
         });

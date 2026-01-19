@@ -1,4 +1,4 @@
-<?
+<?php
 //  db connction and the sesion detils 
 require_once '../../../config/session_Detils.php';
 require_once '../../../config/database.php';

@@ -72,7 +72,7 @@ function loadProductData(productId) {
         document.getElementById("description").value =
           product.description || "";
         document.querySelector(
-          `input[name="status"][value="${product.status}"]`
+          `input[name="status"][value="${product.status}"]`,
         ).checked = true;
         document.getElementById("isFeatured").checked =
           product.is_featured == 1;
@@ -159,14 +159,14 @@ function showNotification(message, type = "success") {
     type === "success"
       ? "bg-primary"
       : type === "error"
-      ? "bg-red-500"
-      : "bg-orange-500";
+        ? "bg-red-500"
+        : "bg-orange-500";
   const icon =
     type === "success"
       ? "check_circle"
       : type === "error"
-      ? "error"
-      : "warning";
+        ? "error"
+        : "warning";
 
   notification.innerHTML = `
     <div class="flex items-center gap-3 min-w-[320px] px-4 py-3 rounded-lg shadow-lg ${bgColor} text-white">
@@ -226,18 +226,27 @@ function submitProduct() {
 }
 
 // Delete product
+let productToDelete = null;
+
 function deleteProduct(productId) {
-  if (
-    !confirm(
-      "Are you sure you want to delete this product? This action cannot be undone."
-    )
-  ) {
-    return;
-  }
+  productToDelete = productId;
+  document.getElementById("deleteModal").classList.remove("hidden");
+}
+
+function closeDeleteModal() {
+  document.getElementById("deleteModal").classList.add("hidden");
+  productToDelete = null;
+}
+
+function confirmDelete() {
+  if (!productToDelete) return;
 
   const formData = new FormData();
   formData.append("action", "delete");
-  formData.append("product_id", productId);
+  formData.append("product_id", productToDelete);
+
+  // Close modal and show loading state
+  closeDeleteModal();
 
   fetch("product_handler.php", {
     method: "POST",
@@ -267,7 +276,7 @@ function filterByCategory(category) {
 
   if (category) {
     window.location.href = `?category=${encodeURIComponent(
-      category
+      category,
     )}&search=${encodeURIComponent(search)}`;
   } else {
     window.location.href = `?search=${encodeURIComponent(search)}`;
@@ -297,7 +306,7 @@ function filterProducts(page = 1) {
 
         // Update pagination
         const paginationContainer = document.getElementById(
-          "paginationContainer"
+          "paginationContainer",
         );
         if (paginationContainer) {
           paginationContainer.innerHTML = data.pagination;
@@ -592,13 +601,13 @@ function displayProductDetails(product) {
       <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
         <p class="text-xs text-gray-500 dark:text-gray-400">Unit Price</p>
         <p class="text-lg font-bold text-[#0d1b12] dark:text-white mt-1">Rs ${parseFloat(
-          product.unit_price
+          product.unit_price,
         ).toFixed(2)}</p>
       </div>
       <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
         <p class="text-xs text-gray-500 dark:text-gray-400">Carton Price</p>
         <p class="text-lg font-bold text-[#0d1b12] dark:text-white mt-1">Rs ${parseFloat(
-          product.carton_price
+          product.carton_price,
         ).toFixed(2)}</p>
       </div>
     </div>
@@ -614,9 +623,9 @@ function displayProductDetails(product) {
         <div class="${
           isLowStock ? "bg-red-500" : "bg-primary"
         } h-2 rounded-full transition-all" style="width: ${Math.min(
-    stockPercentage,
-    100
-  )}%"></div>
+          stockPercentage,
+          100,
+        )}%"></div>
       </div>
     </div>
 

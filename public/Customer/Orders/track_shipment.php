@@ -310,15 +310,56 @@ $status_labels = [
                 </div>
                 <!-- Right Column: Interactive Map -->
                 <div class="lg:col-span-7 h-[600px] lg:h-auto min-h-[500px] flex flex-col rounded-xl overflow-hidden shadow-lg border border-[#e7f3eb] dark:border-[#1e3a29] relative bg-gray-200 dark:bg-gray-800 group">
-                    <!-- Map Placeholder Image -->
+                    <!-- Visual Map with Location Markers -->
                     <div class="relative w-full h-full overflow-hidden rounded-xl">
-                        <div id="mapPlaceholder" class="absolute inset-0 bg-cover bg-center cursor-pointer z-10" data-alt="Map of island showing roads and green terrain with a route highlighted" data-location="Sri Lanaka" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBLw5AQ0a3d_zcn_RcOp8Mq2r8PGR323nfvU3Yyff91FSB7HCY6-wX-FfCEPjdpiWnaGPlJqCceP-mEFBHHLxHoq7EMxTr_cLTelRA9XXIhaLmpFy5SL6nuiOcQsF0Cd1SROKvgG1bEpxjD9Z1Pt7_b7s5dNFy1SjLdDPwOSR4eYDr3nwtQGkBLiumZnHL6ADPAQRJUqv1h-32wcDffdMXbs41j0Bm15LFzdLywgypVwnvrWWoAQKa84tawOD1QYr6SvgbcZ3pgGQg');"></div>
-                        <div id="googleMap" class="absolute inset-0 hidden z-10">
-                            <iframe
-                                class="w-full h-full border-0"
-                                loading="lazy"
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3956.469178660075!2d80.3588519!3d7.4884773!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae2e9287ae39ecd%3A0x8f7945f6d12103c8!2sESOFT%20Metro%20Campus%20-%20Kurunegala!5e0!3m2!1sen!2slk!4v1704620000000!5m2!1sen!2slk">
-                            </iframe>
+                        <div class="absolute inset-0 w-full h-full">
+                            <!-- Map Image Background -->
+                            <img src="../../../assest/map.png" alt="Sri Lanka Map" class="absolute inset-0 w-full h-full object-cover" />
+
+                            <!-- Overlay for better marker visibility -->
+                            <div class="absolute inset-0 bg-black/5"></div>
+
+                            <!-- Colombo Marker (Pending) -->
+                            <div id="marker-colombo" class="location-marker hidden absolute z-10" style="left: 25%; top: 65%;">
+                                <div class="relative">
+                                    <div class="w-16 h-16 bg-amber-500 rounded-full shadow-2xl flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-white text-3xl">location_on</span>
+                                    </div>
+                                    <div class="absolute inset-0 bg-amber-500 rounded-full animate-ping opacity-30"></div>
+                                    <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg shadow-lg text-xs font-bold text-slate-900 dark:text-white">
+                                        Colombo
+                                        <div class="text-[10px] text-slate-500">Order Placed</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Kurunegala Marker (Processing) -->
+                            <div id="marker-kurunegala" class="location-marker hidden absolute z-10" style="left: 45%; top: 35%;">
+                                <div class="relative">
+                                    <div class="w-16 h-16 bg-blue-500 rounded-full shadow-2xl flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-white text-3xl">location_on</span>
+                                    </div>
+                                    <div class="absolute inset-0 bg-blue-500 rounded-full animate-ping opacity-30"></div>
+                                    <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg shadow-lg text-xs font-bold text-slate-900 dark:text-white">
+                                        Kurunegala
+                                        <div class="text-[10px] text-slate-500">Processing</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Kandy Marker (Shipped) -->
+                            <div id="marker-kandy" class="location-marker hidden absolute z-10" style="left: 65%; top: 45%;">
+                                <div class="relative">
+                                    <div class="w-16 h-16 bg-green-500 rounded-full shadow-2xl flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-white text-3xl">local_shipping</span>
+                                    </div>
+                                    <div class="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-30"></div>
+                                    <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg shadow-lg text-xs font-bold text-slate-900 dark:text-white">
+                                        Kandy
+                                        <div class="text-[10px] text-slate-500">In Transit</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -418,5 +459,38 @@ $status_labels = [
 </body>
 <!-- Scripts -->
 <script src="../Orders/js/script.js"></script>
+<script>
+    // Show location marker based on order status
+    document.addEventListener('DOMContentLoaded', function() {
+        const orderStatus = '<?php echo $order["order_status"]; ?>';
+
+        // Hide all markers first
+        document.querySelectorAll('.location-marker').forEach(marker => {
+            marker.classList.add('hidden');
+        });
+
+        // Show marker based on status
+        let markerId = null;
+
+        if (orderStatus === 'pending') {
+            markerId = 'marker-colombo';
+        } else if (orderStatus === 'processing' || orderStatus === 'packed') {
+            markerId = 'marker-kurunegala';
+        } else if (orderStatus === 'shipped') {
+            markerId = 'marker-kandy';
+        }
+
+        // Show the relevant marker
+        if (markerId) {
+            const marker = document.getElementById(markerId);
+            if (marker) {
+                marker.classList.remove('hidden');
+                console.log('Showing location marker for status:', orderStatus);
+            }
+        } else if (orderStatus === 'delivered') {
+            console.log('Order delivered - no active location marker');
+        }
+    });
+</script>
 
 </html>

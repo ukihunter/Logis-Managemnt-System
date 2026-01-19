@@ -687,6 +687,32 @@ $low_stock_items = $stats['low_stock'] ?? 0;
                 </a>
             <?php endif; ?>
         </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-[#152e1e] rounded-xl shadow-2xl max-w-md w-full transform transition-all">
+                <div class="p-6">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-red-600 dark:text-red-400 text-[28px]">warning</span>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-[#0d1b12] dark:text-white">Delete Product</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">This action cannot be undone</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-[#0d1b12] dark:text-white mb-6">Are you sure you want to delete this product? All associated data will be permanently removed from the inventory.</p>
+                    <div class="flex gap-3">
+                        <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-700 text-[#0d1b12] dark:text-white rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 font-medium text-sm transition-colors">
+                            Cancel
+                        </button>
+                        <button onclick="confirmDelete()" class="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium text-sm transition-colors">
+                            Delete Product
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <?php include '../components/scripts.php'; ?>
