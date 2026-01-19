@@ -160,6 +160,10 @@ while ($row = $province_result->fetch_assoc()) {
         .icon-filled {
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
+
+        .detail-panel {
+            transition: transform 0.3s ease-in-out;
+        }
     </style>
     <?php include '../components/styles.php'; ?>
 </head>
@@ -391,9 +395,17 @@ while ($row = $province_result->fetch_assoc()) {
                                                     </div>
                                                 </td>
                                                 <td class="p-4 text-right">
-                                                    <button onclick="editUser(<?php echo $user['id']; ?>)" class="text-primary hover:text-[#0ebf4a] transition-colors" title="Edit User">
-                                                        <span class="material-symbols-outlined">edit</span>
-                                                    </button>
+                                                    <div class="flex items-center justify-end gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                                                        <button onclick="viewUserDetails(<?php echo $user['id']; ?>)" class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-blue-600 dark:text-blue-400 transition-colors" title="View Details">
+                                                            <span class="material-symbols-outlined text-[20px]">visibility</span>
+                                                        </button>
+                                                        <button onclick="editUser(<?php echo $user['id']; ?>)" class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-primary transition-colors" title="Edit User">
+                                                            <span class="material-symbols-outlined text-[20px]">edit</span>
+                                                        </button>
+                                                        <button onclick="deleteUser(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['full_name']); ?>')" class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500 transition-colors" title="Delete User">
+                                                            <span class="material-symbols-outlined text-[20px]">delete</span>
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -549,6 +561,52 @@ while ($row = $province_result->fetch_assoc()) {
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- View User Details Panel -->
+            <div id="viewUserPanel" class="detail-panel fixed right-0 top-0 h-full w-[450px] bg-surface-light dark:bg-surface-dark border-l border-[#e7f3eb] dark:border-gray-700 shadow-2xl overflow-y-auto translate-x-full z-50">
+                <div class="flex flex-col h-full">
+                    <!-- Panel Header -->
+                    <div class="flex items-center justify-between p-6 border-b border-[#e7f3eb] dark:border-gray-700">
+                        <h2 class="text-xl font-bold text-[#0d1b12] dark:text-white">User Details</h2>
+                        <button onclick="closeViewPanel()" class="text-gray-400 hover:text-[#0d1b12] dark:hover:text-white transition-colors">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+
+                    <!-- Panel Content -->
+                    <div id="userDetailsContent" class="flex-1 p-6 space-y-6">
+                        <!-- User details will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div id="deleteModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div class="bg-white dark:bg-[#152e1e] rounded-xl shadow-2xl max-w-md w-full transform transition-all">
+                    <div class="p-6">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-red-600 dark:text-red-400 text-[28px]">warning</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-[#0d1b12] dark:text-white">Delete User</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">This action cannot be undone</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-[#0d1b12] dark:text-white mb-6">
+                            Are you sure you want to delete <strong id="deleteUserName"></strong>? All associated data will be permanently removed.
+                        </p>
+                        <div class="flex gap-3">
+                            <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-700 text-[#0d1b12] dark:text-white rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 font-medium text-sm transition-colors">
+                                Cancel
+                            </button>
+                            <button onclick="confirmDelete()" class="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium text-sm transition-colors">
+                                Delete User
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
