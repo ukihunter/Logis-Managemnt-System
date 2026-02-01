@@ -102,7 +102,7 @@ function setupEventListeners() {
         currentFilters.brands.push(this.value);
       } else {
         currentFilters.brands = currentFilters.brands.filter(
-          (b) => b !== this.value
+          (b) => b !== this.value,
         );
       }
       currentPage = 1;
@@ -167,7 +167,7 @@ function setupEventListeners() {
     categoryButtons[0].classList.add(
       "bg-primary/10",
       "text-primary",
-      "font-bold"
+      "font-bold",
     );
     categoryButtons[0].classList.remove("text-text-main", "dark:text-gray-300");
 
@@ -276,12 +276,12 @@ function createProductCard(product) {
   let priceHTML = hasDiscount
     ? // this will show the prive acording to the discount that in the product
       `<div class="flex items-center gap-2"><span class="text-2xl font-black text-text-main dark:text-white">Rs ${product.discounted_price.toFixed(
-        2
+        2,
       )}</span><span class="text-xs text-red-500 line-through font-medium">Rs ${product.unit_price.toFixed(
-        2
+        2,
       )}</span></div>`
     : `<span class="text-2xl font-black text-text-main dark:text-white">Rs ${product.unit_price.toFixed(
-        2
+        2,
       )}</span>`;
   // cart button html
   let cartButtonHTML = isOutOfStock
@@ -305,11 +305,11 @@ function createProductCard(product) {
                     }</p>
                     <div class="flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full ${stockColor.dot} ${
-    stockColor.pulse
-  }"></span>
+                          stockColor.pulse
+                        }"></span>
                         <span class="text-xs font-bold ${stockColor.text}">${
-    product.stock_status.label
-  }</span>
+                          product.stock_status.label
+                        }</span>
                     </div>
                 </div>
                 <h3 class="font-bold text-lg text-text-main dark:text-white leading-tight line-clamp-2" title="${
@@ -323,7 +323,7 @@ function createProductCard(product) {
                         </div>
                         <div class="flex flex-col items-end">
                             <span class="text-sm font-bold text-text-main dark:text-gray-300">Rs ${product.carton_price.toFixed(
-                              2
+                              2,
                             )}</span>
                             <span class="text-[10px] text-text-muted">Per Carton (${
                               product.carton_quantity
@@ -389,9 +389,8 @@ function renderPagination(pagination) {
 // Update product count display
 
 function updateProductCount(pagination) {
-  document.getElementById(
-    "productCount"
-  ).textContent = `Showing ${pagination.showing_from}-${pagination.showing_to} of ${pagination.total_products} products`;
+  document.getElementById("productCount").textContent =
+    `Showing ${pagination.showing_from}-${pagination.showing_to} of ${pagination.total_products} products`;
 }
 
 // Change page
@@ -403,9 +402,8 @@ function changePage(page) {
 
 // show the error
 function showError(message) {
-  document.getElementById(
-    "productGrid"
-  ).innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-20"><span class="material-symbols-outlined text-6xl text-red-300 mb-4">error</span><p class="text-red-500 text-lg">${message}</p></div>`;
+  document.getElementById("productGrid").innerHTML =
+    `<div class="col-span-full flex flex-col items-center justify-center py-20"><span class="material-symbols-outlined text-6xl text-red-300 mb-4">error</span><p class="text-red-500 text-lg">${message}</p></div>`;
 }
 
 // conntatty  incressing  funtion
@@ -460,14 +458,12 @@ function addToCart(id) {
 
 // Update cart count in header
 function updateCartCount() {
-  fetch("../Cart/cart_handler.php?action=get")
+  fetch("../Catalog/cart_count.php")
     .then((response) => response.json())
     .then((data) => {
-      if (data.success && data.cart) {
-        const cartCountEl = document.getElementById("cartCount");
-        if (cartCountEl) {
-          cartCountEl.textContent = data.cart.item_count;
-        }
+      const cartCountEl = document.getElementById("cartCount");
+      if (cartCountEl) {
+        cartCountEl.textContent = data.count;
       }
     })
     .catch((error) => console.error("Error updating cart count:", error));
@@ -480,8 +476,8 @@ function showNotification(message, type = "info") {
     type === "success"
       ? "bg-green-500"
       : type === "error"
-      ? "bg-red-500"
-      : "bg-blue-500"
+        ? "bg-red-500"
+        : "bg-blue-500"
   }`;
   notification.textContent = message;
   notification.style.opacity = "0";

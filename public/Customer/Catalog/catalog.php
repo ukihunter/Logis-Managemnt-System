@@ -25,6 +25,22 @@ if ($brands_result) {
     }
 }
 
+
+// cart items count
+$user_id = $_SESSION['user_id'];
+
+// Fetch cart items from database
+$cart_items = [];
+$cart_count = 0;
+if ($user_id) {
+    $cart_query = "SELECT COUNT(*) as count FROM cart WHERE user_id = ?";
+    $stmt = $conn->prepare($cart_query);
+    $stmt->bind_param('i', $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $cart_count = $result->fetch_assoc()['count'];
+}
+
 // Get total product count
 $total_query = "SELECT COUNT(*) as total FROM products WHERE status = 'active'";
 $total_result = $conn->query($total_query);
@@ -134,8 +150,8 @@ $total_products = $total_result->fetch_assoc()['total'];
                 <div class="flex items-center gap-4">
                     <button onclick="location.href='../../Customer/Cart/cart.php'" class="relative flex items-center justify-center h-10 px-4 bg-primary hover:bg-green-500 transition-colors text-text-main rounded-lg font-bold text-sm gap-2">
                         <span class="material-symbols-outlined text-[20px] text-white">shopping_cart</span>
-                        <span class="hidden sm:inline text-white">Cart (0)</span>
-                        <span class="flex h-5 w-5 items-center justify-center rounded-full bg-black/10 text-[10px] font-bold text-white">0</span>
+                        <span class="hidden sm:inline text-white">Cart </span>
+                        <span class="flex h-5 w-5 items-center justify-center rounded-full bg-black/10 text-[10px] font-bold text-white" id="cartCount"><?php echo $cart_count; ?></span>
                     </button>
                     <button class="flex items-center gap-2">
                         <div class="relative ml-2">
@@ -330,6 +346,20 @@ $total_products = $total_result->fetch_assoc()['total'];
             </button>
         </div>
     </div>
+    <script>
+        // Example: After successful add-to-cart AJAX
+        function updateCartCount() {
+            fetch("../Catalog/cart_count.php")
+                .then((response) => response.json())
+                .then((data) => {
+                    const cartCountEl = document.getElementById("cartCount");
+                    if (cartCountEl) {
+                        cartCountEl.textContent = data.count;
+                    }
+                })
+                .catch((error) => console.error("Error updating cart count:", error));
+        }
+    </script>
 </body>
 <!-- link the script -->
 <script src="js/script.js"></script>
