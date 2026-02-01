@@ -60,11 +60,11 @@ require_once '../../../config/admin_session.php';
                     <span class="font-bold text-lg">RDC Dashboard</span>
                 </div>
                 <div class="hidden lg:flex w-full max-w-md">
-                    <div class="relative w-full">
+                    <div class="relative w-full " disable>
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark">search</span>
                         </div>
-                        <input class="block w-full pl-10 pr-3 py-2 border-none rounded-lg leading-5 bg-[#e7f3eb] dark:bg-[#2a4034] text-text-main-light dark:text-text-main-dark placeholder-text-secondary-light dark:placeholder-text-secondary-dark focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm" placeholder="Search Order ID, SKU, or Customer..." type="text" />
+                        <input class="block w-full pl-10 pr-3 py-2 border-none rounded-lg leading-5 bg-[#e7f3eb] dark:bg-[#2a4034] text-text-main-light dark:text-text-main-dark placeholder-text-secondary-light dark:placeholder-text-secondary-dark focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm" placeholder="Search Order ID, SKU, or Customer..." type="text" disabled />
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
@@ -73,13 +73,13 @@ require_once '../../../config/admin_session.php';
                         <span class="hidden sm:inline">New Order</span>
                     </button>
                     <div class="h-8 w-px bg-[#e7f3eb] dark:bg-[#2a4034] mx-1 hidden sm:block"></div>
-                    <button class="relative p-2 text-text-main-light dark:text-text-main-dark hover:bg-[#e7f3eb] dark:hover:bg-[#2a4034] rounded-lg transition-colors">
+                    <!--   <button class="relative p-2 text-text-main-light dark:text-text-main-dark hover:bg-[#e7f3eb] dark:hover:bg-[#2a4034] rounded-lg transition-colors">
                         <span class="material-symbols-outlined">notifications</span>
                         <span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border border-surface-light dark:border-surface-dark"></span>
                     </button>
                     <button class="p-2 text-text-main-light dark:text-text-main-dark hover:bg-[#e7f3eb] dark:hover:bg-[#2a4034] rounded-lg transition-colors">
                         <span class="material-symbols-outlined">settings</span>
-                    </button>
+                    </button> -->
                 </div>
             </header>
             <!-- Scrollable Content Area -->

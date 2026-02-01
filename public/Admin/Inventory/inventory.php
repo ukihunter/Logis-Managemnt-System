@@ -198,14 +198,14 @@ $low_stock_items = $stats['low_stock'] ?? 0;
                             <h3 class="text-xl font-bold text-[#0d1b12] dark:text-white">Inventory Overview</h3>
                             <!-- Toolbar Actions -->
                             <div class="flex flex-wrap gap-2">
-                                <button class="flex items-center justify-center gap-2 rounded-lg h-9 px-3 bg-white dark:bg-white/10 border border-[#cfe7d7] dark:border-white/10 text-[#0d1b12] dark:text-white text-sm font-medium shadow-sm hover:bg-gray-50 dark:hover:bg-white/20 transition-colors">
+                                <!--  <button class="flex items-center justify-center gap-2 rounded-lg h-9 px-3 bg-white dark:bg-white/10 border border-[#cfe7d7] dark:border-white/10 text-[#0d1b12] dark:text-white text-sm font-medium shadow-sm hover:bg-gray-50 dark:hover:bg-white/20 transition-colors">
                                     <span class="material-symbols-outlined text-[18px]">filter_list</span>
                                     <span>Filter</span>
-                                </button>
+                                </button> 
                                 <button class="flex items-center justify-center gap-2 rounded-lg h-9 px-3 bg-white dark:bg-white/10 border border-[#cfe7d7] dark:border-white/10 text-[#0d1b12] dark:text-white text-sm font-medium shadow-sm hover:bg-gray-50 dark:hover:bg-white/20 transition-colors">
                                     <span class="material-symbols-outlined text-[18px]">download</span>
                                     <span>Export</span>
-                                </button>
+                                </button> -->
                             </div>
                         </div>
                         <!-- Search and Filter Bar -->

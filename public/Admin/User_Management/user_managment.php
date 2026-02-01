@@ -191,12 +191,12 @@ while ($row = $province_result->fetch_assoc()) {
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
                             <span class="material-symbols-outlined" style="font-size: 20px;">search</span>
                         </span>
-                        <input class="h-10 w-64 rounded-lg bg-[#f8fcf9] dark:bg-gray-800 pl-10 pr-4 text-sm outline-none border-none focus:ring-1 focus:ring-primary dark:text-white transition-all" placeholder="Global search..." type="text" />
+                        <input class="h-10 w-64 rounded-lg bg-[#f8fcf9] dark:bg-gray-800 pl-10 pr-4 text-sm outline-none border-none focus:ring-1 focus:ring-primary dark:text-white transition-all" placeholder="Global search..." type="text" disabled />
                     </div>
-                    <button class="flex size-10 items-center justify-center rounded-lg hover:bg-[#e7f3eb] dark:hover:bg-primary/20 text-[#0d1b12] dark:text-white transition-colors relative">
+                    <!--  <button class="flex size-10 items-center justify-center rounded-lg hover:bg-[#e7f3eb] dark:hover:bg-primary/20 text-[#0d1b12] dark:text-white transition-colors relative">
                         <span class="material-symbols-outlined">notifications</span>
                         <span class="absolute top-2.5 right-2.5 size-2 rounded-full bg-red-500 border border-white dark:border-gray-900"></span>
-                    </button>
+                    </button> -->
                 </div>
             </header>
             <!-- Scrollable Content -->

@@ -140,10 +140,10 @@ $ordersResult = $conn->query($ordersQuery);
             </div>
             <div class="flex items-center gap-4">
 
-                <button class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 relative">
+                <!--<button class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 relative">
                     <span class="material-symbols-outlined">notifications</span>
                     <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
-                </button>
+                </button> -->
             </div>
         </header>
         <div class="flex flex-1 overflow-hidden">
