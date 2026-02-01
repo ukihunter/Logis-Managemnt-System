@@ -119,10 +119,10 @@ require_once 'dashboard_handler.php';
                                     <p class="text-sm font-bold"><?php echo htmlspecialchars($full_name); ?></p>
                                     <p class="text-xs text-text-secondary dark:text-emerald-400"><?php echo htmlspecialchars($business_name); ?></p>
                                 </div>
-                                <a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+                                <!--  <a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
                                     <span class="material-symbols-outlined text-[20px]">person</span>
                                     <span class="text-sm font-medium">Edit Profile</span>
-                                </a>
+                                </a> -->
                                 <a href="../../logout/logout.php" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors text-red-600 dark:text-red-400">
                                     <span class="material-symbols-outlined text-[20px]">logout</span>
                                     <span class="text-sm font-medium">Logout</span>

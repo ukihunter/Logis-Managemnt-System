@@ -68,6 +68,36 @@ $shipping_fee = 0.0;
 $tax_amount = $subtotal * $tax_rate;
 $total = $subtotal + $tax_amount + $shipping_fee;
 //  connction close 
+
+
+
+// Get product IDs already in cart
+$cart_product_ids = array_column($cart_items, 'product_id');
+$placeholders = implode(',', array_fill(0, count($cart_product_ids), '?'));
+
+// Prepare cross-sell query (e.g., featured products not in cart)
+$cross_sell_query = "SELECT id, name, image_path, unit_price FROM products WHERE status = 'active' AND is_featured = 1";
+if (!empty($cart_product_ids)) {
+    $cross_sell_query .= " AND id NOT IN ($placeholders)";
+}
+$cross_sell_query .= " ORDER BY RAND() LIMIT 4";
+
+$cross_stmt = $conn->prepare($cross_sell_query);
+if (!empty($cart_product_ids)) {
+    $types = str_repeat('i', count($cart_product_ids));
+    $cross_stmt->bind_param($types, ...$cart_product_ids);
+}
+$cross_stmt->execute();
+$cross_result = $cross_stmt->get_result();
+
+$cross_sell_products = [];
+while ($row = $cross_result->fetch_assoc()) {
+    $cross_sell_products[] = $row;
+}
+
+
+
+
 $conn->close();
 ?>
 
@@ -331,40 +361,31 @@ $conn->close();
                 </div>
                 <!-- Cross Sell -->
                 <!-- TO DO --->
+
                 <div class="mt-12">
                     <h3 class="text-xl font-bold mb-6 text-text-main dark:text-white flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary">recommend</span>
                         Frequently bought together
                     </h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <!-- Cross Sell Item 1 -->
-                        <div class="bg-surface-light dark:bg-surface-dark p-3 rounded-xl border border-transparent hover:border-gray-200 dark:hover:border-white/10 transition-all cursor-pointer">
-                            <div class="aspect-square rounded-lg bg-gray-100 dark:bg-white/5 mb-3 bg-center bg-cover" data-alt="Pack of brown sugar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAn3Kvsu2_QgIptdeF1clJ0S5oh2VYDp5ECp7iBSrf2Il_M_gOu1SPY83qxnmCN4ItBuuEQMAUew89WAlWz3HgRV6oSitRG3NC435-nN7gu26l1HGO2lWtX4-u_EmEZWtBJRFGUsFksZ2qIwMMbjTd4eGrR8dQrREle7mhzLUKwhLPWOZ8koIMZlNEDR7xyAo1uGUXU6H42-y-L68h7o3bayI-Yk5owPHtbHiSb6rzcVFcTnpLY9EPT5RkE5Lwh0y9vVkeKz7ryOzA");'></div>
-                            <p class="font-bold text-sm text-text-main dark:text-white truncate">Brown Sugar 1kg</p>
-                            <p class="text-xs text-text-secondary dark:text-gray-400 mb-3">Rs2.50 / unit</p>
-                            <button class="w-full py-1.5 rounded-lg border border-[#e7f3eb] dark:border-white/10 text-primary text-xs font-bold hover:bg-primary hover:text-white transition-colors">Add</button>
-                        </div>
-                        <!-- Cross Sell Item 2 -->
-                        <div class="bg-surface-light dark:bg-surface-dark p-3 rounded-xl border border-transparent hover:border-gray-200 dark:hover:border-white/10 transition-all cursor-pointer">
-                            <div class="aspect-square rounded-lg bg-gray-100 dark:bg-white/5 mb-3 bg-center bg-cover" data-alt="Canned tuna stack" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDzM0IrVx9dt_KClOpV0D_1JjUiwEJMUl6S6S6_WWMHibllWOPVERiv4j2XK_FbNJeX4z_mprXrIH-iWzKugbc_FoCPX5fuhD1DgIptcBjrhe7fvMB2LT3mfEvHNHvP77j-vEzmDuPS4sfo3Acpr8z5cfnHWfLXC46yBDUIkBXUjN6UU0HBPqW4e2zKJjpaXPojNWCc1RneXohBgSq4yN_pJktY8dQbIkR2orTci2-NWaXtDiu6b5bfKTKya19vEYkJKMP5OT1Zuj8");'></div>
-                            <p class="font-bold text-sm text-text-main dark:text-white truncate">Canned Tuna 180g</p>
-                            <p class="text-xs text-text-secondary dark:text-gray-400 mb-3">Rs 1.80 / unit</p>
-                            <button class="w-full py-1.5 rounded-lg border border-[#e7f3eb] dark:border-white/10 text-primary text-xs font-bold hover:bg-primary hover:text-white transition-colors">Add</button>
-                        </div>
-                        <!-- Cross Sell Item 3 -->
-                        <div class="bg-surface-light dark:bg-surface-dark p-3 rounded-xl border border-transparent hover:border-gray-200 dark:hover:border-white/10 transition-all cursor-pointer">
-                            <div class="aspect-square rounded-lg bg-gray-100 dark:bg-white/5 mb-3 bg-center bg-cover" data-alt="Red lentils in a bowl" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDvmodpS-w9q-3jLv8gt0SUO9hD41mKcEFPt2Pyfnbuv1-OjDUGIXqkR6Q2edDm_CiV3aG309PuZQfvrPmsCY9jIvu-c0M7vIlVXC653xAnSjAgvFdHl_oMDfJZpN-GZ6QV4OqNLs8agB8SJ5Lz5q9G8wJf6E__fSyXZHBiOP77hA7TjY0zjrLg93_CCSQDr5ymBBQ9QVq9PS6YWLDadeqXSHjVXRtvKh-ZW4r_o8RcFfl9IS_pvEFQQG1KsxaLIF6j3HoLl0Pk1aA");'></div>
-                            <p class="font-bold text-sm text-text-main dark:text-white truncate">Red Lentils 500g</p>
-                            <p class="text-xs text-text-secondary dark:text-gray-400 mb-3">Rs 3.20 / unit</p>
-                            <button class="w-full py-1.5 rounded-lg border border-[#e7f3eb] dark:border-white/10 text-primary text-xs font-bold hover:bg-primary hover:text-white transition-colors">Add</button>
-                        </div>
-                        <!-- Cross Sell Item 4 -->
-                        <div class="bg-surface-light dark:bg-surface-dark p-3 rounded-xl border border-transparent hover:border-gray-200 dark:hover:border-white/10 transition-all cursor-pointer">
-                            <div class="aspect-square rounded-lg bg-gray-100 dark:bg-white/5 mb-3 bg-center bg-cover" data-alt="Pack of pasta spaghetti" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAOMEa3U9Py40K6wGqCa84G83119e66yPRT3Ibig5aSCOYJ-TFR6ekDTyzijjHPk337sZP4XPQamq8t924-Sg_2fFiuRCBt-Dpp_-F-9MZwR2nASJwYOhE_QVy753a23TtRFMIvz-LzhcnojarXxqKYaUmMGW6zgii0pkyHRaj39wDx9uKpONAnZ3SRl2rLIF6siOnBNS0x38mZD18LqRsOscAMq1JYyIRcXfY2hP1oj_osEgvN6evP8ajX0U1ryOJn2tmBxDbnfM4");'></div>
-                            <p class="font-bold text-sm text-text-main dark:text-white truncate">Spaghetti 500g</p>
-                            <p class="text-xs text-text-secondary dark:text-gray-400 mb-3">Rs 1.20 / unit</p>
-                            <button class="w-full py-1.5 rounded-lg border border-[#e7f3eb] dark:border-white/10 text-primary text-xs font-bold hover:bg-primary hover:text-white transition-colors">Add</button>
-                        </div>
+                        <?php foreach ($cross_sell_products as $product): ?>
+                            <div class="bg-surface-light dark:bg-surface-dark p-3 rounded-xl border border-transparent hover:border-gray-200 dark:hover:border-white/10 transition-all cursor-pointer">
+                                <div class="aspect-square rounded-lg bg-gray-100 dark:bg-white/5 mb-3 bg-center bg-cover"
+                                    style='background-image: url("../../../<?php echo htmlspecialchars($product['image_path']); ?>");'
+                                    data-alt="<?php echo htmlspecialchars($product['name']); ?>"></div>
+                                <p class="font-bold text-sm text-text-main dark:text-white truncate"><?php echo htmlspecialchars($product['name']); ?></p>
+                                <p class="text-xs text-text-secondary dark:text-gray-400 mb-3">Rs <?php echo number_format($product['unit_price'], 2); ?> / unit</p>
+                                <form method="POST" action="add_to_cart.php">
+                                    <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                    <button type="submit" class="w-full py-1.5 rounded-lg border border-[#e7f3eb] dark:border-white/10 text-primary text-xs font-bold hover:bg-primary hover:text-white transition-colors add-cross-sell-btn" data-product-id="<?php echo $product['id']; ?>">
+                                        Add
+                                    </button>
+                                </form>
+                            </div>
+                        <?php endforeach; ?>
+                        <?php if (empty($cross_sell_products)): ?>
+                            <div class="col-span-4 text-center text-gray-400">No recommendations available.</div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -402,8 +423,8 @@ $conn->close();
                             <div class="mb-6">
                                 <label class="block text-xs font-medium text-text-secondary dark:text-gray-400 mb-2">Promotional Code</label>
                                 <div class="flex gap-2">
-                                    <input class="flex-1 rounded-lg border-none bg-gray-50 dark:bg-black/20 text-sm focus:ring-1 focus:ring-primary dark:text-white" placeholder="Enter code" type="text" />
-                                    <button class="px-4 py-2 bg-gray-200 dark:bg-white/10 text-text-main dark:text-white text-sm font-bold rounded-lg hover:bg-gray-300 dark:hover:bg-white/20 transition-colors">Apply</button>
+                                    <input class="flex-1 rounded-lg border-none bg-gray-50 dark:bg-black/20 text-sm focus:ring-1 focus:ring-primary dark:text-white" placeholder="Currently Unavailable" type="text" disabled />
+                                    <button class="px-4 py-2 bg-gray-200 dark:bg-white/10 text-text-main dark:text-white text-sm font-bold rounded-lg hover:bg-gray-300 dark:hover:bg-white/20 transition-colors cursor-not-allowed" disabled>Apply</button>
                                 </div>
                             </div>
                             <!-- Checkout Button -->
@@ -478,6 +499,51 @@ $conn->close();
             <p class="text-text-secondary dark:text-gray-500 text-sm">© <?php echo date("Y"); ?> DistriMgt Distribution Systems. All rights reserved.</p>
         </div>
     </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.add-cross-sell-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productId = this.getAttribute('data-product-id');
+                    const button = this;
+                    button.disabled = true;
+                    button.textContent = 'Adding...';
+                    fetch('add_to_cart.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'product_id=' + encodeURIComponent(productId) + '&quantity=1'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                button.textContent = 'Added!';
+                                // Optionally update cart count here
+                                setTimeout(() => {
+                                    button.textContent = 'Add';
+                                    button.disabled = false;
+                                    location.reload(); // reload to update cart display
+                                }, 1000);
+                            } else {
+                                button.textContent = 'Error';
+                                setTimeout(() => {
+                                    button.textContent = 'Add';
+                                    button.disabled = false;
+                                }, 1500);
+                            }
+                        })
+                        .catch(() => {
+                            button.textContent = 'Error';
+                            setTimeout(() => {
+                                button.textContent = 'Add';
+                                button.disabled = false;
+                            }, 1500);
+                        });
+                });
+            });
+        });
+    </script>
 </body>
 
 <!-- script link  -->
