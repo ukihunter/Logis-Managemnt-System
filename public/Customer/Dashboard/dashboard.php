@@ -64,7 +64,7 @@ require_once 'dashboard_handler.php';
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-text-secondary dark:text-emerald-400">
                                 <span class="material-symbols-outlined text-[20px]">search</span>
                             </div>
-                            <input class="block w-full rounded-lg border-none bg-slate-200/50 dark:bg-white/10 py-2.5 pl-10 pr-3 text-sm placeholder:text-text-secondary dark:placeholder:text-emerald-400/70 focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-black/20" placeholder="Search products, orders..." type="text" />
+                            <input class="block w-full rounded-lg border-none bg-slate-200/50 dark:bg-white/10 py-2.5 pl-10 pr-3 text-sm placeholder:text-text-secondary dark:placeholder:text-emerald-400/70 focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-black/20" placeholder="Search products, orders..." type="text" disabled />
                         </div>
                     </div>
                 </div>
@@ -347,21 +347,21 @@ require_once 'dashboard_handler.php';
                     <div class="flex flex-col gap-4">
                         <h2 class="text-xl font-bold">Quick Categories</h2>
                         <div class="grid grid-cols-2 gap-3">
-                            <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-all group">
-                                <span class="material-symbols-outlined text-3xl mb-2 text-text-secondary dark:text-emerald-400 group-hover:text-primary transition-colors">toys</span>
-                                <span class="text-sm font-bold">Toys</span>
+                            <button class="quick-category-btn flex flex-col items-center justify-center p-4 rounded-xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-all group" data-category="Beverages">
+                                <span class="material-symbols-outlined text-3xl mb-2 text-text-secondary dark:text-emerald-400 group-hover:text-primary transition-colors">local_drink</span>
+                                <span class="text-sm font-bold">Beverages</span>
                             </button>
-                            <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-all group">
-                                <span class="material-symbols-outlined text-3xl mb-2 text-text-secondary dark:text-emerald-400 group-hover:text-primary transition-colors">apparel</span>
-                                <span class="text-sm font-bold">Cloth</span>
-                            </button>
-                            <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-all group">
-                                <span class="material-symbols-outlined text-3xl mb-2 text-text-secondary dark:text-emerald-400 group-hover:text-primary transition-colors">devices_other</span>
-                                <span class="text-sm font-bold">Electronics</span>
-                            </button>
-                            <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-all group">
+                            <button class="quick-category-btn flex flex-col items-center justify-center p-4 rounded-xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-all group" data-category="Home Care">
                                 <span class="material-symbols-outlined text-3xl mb-2 text-text-secondary dark:text-emerald-400 group-hover:text-primary transition-colors">clean_hands</span>
-                                <span class="text-sm font-bold">Cleaning</span>
+                                <span class="text-sm font-bold">Home Care</span>
+                            </button>
+                            <button class="quick-category-btn flex flex-col items-center justify-center p-4 rounded-xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-all group" data-category="Personal Care">
+                                <span class="material-symbols-outlined text-3xl mb-2 text-text-secondary dark:text-emerald-400 group-hover:text-primary transition-colors">sentiment_satisfied</span>
+                                <span class="text-sm font-bold">Personal Care</span>
+                            </button>
+                            <button class="quick-category-btn flex flex-col items-center justify-center p-4 rounded-xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-all group" data-category="Snacks">
+                                <span class="material-symbols-outlined text-3xl mb-2 text-text-secondary dark:text-emerald-400 group-hover:text-primary transition-colors">bakery_dining</span>
+                                <span class="text-sm font-bold">Snacks</span>
                             </button>
                         </div>
                     </div>
@@ -409,7 +409,14 @@ require_once 'dashboard_handler.php';
             </button>
         </div>
     </div>
-
+    <script>
+        document.querySelectorAll('.quick-category-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const category = encodeURIComponent(this.getAttribute('data-category'));
+                window.location.href = `../Catalog/catalog.php?category=${category}`;
+            });
+        });
+    </script>
 </body>
 <!-- script link -->
 <script src="../Dashboard/js/script.js"></script>

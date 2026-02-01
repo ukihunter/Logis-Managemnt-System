@@ -4,7 +4,7 @@ require_once '../../../config/session_Detils.php';
 require_once '../../../config/database.php';
 //get db cnnection 
 $conn = getDBConnection();
-
+$selected_category = $_GET['category'] ?? 'all';
 // Fetch categories
 $categories_query = "SELECT * FROM categories ORDER BY name";
 $categories_result = $conn->query($categories_query);
@@ -292,9 +292,9 @@ $total_products = $total_result->fetch_assoc()['total'];
                     <button class="p-2 rounded-lg bg-primary/10 text-primary transition-colors" title="Grid View">
                         <span class="material-symbols-outlined filled">grid_view</span>
                     </button>
-                    <button class="p-2 rounded-lg text-text-muted hover:text-text-main transition-colors" title="List View">
+                    <!--  <button class="p-2 rounded-lg text-text-muted hover:text-text-main transition-colors" title="List View">
                         <span class="material-symbols-outlined">view_list</span>
-                    </button>
+                    </button> -->
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="text-sm font-medium text-text-muted hidden sm:block">Sort by:</span>

@@ -15,7 +15,28 @@ document.addEventListener("DOMContentLoaded", function () {
   loadProducts();
   setupEventListeners();
   setupProfileDropdown();
+
+  // Highlight selected category button if present
+  const selectedCategory = currentFilters.category;
+  if (selectedCategory && selectedCategory !== "all") {
+    document.querySelectorAll(".category-filter").forEach((btn) => {
+      if (btn.dataset.category === selectedCategory) {
+        btn.classList.add("bg-primary/10", "text-primary", "font-bold");
+        btn.classList.remove("text-text-main", "dark:text-gray-300");
+      } else {
+        btn.classList.remove("bg-primary/10", "text-primary", "font-bold");
+        btn.classList.add("text-text-main", "dark:text-gray-300");
+      }
+    });
+  }
 });
+
+// Get category from URL if present
+function getUrlCategory() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("category") || "all";
+}
+currentFilters.category = getUrlCategory();
 
 // Setup profile dropdown
 function setupProfileDropdown() {
@@ -23,7 +44,7 @@ function setupProfileDropdown() {
   const profileDropdown = document.getElementById("profileDropdown");
   const mobileProfileBtn = document.getElementById("mobileProfileBtn");
 
-  //  cathing the action
+  //  catching the action
   if (profileMenuBtn && profileDropdown) {
     profileMenuBtn.addEventListener("click", function (e) {
       e.stopPropagation();
@@ -40,14 +61,23 @@ function setupProfileDropdown() {
   }
 
   // cathing the action
-  document.addEventListener("click", function (e) {
-    if (
-      profileDropdown &&
-      !profileMenuBtn?.contains(e.target) &&
-      !mobileProfileBtn?.contains(e.target) &&
-      !profileDropdown.contains(e.target)
-    ) {
-      profileDropdown.classList.add("hidden");
+  document.addEventListener("DOMContentLoaded", function () {
+    loadProducts();
+    setupEventListeners();
+    setupProfileDropdown();
+
+    // Highlight selected category button if present
+    const selectedCategory = currentFilters.category;
+    if (selectedCategory && selectedCategory !== "all") {
+      document.querySelectorAll(".category-filter").forEach((btn) => {
+        if (btn.dataset.category === selectedCategory) {
+          btn.classList.add("bg-primary/10", "text-primary", "font-bold");
+          btn.classList.remove("text-text-main", "dark:text-gray-300");
+        } else {
+          btn.classList.remove("bg-primary/10", "text-primary", "font-bold");
+          btn.classList.add("text-text-main", "dark:text-gray-300");
+        }
+      });
     }
   });
 }

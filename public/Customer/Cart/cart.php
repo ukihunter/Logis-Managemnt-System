@@ -182,7 +182,7 @@ $conn->close();
             <div class="flex items-center gap-6">
                 <nav class="hidden lg:flex items-center gap-6">
                     <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="../Dashboard/dashboard.php">Dashboard</a>
-                    <a class="text-text-main dark:text-gray-200 text-sm font-bold" href="#">Catalog</a>
+                    <a class="text-text-main dark:text-gray-200 text-sm font-bold" href="../Catalog/catalog.php">Catalog</a>
                     <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="../Orders/order.php">Orders</a>
                     <!--  <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Invoices</a>-->
                 </nav>
