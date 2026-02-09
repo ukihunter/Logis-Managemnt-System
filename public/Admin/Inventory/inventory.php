@@ -87,6 +87,16 @@ if ($brands_result) {
     }
 }
 
+// Fetch branches
+$branches_query = "SELECT * FROM branches WHERE status = 'active' ORDER BY name";
+$branches_result = $conn->query($branches_query);
+$branches = [];
+if ($branches_result) {
+    while ($row = $branches_result->fetch_assoc()) {
+        $branches[] = $row;
+    }
+}
+
 // Calculate statistics from ALL products (not just current page)
 $stats_query = "SELECT SUM(stock_level * unit_price) as total_value, SUM(CASE WHEN stock_level < (max_level * 0.2) THEN 1 ELSE 0 END) as low_stock FROM products";
 $stats_result = $conn->query($stats_query);
@@ -319,6 +329,14 @@ $low_stock_items = $stats['low_stock'] ?? 0;
                                                         <div class="flex items-center justify-end gap-1 sm:gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
                                                             <button onclick="openDetailsPanel(<?php echo $product['id']; ?>)" class="p-1 sm:p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 hover:text-primary transition-colors" title="View Details">
                                                                 <span class="material-symbols-outlined text-[18px] sm:text-[20px]">visibility</span>
+                                                            </button>
+                                                            <button
+                                                                class="stock-transfer-btn p-1 sm:p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 hover:text-blue-600 transition-colors"
+                                                                title="Stock Transfer"
+                                                                data-product-id="<?php echo $product['id']; ?>"
+                                                                data-product-name="<?php echo htmlspecialchars($product['name'], ENT_QUOTES); ?>"
+                                                                data-stock-level="<?php echo $product['stock_level']; ?>">
+                                                                <span class="material-symbols-outlined text-[18px] sm:text-[20px]">swap_horiz</span>
                                                             </button>
                                                             <button onclick="openProductPanel('edit', <?php echo $product['id']; ?>)" class="p-1 sm:p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 hover:text-primary transition-colors" title="Edit Details">
                                                                 <span class="material-symbols-outlined text-[18px] sm:text-[20px]">edit</span>
@@ -686,6 +704,68 @@ $low_stock_items = $stats['low_stock'] ?? 0;
                     <span class="text-sm font-medium">Reports</span>
                 </a>
             <?php endif; ?>
+        </div>
+
+        <!-- Stock Transfer Modal -->
+        <div id="stockTransferModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-[#152e1e] rounded-xl shadow-2xl max-w-md w-full transform transition-all">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-blue-600 dark:text-blue-400 text-[28px]">swap_horiz</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-[#0d1b12] dark:text-white">Stock Transfer</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1" id="transferProductName"></p>
+                            </div>
+                        </div>
+                        <button onclick="closeStockTransferModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+
+                    <form id="stockTransferForm" class="space-y-4">
+                        <input type="hidden" id="transferProductId" name="product_id">
+
+                        <!-- Available Stock Display -->
+                        <div class="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-3">
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Available Stock</p>
+                            <p class="text-2xl font-bold text-[#0d1b12] dark:text-white" id="availableStock">0</p>
+                        </div>
+
+                        <!-- Branch Selection -->
+                        <div>
+                            <label class="block text-sm font-medium text-[#0d1b12] dark:text-white mb-2">Select Branch</label>
+                            <select id="transferBranch" name="branch_id" required class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="">Choose a branch...</option>
+                            </select>
+                        </div>
+
+                        <!-- Quantity Input -->
+                        <div>
+                            <label class="block text-sm font-medium text-[#0d1b12] dark:text-white mb-2">Transfer Quantity</label>
+                            <input type="number" id="transferQuantity" name="quantity" min="1" required class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter quantity">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Maximum available: <span id="maxQuantity">0</span></p>
+                        </div>
+
+                        <!-- Notes -->
+                        <div>
+                            <label class="block text-sm font-medium text-[#0d1b12] dark:text-white mb-2">Notes (Optional)</label>
+                            <textarea id="transferNotes" name="notes" rows="3" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#102216] text-[#0d1b12] dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Add any notes about this transfer..."></textarea>
+                        </div>
+
+                        <div class="flex gap-3 pt-2">
+                            <button type="button" onclick="closeStockTransferModal()" class="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-700 text-[#0d1b12] dark:text-white rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 font-medium text-sm transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit" class="flex-1 px-4 py-2.5 bg-primary hover:bg-green-400 text-[#0d1b12] rounded-lg font-bold text-sm transition-colors">
+                                Transfer Stock
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
         <!-- Delete Confirmation Modal -->

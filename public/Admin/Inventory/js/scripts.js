@@ -694,3 +694,170 @@ function displayProductDetails(product) {
     </div>
   `;
 }
+
+// Stock Transfer Modal Functions
+let currentTransferProduct = null;
+
+function openStockTransferModal(productId, productName, stockLevel) {
+  console.log(
+    "Opening stock transfer modal for:",
+    productId,
+    productName,
+    stockLevel,
+  );
+
+  currentTransferProduct = {
+    id: productId,
+    name: productName,
+    stock: stockLevel,
+  };
+
+  // Update modal content
+  const transferProductId = document.getElementById("transferProductId");
+  const transferProductName = document.getElementById("transferProductName");
+  const availableStock = document.getElementById("availableStock");
+  const maxQuantity = document.getElementById("maxQuantity");
+  const transferQuantity = document.getElementById("transferQuantity");
+  const modal = document.getElementById("stockTransferModal");
+
+  if (!transferProductId || !modal) {
+    console.error("Modal elements not found!");
+    alert("Error: Stock transfer modal not found. Please refresh the page.");
+    return;
+  }
+
+  transferProductId.value = productId;
+  transferProductName.textContent = productName;
+  availableStock.textContent = stockLevel;
+  maxQuantity.textContent = stockLevel;
+  transferQuantity.max = stockLevel;
+
+  // Reset form
+  document.getElementById("stockTransferForm").reset();
+  transferProductId.value = productId;
+
+  // Load branches
+  loadBranches();
+
+  // Show modal
+  modal.classList.remove("hidden");
+  console.log("Modal should now be visible");
+}
+
+function closeStockTransferModal() {
+  document.getElementById("stockTransferModal").classList.add("hidden");
+  currentTransferProduct = null;
+}
+
+function loadBranches() {
+  const formData = new FormData();
+  formData.append("action", "get_branches");
+
+  fetch("stock_transfer_handler.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        const select = document.getElementById("transferBranch");
+        select.innerHTML = '<option value="">Choose a branch...</option>';
+
+        data.branches.forEach((branch) => {
+          const option = document.createElement("option");
+          option.value = branch.id;
+          option.textContent = `${branch.name} - ${branch.location}`;
+          select.appendChild(option);
+        });
+      } else {
+        showNotification("Failed to load branches", "error");
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      showNotification("Error loading branches", "error");
+    });
+}
+
+// Handle stock transfer form submission
+document.addEventListener("DOMContentLoaded", function () {
+  // Event delegation for stock transfer buttons
+  document.addEventListener("click", function (e) {
+    const transferBtn = e.target.closest(".stock-transfer-btn");
+    if (transferBtn) {
+      e.preventDefault();
+      const productId = parseInt(transferBtn.dataset.productId);
+      const productName = transferBtn.dataset.productName;
+      const stockLevel = parseInt(transferBtn.dataset.stockLevel);
+
+      console.log(
+        "Stock transfer clicked:",
+        productId,
+        productName,
+        stockLevel,
+      );
+      openStockTransferModal(productId, productName, stockLevel);
+    }
+  });
+
+  const transferForm = document.getElementById("stockTransferForm");
+  if (transferForm) {
+    transferForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      formData.append("action", "transfer_stock");
+
+      const quantity = parseInt(formData.get("quantity"));
+      const maxStock = currentTransferProduct
+        ? currentTransferProduct.stock
+        : 0;
+
+      // Validate quantity
+      if (quantity <= 0) {
+        showNotification("Quantity must be greater than 0", "error");
+        return;
+      }
+
+      if (quantity > maxStock) {
+        showNotification(
+          `Cannot transfer more than ${maxStock} units`,
+          "error",
+        );
+        return;
+      }
+
+      // Disable submit button
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Processing...";
+
+      fetch("stock_transfer_handler.php", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            showNotification(data.message, "success");
+            closeStockTransferModal();
+            // Reload page to update stock levels
+            setTimeout(() => {
+              location.reload();
+            }, 1000);
+          } else {
+            showNotification(data.message || "Transfer failed", "error");
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          showNotification("Error processing transfer", "error");
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        });
+    });
+  }
+});
